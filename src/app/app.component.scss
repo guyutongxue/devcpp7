@@ -1,0 +1,23 @@
+:host {
+    #header #footer {
+        width: 100%;
+        height: 2em;
+    }
+
+    #mainView {
+        position: absolute;
+        top: 2em;
+        bottom: 2em;
+        width: 100%;
+    }
+
+    #header {
+        position: fixed;
+        top    : 0;
+    }
+
+    #footer {
+        position: fixed;
+        bottom : 0;
+    }
+}
