@@ -1,10 +1,17 @@
 <div id="asContainer">
-<as-split unit="pixel" direction="horizontal">
-    <div as-split-area [size]="300">
-        <router-outlet name="sidebar"></router-outlet>
-    </div>
-    <div as-split-area size="*">
-        <router-outlet></router-outlet>
-    </div>
-</as-split>
+    <as-split unit="pixel" direction="vertical">
+        <div as-split-area size="*">
+            <as-split unit="pixel" direction="horizontal">
+                <div as-split-area [size]="200" minSize="150">
+                    <router-outlet name="sidebar"></router-outlet>
+                </div>
+                <div as-split-area size="*">
+                    <router-outlet></router-outlet>
+                </div>
+            </as-split>
+        </div>
+        <div as-split-area [size]="200" minSize="150">
+            <router-outlet name="tools"></router-outlet>
+        </div>
+    </as-split>
 </div>

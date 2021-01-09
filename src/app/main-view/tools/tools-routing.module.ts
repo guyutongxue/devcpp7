@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { EditorComponent } from './editor/editor.component';
+
+import { MessageComponent } from './message/message.component'
 
 const routes: Routes = [
   {
-    path: 'edit/:id',
-    component: EditorComponent
+    path: 'message',
+    component: MessageComponent,
+    outlet: 'tools'
   }
 ];
 
@@ -15,4 +17,4 @@ const routes: Routes = [
   imports: [CommonModule, RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class TabsRoutingModule { }
+export class ToolsRoutingModule {}

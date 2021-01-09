@@ -4,6 +4,7 @@ import { PageNotFoundComponent } from './shared/components';
 
 import { TabsRoutingModule } from './main-view/tabs/tabs-routing.module'
 import { SidebarRoutingModule } from './main-view/sidebar/sidebar-routing.module'
+import { ToolsRoutingModule } from './main-view/tools/tools-routing.module'
 
 const routes: Routes = [
   {
@@ -21,7 +22,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
     TabsRoutingModule,
-    SidebarRoutingModule
+    SidebarRoutingModule,
+    ToolsRoutingModule
   ],
   exports: [RouterModule]
 })

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor'
-
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
 import { EditorComponent } from './editor/editor.component';
 
 @NgModule({
@@ -10,6 +10,7 @@ import { EditorComponent } from './editor/editor.component';
   imports: [
     CommonModule,
     FormsModule,
+    NzTabsModule,
     MonacoEditorModule,
   ]
 })

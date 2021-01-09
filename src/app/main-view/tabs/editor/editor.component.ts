@@ -7,13 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EditorComponent implements OnInit {
 
-  constructor() { }
-
   editorOptions: monaco.editor.IEditorConstructionOptions = {
     language: "cpp",
     theme: "vs-light"
   };
   code: string = '#include <iostream>\nint main() {\n    std::cout << "Hello, world!" << std::endl;\n}';
+
+  constructor() { }
+
   ngOnInit(): void {
   }
 
