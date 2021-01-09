@@ -9,7 +9,7 @@ export class EditorComponent implements OnInit {
 
   constructor() { }
 
-  editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
+  editorOptions: monaco.editor.IEditorConstructionOptions = {
     language: "cpp",
     theme: "vs-light"
   };

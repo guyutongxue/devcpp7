@@ -15,7 +15,7 @@ import { MainViewModule } from './main-view/main-view.module'
 
 import { AppComponent } from './app.component';
 
-import { NuMonacoEditorModule } from '@ng-util/monaco-editor';
+import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 
 // AoT requires an exported function for factories
@@ -34,9 +34,6 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MainViewModule,
     NzLayoutModule,
     AppRoutingModule,
-    NuMonacoEditorModule.forRoot({
-      baseUrl: `lib`,
-    }),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

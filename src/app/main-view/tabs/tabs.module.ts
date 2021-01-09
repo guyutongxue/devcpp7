@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NuMonacoEditorModule } from '@ng-util/monaco-editor'
+import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor'
 
 import { EditorComponent } from './editor/editor.component';
 
@@ -10,7 +10,7 @@ import { EditorComponent } from './editor/editor.component';
   imports: [
     CommonModule,
     FormsModule,
-    NuMonacoEditorModule,
+    MonacoEditorModule,
   ]
 })
 export class TabsModule { }
