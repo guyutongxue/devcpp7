@@ -1,8 +1,17 @@
 {
-  "productName": "angular-electron",
+  "productName": "Dev C++ 7",
   "directories": {
     "output": "release/"
   },
+  "extraResources": [
+    {
+      "from": "./src/extraResources/",
+      "to": "extraResources",
+      "filter": [
+        "**/*"
+      ]
+    }
+  ],
     "files": [
         "**/*",
         "!**/*.ts",
