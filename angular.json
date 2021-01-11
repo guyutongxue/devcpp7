@@ -121,7 +121,10 @@
               "src/assets"
             ],
             "customWebpackConfig": {
-              "path": "./angular.webpack.js"
+              "path": "./angular.webpack.js",
+              "mergeStrategies": {
+                "externals": "append"
+              }
             }
           }
         },

@@ -1,13 +1,7 @@
 import { app, BrowserWindow, screen, ipcMain } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-
-(global as any).monacoDir = `file:///${__dirname}/dist/lib/vs`;
-ipcMain.on('getGlobal', (e, arg) => {
-  console.log(e);
-  e.reply(global);
-});
-
+import loadServer from './src/background/server/server';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
@@ -88,3 +82,5 @@ try {
   // Catch Error
   // throw e;
 }
+
+loadServer();
