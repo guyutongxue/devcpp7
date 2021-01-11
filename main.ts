@@ -1,7 +1,6 @@
 import { app, BrowserWindow, screen, ipcMain } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-import loadServer from './src/background/server/server';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
@@ -83,4 +82,4 @@ try {
   // throw e;
 }
 
-loadServer();
+require('./src/background/background.js');

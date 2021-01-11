@@ -20,6 +20,7 @@
         "!package.json",
         "!package-lock.json",
         "!src/",
+        "src/background/**/*",
         "!e2e/",
         "!hooks/",
         "!angular.json",

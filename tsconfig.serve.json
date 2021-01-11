@@ -19,6 +19,9 @@
   "files": [
     "main.ts"
   ],
+  "include": [
+    "src/background/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"
