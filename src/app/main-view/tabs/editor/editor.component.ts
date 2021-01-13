@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -6,7 +6,8 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.scss']
+  styleUrls: ['./editor.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class EditorComponent implements OnInit {
 
@@ -15,6 +16,7 @@ export class EditorComponent implements OnInit {
     theme: "vs-light"
   };
   code: string = '#include <iostream>\nint main() {\n    std::cout << "Hello, world!" << std::endl;\n}';
+  editor: monaco.editor.IStandaloneCodeEditor;
 
   constructor() { }
 
@@ -22,7 +24,9 @@ export class EditorComponent implements OnInit {
   }
 
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
-    editor.setModel(monaco.editor.createModel(this.code, 'cpp', monaco.Uri.parse('file:///1.cpp')));
+    this.editor = editor;
+    console.log(this.editor);
+    this.editor.setModel(monaco.editor.createModel(this.code, 'cpp', monaco.Uri.parse('file:///1.cpp')));
     MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
     // create the web socket
     const url = this.createUrl();
