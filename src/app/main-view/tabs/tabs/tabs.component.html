@@ -1,6 +1,8 @@
 <div *ngIf="tabList.length" id="tabContainer">
-<nz-tabset nzType="editable-card" [(nzSelectedIndex)]="activeIndex" (nzClose)="closeTab($event)" [nzAddIcon]="false">
-    <nz-tab *ngFor="let tab of tabList" nzClosable [nzTitle]="tab.title"></nz-tab>
-</nz-tabset>
-<router-outlet></router-outlet>
+    <nz-tabset nzType="editable-card" [(nzSelectedIndex)]="activeIndex" (nzClose)="closeTab($event)" nzHideAdd>
+        <nz-tab *ngFor="let tab of tabList" nzClosable [nzTitle]="tab.title"></nz-tab>
+    </nz-tabset>
+    <div id="routerWrapper">
+        <router-outlet></router-outlet>
+    </div>
 </div>

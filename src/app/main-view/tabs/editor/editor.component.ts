@@ -1,7 +1,10 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router'
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+
+import { TabsService } from '../../../services/tabs.service'
 
 @Component({
   selector: 'app-editor',
@@ -15,12 +18,23 @@ export class EditorComponent implements OnInit {
     language: "cpp",
     theme: "vs-light"
   };
-  code: string = '#include <iostream>\nint main() {\n    std::cout << "Hello, world!" << std::endl;\n}';
+  key: string;
+  code: string;
   editor: monaco.editor.IStandaloneCodeEditor;
 
-  constructor() { }
+  constructor(private route: ActivatedRoute,
+    private tabsService: TabsService) { }
+
+
+  private keyOnChange(key: string) {
+    this.key = key;
+    this.code = this.tabsService.getByKey(key).value.code;
+  }
 
   ngOnInit(): void {
+    this.route.params.subscribe(routeParams => {
+      this.keyOnChange(routeParams['key']);
+    });
   }
 
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
@@ -34,7 +48,7 @@ export class EditorComponent implements OnInit {
     // listen when the web socket is opened
     console.log("Hello");
     listen({
-      webSocket ,
+      webSocket,
       onConnection: (connection: MessageConnection) => {
         // create and start the language client
         const languageClient = this.createLanguageClient(connection);
@@ -45,7 +59,7 @@ export class EditorComponent implements OnInit {
   }
 
   public createUrl(): string {
-        return 'ws://localhost:3000/langServer';
+    return 'ws://localhost:3000/langServer';
   }
 
   public createLanguageClient(connection: MessageConnection): MonacoLanguageClient {
@@ -75,7 +89,7 @@ export class EditorComponent implements OnInit {
       minReconnectionDelay: 1000,
       reconnectionDelayGrowFactor: 1.3,
       connectionTimeout: 10000,
-      maxRetries: Infinity,
+      maxRetries: 8,
       debug: false
     };
     return new ReconnectingWebSocket(socketUrl, [], socketOptions) as any;

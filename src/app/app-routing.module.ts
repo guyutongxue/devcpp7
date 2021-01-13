@@ -8,11 +8,6 @@ import { ToolsRoutingModule } from './main-view/tools/tools-routing.module'
 
 const routes: Routes = [
   {
-    path: '',
-    redirectTo: 'edit/ddd',
-    pathMatch: 'full'
-  },
-  {
     path: '**',
     component: PageNotFoundComponent
   }
