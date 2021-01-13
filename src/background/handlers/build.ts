@@ -1,8 +1,8 @@
 import * as electron from 'electron';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import { execFile, spawn } from 'child_process';
-import { getWindow, getResourcePath } from './basicUtil'
+import { getWindow, extraResourcesPath } from '../basicUtil'
 
 function getExecutablePath(srcPath: string, ext: string = '.exe') {
   return path.join(path.dirname(srcPath), path.parse(srcPath).name + ext);
@@ -37,7 +37,7 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<{ 
     ]
   }
   return new Promise((resolve, reject) => {
-    execFile(path.join(getResourcePath(), 'mingw64/bin/g++.exe'), args, (error, stdout, stderr) => {
+    execFile(path.join(extraResourcesPath, 'mingw64/bin/g++.exe'), args, (error, stdout, stderr) => {
       if (error) {
         resolve({
           success: false,
@@ -101,7 +101,7 @@ export async function runExe(event: electron.IpcMainEvent, arg: { path: string }
   }
   spawn('cmd.exe', [
     '/C',
-    path.join(getResourcePath(), 'bin/ConsolePauser.exe'),
+    path.join(extraResourcesPath, 'bin/ConsolePauser.exe'),
     getExecutablePath(arg.path)
   ], {
     detached: true

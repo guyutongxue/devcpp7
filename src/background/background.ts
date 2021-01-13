@@ -16,4 +16,4 @@ child_process.fork(
 );
 
 // Hook all handlers
-require('handlers/main.js');
+require('./handlers/main.js');
