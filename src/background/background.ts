@@ -1,13 +1,8 @@
 import * as child_process from 'child_process';
 import * as path from 'path';
-import * as isAsar from 'electron-is-running-in-asar';
+import { extraResourcesPath } from './basicUtil'
 
-// very stupid to import a package, but useful.
-const extraResourcesPath =
-  !isAsar()
-    ? path.join(__dirname, '../extraResources')
-    : path.join((process as any).resourcesPath, 'extraResources');
-
+// Start language server
 child_process.fork(
     path.resolve(__dirname, 'server/server.js'),
     [
@@ -19,3 +14,6 @@ child_process.fork(
         stdio: "ignore"
     }
 );
+
+// Hook all handlers
+require('handlers/main.js');
