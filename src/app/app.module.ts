@@ -11,12 +11,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { MainViewModule } from './main-view/main-view.module'
-
-import { AppComponent } from './app.component';
-
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
+
+import { MainViewModule } from './main-view/main-view.module'
+import { HeaderModule } from './header/header.module'
+
+import { AppComponent } from './app.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -32,6 +33,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     CoreModule,
     SharedModule,
     MainViewModule,
+    HeaderModule,
     NzLayoutModule,
     AppRoutingModule,
     TranslateModule.forRoot({

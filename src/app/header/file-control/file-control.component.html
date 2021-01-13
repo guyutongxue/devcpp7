@@ -1,4 +1,7 @@
 <nz-button-group>
-    <button nz-button nzType="primary"><i nz-icon nzType="cloud"></i></button>
-    <button nz-button nzType="primary"><i nz-icon nzType="cloud-download"></i></button>
-  </nz-button-group>
+    <button nz-button nzType="secondary" (click)="newFile()"><i nz-icon nzType="plus"></i></button>
+    <button nz-button nzType="secondary" (click)="openFile()"><i nz-icon nzType="folder-open"></i></button>
+</nz-button-group>
+<nz-button-group>
+    <button nz-button nzType="secondary" (click)="saveFile()"><i nz-icon nzType="save"></i></button>
+</nz-button-group>

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { fromEventPattern } from 'rxjs';
 import { TabsService } from '../../../services/tabs.service'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-tabs',
@@ -7,32 +9,25 @@ import { TabsService } from '../../../services/tabs.service'
   styleUrls: ['./tabs.component.scss']
 })
 export class TabsComponent implements OnInit {
-  selectedIndex: number = 0;
-  keyList: string[];
 
-  constructor(private tabsService: TabsService) { }
+  constructor(private router: Router,
+    private tabsService: TabsService) { }
 
   ngOnInit(): void { }
-  
+
   get tabList() {
     return this.tabsService.tabList;
   }
 
-  get activeKey(): string {
-    return this.tabsService.activeTabKey;
+  get activeIndex(): number {
+    return this.tabsService.getActive().index;
   }
-  set activeKey(key: string) {
-    this.tabsService.changeActiveByKey(key);
-  }
-
-  getTabByKey(key: string) {
-    return this.tabsService.getByKey(key);
+  set activeIndex(index: number) {
+    this.router.navigate(['edit/' + this.tabList[index].key]);
+    this.tabsService.changeActive(index);
   }
 
-  newTab() { 
-
-  }
-  closeTab(e: { index: number }) { 
+  closeTab(e: { index: number }) {
     this.tabsService.removeAt(e.index);
   }
 }

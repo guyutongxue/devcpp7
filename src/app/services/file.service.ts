@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { ipcRenderer } from 'electron'
 
+import { ElectronService } from '../core/services/electron/electron.service'
 import { TabsService } from './tabs.service'
 
 @Injectable({
@@ -10,15 +10,15 @@ import { TabsService } from './tabs.service'
 })
 export class FileService {
   private nextUntitledNumber: number = 1;
-  constructor(private tabsService: TabsService) { }
+  constructor(private tabsService: TabsService, private electronService: ElectronService) { }
 
   private succUntitledNumber() {
     this.nextUntitledNumber++;
   }
 
   saveAs() {
-    let activeTab = this.tabsService.getActive();
-    let result = ipcRenderer.sendSync("file/saveAs", {
+    let activeTab = this.tabsService.getActive().value;
+    let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
       content: activeTab.code,
       defaultFilename:
         activeTab.path === ""
@@ -36,11 +36,11 @@ export class FileService {
 
   save() {
     // new file, not stored yet
-    let activeTab = this.tabsService.getActive();
+    let activeTab = this.tabsService.getActive().value;
     if (activeTab.path === null) {
       this.saveAs();
     } else {
-      let result = ipcRenderer.sendSync("file/save", {
+      let result = this.electronService.ipcRenderer.sendSync("file/save", {
         content: activeTab.code,
         path: activeTab.path,
       });
@@ -55,7 +55,7 @@ export class FileService {
   }
 
   open() {
-    let result = ipcRenderer.sendSync("file/open", {});
+    let result = this.electronService.ipcRenderer.sendSync("file/open", {});
     if (!result.success) {
       if ("error" in result) {
         alert(result.error);
@@ -74,10 +74,10 @@ export class FileService {
         code: file.content,
         path: file.path,
       });
-      this.tabsService.changeActiveByKey(file.key);
+      this.tabsService.changeActive(file.key);
     }
   }
-  
+
   new() {
     let newKey = uuidv4();
     this.tabsService.add({
@@ -85,7 +85,7 @@ export class FileService {
       type: "file",
       title: `new${this.nextUntitledNumber}.cpp`
     });
-    this.tabsService.changeActiveByKey(newKey);
+    this.tabsService.changeActive(newKey);
     this.succUntitledNumber();
   }
 }

@@ -10,6 +10,15 @@ interface Tab {
   saved: boolean
 }
 
+interface Enumerate<T> {
+  index: number;
+  value: T;
+}
+const nullEnum : Enumerate<any> = {
+  index: null,
+  value: null
+};
+
 interface TabOptions {
   key: string,
   type: "file" | "devcpp",
@@ -29,30 +38,41 @@ export class TabsService {
     code: "int main() {}",
     path: null,
     saved: false
+  },{
+    key: "bbb",
+    type: "file",
+    title: "b.cpp",
+    code: "int main() { ; ; ; }",
+    path: null,
+    saved: false
   }];
 
-  activeTabKey: string = null;
+  private activeTabKey: string = null;
+
   constructor() {
   }
 
-  getActive() {
-    if (this.activeTabKey === null) return undefined;
-    return this.tabList.find(x => x.key === this.activeTabKey);
-  }
-  
-  getByKey(key: string): Tab {
-    return this.tabList.find(x => x.key === key);
-  }
-  private getIndexByKey(key: string): number {
-    return this.tabList.findIndex((x: Tab) => x.key === key);
+  getActive(): Enumerate<Tab> {
+    if (this.activeTabKey === null) return nullEnum;
+    return this.getByKey(this.activeTabKey)
   }
 
-  changeActiveByKey(key: string) {
-    this.activeTabKey = key;
+  getByKey(key: string): Enumerate<Tab> {
+    let index = this.tabList.findIndex((x: Tab) => x.key === key);
+    if (typeof index === "undefined") return nullEnum;
+    return {
+      index,
+      value: this.tabList[index]
+    }
   }
 
-  empty() {
-    return this.tabList.length === 0;
+  changeActive(key: string): void;
+  changeActive(index: number): void;
+  changeActive(arg: any) {
+    if (typeof arg === "string")
+      this.activeTabKey = arg;
+    else if (typeof arg === "number")
+      this.activeTabKey = this.tabList[arg].key;
   }
 
   add(options: TabOptions) {
@@ -67,10 +87,6 @@ export class TabsService {
     this.tabList.push(newTab);
   }
 
-  remove(key: string) {
-    this.removeAt(this.getIndexByKey(key));
-  }
-
   removeAt(index: number) {
     let target = this.tabList[index];
     if (target.saved === false) {
@@ -79,7 +95,7 @@ export class TabsService {
     this.tabList.splice(index, 1);
     // closing current tab
     if (this.activeTabKey === target.key) {
-      if (this.empty()) {
+      if (this.tabList.length === 0) {
         // The only tab in MainView
         this.activeTabKey = null;
       } else if (index === this.tabList.length) {
@@ -97,13 +113,13 @@ export class TabsService {
   }
 
   updateCode(key: string, newCode: string) {
-    let target = this.getByKey(key);
+    let target = this.getByKey(key).value;
     target.code = newCode;
     target.saved = false;
   }
 
   saveCode(key: string, savePath: string) {
-    let target = this.getByKey(key);
+    let target = this.getByKey(key).value;
     target.saved = true;
     target.path = savePath;
     target.title = path.basename(savePath);

@@ -2,6 +2,7 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { getWindow } from '../basicUtil';
+import { SaveFileOptions, SaveAsFileOptions } from './typing'
 
 // interface Result { success: boolean, [key: string]: any };
 
@@ -10,7 +11,7 @@ import { getWindow } from '../basicUtil';
  * @param event 
  * @param arg 
  */
-export function saveFile(event: electron.IpcMainEvent, arg: { content: string, path: string }) {
+export function saveFile(event: electron.IpcMainEvent, arg: SaveFileOptions) {
   try {
     fs.writeFileSync(arg.path, arg.content, "utf-8");
     event.returnValue = {
@@ -29,7 +30,7 @@ export function saveFile(event: electron.IpcMainEvent, arg: { content: string, p
  * @param event 
  * @param arg 
  */
-export async function saveAsFile(event: electron.IpcMainEvent, arg: { content: string, defaultFilename: string }) {
+export async function saveAsFile(event: electron.IpcMainEvent, arg: SaveAsFileOptions) {
   try {
     let options: electron.SaveDialogOptions = {
       defaultPath: arg.defaultFilename,
@@ -74,7 +75,7 @@ export async function saveAsFile(event: electron.IpcMainEvent, arg: { content: s
  * @param event 
  * @param arg 
  */
-export async function openFile(event: electron.IpcMainEvent, arg: {}) {
+export async function openFile(event: electron.IpcMainEvent, arg: any) {
   try {
     let options: electron.OpenDialogOptions = {
       filters: [
