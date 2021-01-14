@@ -21,7 +21,7 @@ export class FileService {
     let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
       content: activeTab.code,
       defaultFilename:
-        activeTab.path === ""
+        activeTab.path === null
           ? activeTab.title
           : activeTab.path,
     });
@@ -35,6 +35,7 @@ export class FileService {
   }
 
   save() {
+    this.tabsService.syncActiveCode();
     // new file, not stored yet
     let activeTab = this.tabsService.getActive().value;
     if (activeTab.path === null) {

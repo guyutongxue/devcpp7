@@ -23,7 +23,7 @@ export class TabsComponent implements OnInit {
     return this.tabsService.getActive().index;
   }
   set activeIndex(index: number) {
-    this.router.navigate(['edit/' + this.tabList[index].key]);
+    this.router.navigate(['file/' + this.tabList[index].key]);
     this.tabsService.changeActive(index);
   }
 

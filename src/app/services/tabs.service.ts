@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as path from 'path';
+import { EditorService } from './editor.service'
 
-interface Tab {
+export interface Tab {
   key: string, // An unique udid for each tab
   type: "file" | "devcpp",
   title: string,
@@ -47,9 +48,14 @@ export class TabsService {
     saved: false
   }];
 
-  private activeTabKey: string = null;
+  private activeTabKey: string = "aaa";
 
-  constructor() {
+  constructor(private editorService: EditorService) {
+  }
+
+  syncActiveCode() {
+    if (this.getActive().value === null) return;
+    this.getActive().value.code = this.editorService.getCode();
   }
 
   getActive(): Enumerate<Tab> {
@@ -66,13 +72,19 @@ export class TabsService {
     }
   }
 
-  changeActive(key: string): void;
+  changeActive(key?: string): void;
   changeActive(index: number): void;
   changeActive(arg: any) {
+    if (typeof arg === "undefined") {
+      this.editorService.switchToModel(this.getActive().value);
+      return;
+    }
+    this.syncActiveCode();
     if (typeof arg === "string")
       this.activeTabKey = arg;
     else if (typeof arg === "number")
       this.activeTabKey = this.tabList[arg].key;
+      this.editorService.switchToModel(this.getActive().value);
   }
 
   add(options: TabOptions) {
@@ -82,7 +94,7 @@ export class TabsService {
       title: options.title,
       code: options.code ?? "",
       saved: options.path ? true : false,
-      path: options.path ?? ""
+      path: options.path ?? null
     };
     this.tabList.push(newTab);
   }
@@ -123,5 +135,6 @@ export class TabsService {
     target.saved = true;
     target.path = savePath;
     target.title = path.basename(savePath);
+    this.editorService.switchToModel(target, true);
   }
 }

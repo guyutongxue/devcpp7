@@ -8,7 +8,8 @@ function startLanguageServer() {
         [
             '3000',
             path.join(extraResourcesPath, 'mingw64/bin/clangd.exe'),
-            `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`
+            `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`,
+            // `--log=verbose`
         ],
         {
             stdio: "ignore"
@@ -16,6 +17,6 @@ function startLanguageServer() {
     );
 }
 
-// startLanguageServer();
+startLanguageServer();
 // Hook all handlers
 require('./handlers/main.js');
