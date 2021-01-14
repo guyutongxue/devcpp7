@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { APP_INITIALIZER } from '@angular/core'
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
@@ -18,6 +19,8 @@ import { MainViewModule } from './main-view/main-view.module'
 import { HeaderModule } from './header/header.module'
 
 import { AppComponent } from './app.component';
+import { EditorComponent } from './main-view/tabs/editor/editor.component'
+import { EditorService } from './services/editor.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -25,7 +28,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [ AppComponent, EditorComponent ],
   imports: [
     BrowserModule,
     FormsModule,
@@ -36,6 +39,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     HeaderModule,
     NzLayoutModule,
     AppRoutingModule,
+    MonacoEditorModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

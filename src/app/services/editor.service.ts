@@ -3,6 +3,7 @@ import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import * as path from 'path';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
+import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor'
 import { Tab } from './tabs.service'
 
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
@@ -44,7 +45,9 @@ export class EditorService {
   private isInit = false;
   private editor : monaco.editor.IStandaloneCodeEditor;
 
-  constructor() { }
+  constructor(private monacoEditorLoaderService: MonacoEditorLoaderService) { 
+    this.monacoEditorLoaderService.loadMonaco();
+  }
 
   private getUri(tab: Tab): monaco.Uri {
     let uri = tab.type + "://";

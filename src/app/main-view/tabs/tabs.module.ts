@@ -8,10 +8,9 @@ import { CloseOutline } from '@ant-design/icons-angular/icons';
 
 import { TabsComponent } from './tabs/tabs.component'
 import { EditorComponent } from './editor/editor.component';
-import { MonacoEditorComponent } from '@materia-ui/ngx-monaco-editor'
 
 @NgModule({
-  declarations: [EditorComponent, TabsComponent, MonacoEditorComponent],
+  declarations: [TabsComponent],
   imports: [
     CommonModule,
     AppRoutingModule,

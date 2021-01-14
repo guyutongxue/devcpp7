@@ -13,7 +13,10 @@ export class TabsComponent implements OnInit {
   constructor(private router: Router,
     private tabsService: TabsService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+    if (this.tabsService.getActive().index !== null)
+      this.activeIndex = this.activeIndex;
+  }
 
   get tabList() {
     return this.tabsService.tabList;

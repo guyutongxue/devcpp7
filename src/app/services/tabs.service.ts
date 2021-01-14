@@ -43,7 +43,7 @@ export class TabsService {
     key: "bbb",
     type: "file",
     title: "b.cpp",
-    code: "int main() { ; ; ; }",
+    code: "#include <cstdio>\nint main() { ; ; ; }",
     path: null,
     saved: false
   }];
