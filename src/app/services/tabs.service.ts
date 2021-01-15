@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { editor } from 'monaco-editor';
 import * as path from 'path';
 import { EditorService } from './editor.service'
 
@@ -48,12 +49,23 @@ export class TabsService {
     saved: false
   }];
 
-  private activeTabKey: string = "aaa";
+  private activeTabKey: string = "bbb";
 
   constructor(private editorService: EditorService) {
+    // TabsService controls how EditorService works.
+    // When EditorService is not initialized, TabsService should do noting.
+    // So I add `if (!this.editorService.isInit) return;` in each function
+    // that use EditorService.
+    // When initialization finished, it will send a event. TabsService will
+    // do necessary initialization by calling `getActive` then.
+    editorService.eventEmitter.subscribe((v: string) => {
+      console.log("editorService event: ", v);
+      this.getActive();
+    })
   }
 
   syncActiveCode() {
+    if (!this.editorService.isInit) return;
     if (this.getActive().value === null) return;
     this.getActive().value.code = this.editorService.getCode();
   }
@@ -64,7 +76,7 @@ export class TabsService {
   }
 
   getByKey(key: string): Enumerate<Tab> {
-    let index = this.tabList.findIndex((x: Tab) => x.key === key);
+    const index = this.tabList.findIndex((x: Tab) => x.key === key);
     if (typeof index === "undefined") return nullEnum;
     return {
       index,
@@ -75,6 +87,7 @@ export class TabsService {
   changeActive(key?: string): void;
   changeActive(index: number): void;
   changeActive(arg: any) {
+    if (!this.editorService.isInit) return;
     if (typeof arg === "undefined") {
       this.editorService.switchToModel(this.getActive().value);
       return;
@@ -88,7 +101,7 @@ export class TabsService {
   }
 
   add(options: TabOptions) {
-    let newTab: Tab = {
+    const newTab: Tab = {
       key: options.key,
       type: options.type,
       title: options.title,
@@ -100,7 +113,7 @@ export class TabsService {
   }
 
   removeAt(index: number) {
-    let target = this.tabList[index];
+    const target = this.tabList[index];
     if (target.saved === false) {
       // [TODO]
     }
@@ -125,16 +138,18 @@ export class TabsService {
   }
 
   updateCode(key: string, newCode: string) {
-    let target = this.getByKey(key).value;
+    const target = this.getByKey(key).value;
     target.code = newCode;
     target.saved = false;
   }
 
   saveCode(key: string, savePath: string) {
-    let target = this.getByKey(key).value;
+    if (!this.editorService.isInit) return;
+    const target = this.getByKey(key).value;
+    const oldPath = target.path;
     target.saved = true;
     target.path = savePath;
     target.title = path.basename(savePath);
-    this.editorService.switchToModel(target, true);
+    this.editorService.switchToModel(target, savePath !== oldPath);
   }
 }

@@ -1,9 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
-import * as path from 'path';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
-import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor'
 import { Tab } from './tabs.service'
 
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
@@ -42,17 +40,16 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   providedIn: 'root'
 })
 export class EditorService {
-  private isInit = false;
+  isInit = false;
+  eventEmitter : EventEmitter<string> = new EventEmitter();
   private editor : monaco.editor.IStandaloneCodeEditor;
 
-  constructor(private monacoEditorLoaderService: MonacoEditorLoaderService) { 
-    this.monacoEditorLoaderService.loadMonaco();
-  }
+  constructor() {}
 
   private getUri(tab: Tab): monaco.Uri {
     let uri = tab.type + "://";
     if (tab.path === null) uri += '/anon_workspace/' + tab.title;
-    else uri += path.join('/', tab.path.replace(/\\/g, '/'));
+    else uri += '/' + tab.path.replace(/\\/g, '/');
     console.log(uri);
     return monaco.Uri.parse(uri);
   }
@@ -105,6 +102,7 @@ export class EditorService {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     this.isInit = true;
+    this.eventEmitter.emit("initCompleted");
   }
 
   switchToModel(tab: Tab, disposeOld = false) {
@@ -112,6 +110,7 @@ export class EditorService {
     let newModel = monaco.editor.getModel(uri) ?? monaco.editor.createModel(tab.code, 'cpp', uri);
     let oldModel = this.editor.getModel();
     this.editor.setModel(newModel);
+    newModel.onDidChangeContent(e => tab.saved = false);
     if (disposeOld) oldModel.dispose();
   }
 

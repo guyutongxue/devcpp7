@@ -32,5 +32,8 @@ export class TabsComponent implements OnInit {
 
   closeTab(e: { index: number }) {
     this.tabsService.removeAt(e.index);
+    if (this.tabList.length === 0) {
+      this.router.navigate(['']);
+    }
   }
 }

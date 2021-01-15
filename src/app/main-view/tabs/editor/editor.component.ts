@@ -16,6 +16,7 @@ export class EditorComponent implements OnInit {
 
   };
   key: string;
+  code: string; // binding [(ngModel)] in <ngx-monaco-editor> is necessary
 
   constructor(private route: ActivatedRoute,
     private tabsService: TabsService,
