@@ -37,7 +37,7 @@ export class EditorComponent implements OnInit {
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
     this.editorService.monacoInit(editor);
     if (this.key) this.editorService.switchToModel(this.tabsService.getByKey(this.key).value);
-    this.editorService.startLanguageClient(3000);
+    this.editorService.startLanguageClient();
   }
 
 }

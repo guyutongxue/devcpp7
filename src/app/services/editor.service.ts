@@ -2,7 +2,10 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
+
 import { Tab } from './tabs.service'
+import { ElectronService } from '../core/services';
+import { StartLanguageServerResult } from '../../background/handlers/typing';
 
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   base: "vs",
@@ -44,7 +47,7 @@ export class EditorService {
   eventEmitter : EventEmitter<string> = new EventEmitter();
   private editor : monaco.editor.IStandaloneCodeEditor;
 
-  constructor() {}
+  constructor(private electronService: ElectronService) {}
 
   private getUri(tab: Tab): monaco.Uri {
     let uri = tab.type + "://";
@@ -54,11 +57,12 @@ export class EditorService {
     return monaco.Uri.parse(uri);
   }
 
-  startLanguageClient(port: number) {
+  startLanguageClient() {
+    const result: StartLanguageServerResult = this.electronService.ipcRenderer.sendSync('langServer/start');
     if (!this.isInit) return;
     MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
     // create the web socket
-    const socketUrl = `ws://localhost:${port}/langServer`;
+    const socketUrl = `ws://localhost:${result.port}/langServer`;
     const socketOptions = {
       maxReconnectionDelay: 10000,
       minReconnectionDelay: 1000,

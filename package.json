@@ -29,6 +29,7 @@
     "angular-split": "5.0.0",
     "electron-is-running-in-asar": "1.0.0",
     "express": "4.17.1",
+    "get-port": "5.1.1",
     "monaco-editor": "0.21.1",
     "monaco-editor-core": "0.21.1",
     "monaco-languageclient": "0.13.1-next.4",

@@ -99,7 +99,8 @@ export async function runExe(event: electron.IpcMainEvent, arg: { path: string }
     getWindow().webContents.send('v:buildControl/compiled', result);
     if (!result.success) return;
   }
-  spawn('cmd.exe', [
+  const cmdPath = process.env['ComSpec'];
+  spawn(cmdPath, [
     '/C',
     path.join(extraResourcesPath, 'bin/ConsolePauser.exe'),
     getExecutablePath(arg.path)
