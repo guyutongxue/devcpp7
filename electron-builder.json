@@ -37,21 +37,9 @@
     "allowToChangeInstallationDirectory": true
   },
   "win": {
-    "icon": "dist/assets/icons",
+    "icon": "dist/assets/icons/favicon.ico",
     "target": [
       "nsis"
-    ]
-  },
-  "mac": {
-    "icon": "dist/assets/icons",
-    "target": [
-      "dmg"
-    ]
-  },
-  "linux": {
-    "icon": "dist/assets/icons",
-    "target": [
-      "AppImage"
     ]
   }
 }
