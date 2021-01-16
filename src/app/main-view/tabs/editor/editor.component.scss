@@ -1,3 +1,6 @@
 ngx-monaco-editor {
     height: 100%;
+    .editor-container {
+        overflow: overlay !important;
+    }
 }

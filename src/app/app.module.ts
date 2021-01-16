@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { APP_INITIALIZER } from '@angular/core'
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
@@ -11,12 +12,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
+
 import { MainViewModule } from './main-view/main-view.module'
+import { HeaderModule } from './header/header.module'
 
 import { AppComponent } from './app.component';
-
-import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
-import { NzLayoutModule } from 'ng-zorro-antd/layout';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -24,7 +25,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [ AppComponent ],
   imports: [
     BrowserModule,
     FormsModule,
@@ -32,6 +33,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     CoreModule,
     SharedModule,
     MainViewModule,
+    HeaderModule,
     NzLayoutModule,
     AppRoutingModule,
     TranslateModule.forRoot({
