@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 import { fromEventPattern } from 'rxjs';
 import { TabsService } from '../../../services/tabs.service'
 import { Router } from '@angular/router'
@@ -35,5 +36,11 @@ export class TabsComponent implements OnInit {
     if (this.tabList.length === 0) {
       this.router.navigate(['']);
     }
+  }
+
+  // https://github.com/NG-ZORRO/ng-zorro-antd/issues/3461
+  cdkOnDrop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.tabsService.tabList, event.previousIndex, event.currentIndex);
+    // this.activeIndex = event.currentIndex;
   }
 }

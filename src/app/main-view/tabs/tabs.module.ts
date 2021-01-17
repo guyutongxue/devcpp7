@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AppRoutingModule } from '../../app-routing.module'
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { AppRoutingModule } from '../../app-routing.module';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { CloseOutline } from '@ant-design/icons-angular/icons';
@@ -17,6 +18,7 @@ import { EditorComponent } from './editor/editor.component';
     CommonModule,
     AppRoutingModule,
     FormsModule,
+    DragDropModule,
     NzTabsModule,
     NzIconModule.forChild([CloseOutline]),
     MonacoEditorModule

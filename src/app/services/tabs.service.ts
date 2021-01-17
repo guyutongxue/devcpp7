@@ -133,10 +133,6 @@ export class TabsService {
     }
   }
 
-  sortableHandler(oldIndex: number, newIndex: number) {
-    this.tabList.splice(newIndex, 0, this.tabList.splice(oldIndex, 1)[0]);
-  }
-
   updateCode(key: string, newCode: string) {
     const target = this.getByKey(key).value;
     target.code = newCode;
