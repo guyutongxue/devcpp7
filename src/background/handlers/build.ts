@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { execFile, spawn } from 'child_process';
 import { getWindow, extraResourcesPath } from '../basicUtil'
+import { GccDiagnostics, BuildResult } from './typing';
 
 
 function encode(src: string) {
@@ -66,14 +67,14 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<{ 
   });
 }
 
-interface BuildResult { success: boolean, stage?: "compile" | "link", diagnostics: any[], linkerr?: string }
+
 
 async function doCompile(srcPath: string): Promise<BuildResult> {
   // 
   // generate .o
   const compileResult = await execCompiler(srcPath);
   console.log(compileResult);
-  const diagnostics: any[] = JSON.parse(compileResult.stderr);
+  const diagnostics: GccDiagnostics = JSON.parse(compileResult.stderr);
   if (!compileResult.success) {
     return {
       success: false,
