@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NzNotificationService } from 'ng-zorro-antd/notification'
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzModalService } from 'ng-zorro-antd/modal';
+
 import { BuildResult } from '../../../background/handlers/typing';
 import { ElectronService } from '../../core/services';
+import { FileService } from '../../services/file.service';
 import { TabsService } from '../../services/tabs.service';
 
 @Component({
@@ -12,7 +15,9 @@ import { TabsService } from '../../services/tabs.service';
 export class BuildControlComponent implements OnInit {
 
   constructor(private notification: NzNotificationService,
+    private modal: NzModalService,
     private electronService: ElectronService,
+    private fileService: FileService,
     private tabsService: TabsService) { }
 
   ngOnInit(): void {
@@ -33,10 +38,28 @@ export class BuildControlComponent implements OnInit {
     });
   }
 
-  compile(): void {
+  private sendBuildRequest() {
     this.electronService.ipcRenderer.send("build/build", {
       path: this.tabsService.getActive().value.path
     });
+  }
+
+  compile(): void {
+    if (!this.tabsService.getActive().value.saved) {
+      this.modal.confirm({
+        nzTitle: '未保存',
+        nzContent: '需要先保存文件，然后才能编译。是否保存？',
+        nzOkText: '保存',
+        nzOnOk: () => {
+          this.fileService.save();
+          this.sendBuildRequest();
+          console.log("here");
+        } ,
+        nzCancelText: '取消',
+      });
+    } else {
+      this.sendBuildRequest();
+    }
 
   }
 
