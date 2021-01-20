@@ -6,14 +6,7 @@ import { getWindow, extraResourcesPath } from '../basicUtil'
 
 
 function encode(src: string) {
-  return '$' + encodeURIComponent(src);
-}
-
-function isSameName(a: string, b:string) {
-  if (a[0] === '$' && b[0] === '$') return a === b;
-  if (a[0] === '$') return encode(b) === a;
-  if (b[0] === '$') return encode(a) === b;
-  return a === b;
+  return encodeURIComponent(src);
 }
 
 function changeExt(srcPath: string, ext: string) {
@@ -61,7 +54,6 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<{ 
         resolve({
           success: false,
           error,
-          stdout,
           stderr
         });
       } else {
@@ -111,14 +103,14 @@ async function doCompile(srcPath: string): Promise<BuildResult> {
 
 export async function build(event: electron.IpcMainEvent, arg: { path: string }) {
   const result = await doCompile(arg.path);
-  getWindow().webContents.send('ng:buildControl/compiled', result);
+  getWindow().webContents.send('ng:build-control/built', result);
 }
 
 export async function runExe(event: electron.IpcMainEvent, arg: { path: string }) {
   console.log(arg.path);
   if (!isCompiled(arg.path)) {
     const result = await doCompile(arg.path);
-    getWindow().webContents.send('ng:buildControl/compiled', result);
+    getWindow().webContents.send('ng:build-control/built', result);
     if (!result.success) return;
   }
   const cmdPath = process.env['ComSpec'];

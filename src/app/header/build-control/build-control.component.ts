@@ -12,13 +12,15 @@ export class BuildControlComponent implements OnInit {
   constructor(private electronService: ElectronService, private tabsService: TabsService) { }
 
   ngOnInit(): void {
-    this.electronService.ipcRenderer.on("ng:build-control/build", () => { });
+    this.electronService.ipcRenderer.on("ng:build-control/built", (event, val) => { 
+      console.log("compiled got.", val)
+    });
   }
 
   compile(): void {
-    this.electronService.ipcRenderer.sendSync("build/build", {
+    this.electronService.ipcRenderer.send("build/build", {
       path: this.tabsService.getActive().value.path
-    } );
+    });
 
   }
 

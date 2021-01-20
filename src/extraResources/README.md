@@ -7,3 +7,7 @@ to `mingw64` directory.
 ### Language Server 
 
 Unpacked https://github.com/clangd/clangd/releases/download/11.0.0/clangd-windows-11.0.0.zip **into** MinGW. (Or `clangd` won't recognize system headers.)
+
+## ConsolePauser
+
+A subproject copied from original Dev-C++. Put it at `bin/ConsolePauser.exe`.
