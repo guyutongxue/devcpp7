@@ -14,7 +14,7 @@ export class TabsComponent implements OnInit {
   constructor(private router: Router,
     private tabsService: TabsService) { }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     if (this.tabsService.getActive().index !== null)
       this.activeIndex = this.activeIndex;
   }
@@ -27,10 +27,10 @@ export class TabsComponent implements OnInit {
     return this.tabsService.getActive().index;
   }
   set activeIndex(index: number) {
-    if (this.tabsService.getActive().index !== null)
+    if (index >= 0) {
       this.router.navigate(['file/' + this.tabList[index].key]);
-    if (index > 0)
       this.tabsService.changeActive(index);
+    }
   }
 
   closeTab(e: { index: number }) {

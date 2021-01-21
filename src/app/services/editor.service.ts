@@ -12,6 +12,7 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   inherit: true,
   colors: {
     'editor.background': '#ffffff',
+		"editor.lineHighlightBackground": "#ccffff",
     // 'editor.selectionBackground': '#000080', // https://github.com/microsoft/vscode/issues/36490
     // 'editor.selectionForeground': '#ffffff',
   },
