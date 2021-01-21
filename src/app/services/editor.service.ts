@@ -53,6 +53,7 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
 })
 export class EditorService {
   isInit = false;
+  isLanguageClientStarted = false;
   eventEmitter: EventEmitter<string> = new EventEmitter();
   private editor: monaco.editor.IStandaloneCodeEditor;
 
@@ -62,7 +63,6 @@ export class EditorService {
     let uri = tab.type + "://";
     if (tab.path === null) uri += '/anon_workspace/' + tab.title;
     else uri += '/' + tab.path.replace(/\\/g, '/');
-    console.log(uri);
     return monaco.Uri.parse(uri);
   }
 
@@ -105,7 +105,11 @@ export class EditorService {
           }
         });
         const disposable = languageClient.start();
-        connection.onClose(() => disposable.dispose());
+        this.isLanguageClientStarted = true;
+        connection.onClose(() => {
+          this.isLanguageClientStarted = false;
+          disposable.dispose();
+        });
       }
     });
   }
@@ -123,12 +127,19 @@ export class EditorService {
     let newModel = monaco.editor.getModel(uri) ?? monaco.editor.createModel(tab.code, 'cpp', uri);
     let oldModel = this.editor.getModel();
     this.editor.setModel(newModel);
+    console.log('switch to ', uri.toString());
     newModel.onDidChangeContent(e => tab.saved = false);
     if (disposeOld) oldModel.dispose();
   }
 
   getCode() {
     return this.editor.getModel().getValue();
+  }
+
+  destroy(tab: Tab) {
+    let uri = this.getUri(tab);
+    console.log('destroy ', uri.toString());
+    monaco.editor.getModel(uri).dispose();
   }
 
 }

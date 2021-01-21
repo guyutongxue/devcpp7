@@ -27,8 +27,10 @@ export class TabsComponent implements OnInit {
     return this.tabsService.getActive().index;
   }
   set activeIndex(index: number) {
-    this.router.navigate(['file/' + this.tabList[index].key]);
-    this.tabsService.changeActive(index);
+    if (this.tabsService.getActive().index !== null)
+      this.router.navigate(['file/' + this.tabList[index].key]);
+    if (index > 0)
+      this.tabsService.changeActive(index);
   }
 
   closeTab(e: { index: number }) {

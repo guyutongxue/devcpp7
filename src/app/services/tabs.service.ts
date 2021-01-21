@@ -16,7 +16,7 @@ interface Enumerate<T> {
   index: number;
   value: T;
 }
-const nullEnum : Enumerate<any> = {
+const nullEnum: Enumerate<any> = {
   index: null,
   value: null
 };
@@ -40,7 +40,7 @@ export class TabsService {
     code: "int main() {}",
     path: null,
     saved: false
-  },{
+  }, {
     key: "bbb",
     type: "file",
     title: "b.cpp",
@@ -92,12 +92,16 @@ export class TabsService {
       this.editorService.switchToModel(this.getActive().value);
       return;
     }
-    this.syncActiveCode();
-    if (typeof arg === "string")
+    if (this.activeTabKey !== null) {
+      this.syncActiveCode();
+    }
+    if (typeof arg === "string") {
       this.activeTabKey = arg;
-    else if (typeof arg === "number")
+    }
+    else if (typeof arg === "number") {
       this.activeTabKey = this.tabList[arg].key;
-      this.editorService.switchToModel(this.getActive().value);
+    }
+    this.editorService.switchToModel(this.getActive().value);
   }
 
   add(options: TabOptions) {
@@ -113,24 +117,26 @@ export class TabsService {
   }
 
   removeAt(index: number) {
-    const target = this.tabList[index];
+    // Clone it, for we will remove it's src later
+    const target = Object.assign({}, this.tabList[index]);
     if (target.saved === false) {
       // [TODO]
     }
     this.tabList.splice(index, 1);
     // closing current tab
     if (this.activeTabKey === target.key) {
+      this.activeTabKey = null;
       if (this.tabList.length === 0) {
         // The only tab in MainView
-        this.activeTabKey = null;
       } else if (index === this.tabList.length) {
         // The last tab, move to front
-        this.activeTabKey = this.tabList[index - 1].key;
+        this.changeActive(index - 1);
       } else {
         // Stay on current index (next tab)
-        this.activeTabKey = this.tabList[index].key;
+        this.changeActive(index);
       }
     }
+    this.editorService.destroy(target);
   }
 
   updateCode(key: string, newCode: string) {

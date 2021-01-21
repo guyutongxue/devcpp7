@@ -16,7 +16,6 @@ export class EditorComponent implements OnInit {
 
   };
   key: string;
-  code: string; // binding [(ngModel)] in <ngx-monaco-editor> is necessary
 
   constructor(private route: ActivatedRoute,
     private tabsService: TabsService,
@@ -36,8 +35,11 @@ export class EditorComponent implements OnInit {
 
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
     this.editorService.monacoInit(editor);
-    if (this.key) this.editorService.switchToModel(this.tabsService.getByKey(this.key).value);
-    this.editorService.startLanguageClient();
+    if (this.key) {
+      let activeTab = this.tabsService.getByKey(this.key).value;
+      this.editorService.switchToModel(activeTab);
+    }
+    if (!this.editorService.isLanguageClientStarted) this.editorService.startLanguageClient();
   }
 
 }
