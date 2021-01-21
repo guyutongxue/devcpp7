@@ -26,7 +26,13 @@ function isCompiled(srcPath: string): boolean {
     return false;
 }
 
-async function execCompiler(srcPath: string, noLink: boolean = true): Promise<{ success: boolean, stderr: string, [key: string]: any}> {
+interface ExecCompilerResult {
+  success: boolean,
+  stderr: string,
+  [key: string]: any
+}
+
+async function execCompiler(srcPath: string, noLink: boolean = true): Promise<ExecCompilerResult> {
   let outputFileName: string;
   const cwd = path.dirname(srcPath);
   let args: string[];
@@ -115,11 +121,11 @@ export async function runExe(event: electron.IpcMainEvent, arg: { path: string }
     if (!result.success) return;
   }
   const cmdPath = process.env['ComSpec'];
-  spawn(cmdPath, [
-    '/C',
-    path.join(extraResourcesPath, 'bin/ConsolePauser.exe'),
+  spawn(path.join(extraResourcesPath, 'bin/ConsolePauser.exe'), [
     getExecutablePath(arg.path)
   ], {
-    detached: true
+    detached: true,
+    shell: true,
+    cwd: path.dirname(arg.path)
   });
 }

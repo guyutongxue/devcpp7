@@ -10,8 +10,17 @@ import { StartLanguageServerResult } from '../../background/handlers/typing';
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   base: "vs",
   inherit: true,
-  colors: {},
+  colors: {
+    'editor.background': '#ffffff',
+    // 'editor.selectionBackground': '#000080', // https://github.com/microsoft/vscode/issues/36490
+    // 'editor.selectionForeground': '#ffffff',
+  },
   rules: [
+    {
+      token: '',
+      foreground: '#000000',
+      background: '#ffffff'
+    },
     {
       token: 'string',
       foreground: '#0000ff',
@@ -44,10 +53,10 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
 })
 export class EditorService {
   isInit = false;
-  eventEmitter : EventEmitter<string> = new EventEmitter();
-  private editor : monaco.editor.IStandaloneCodeEditor;
+  eventEmitter: EventEmitter<string> = new EventEmitter();
+  private editor: monaco.editor.IStandaloneCodeEditor;
 
-  constructor(private electronService: ElectronService) {}
+  constructor(private electronService: ElectronService) { }
 
   private getUri(tab: Tab): monaco.Uri {
     let uri = tab.type + "://";

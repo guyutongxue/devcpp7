@@ -1,4 +1,4 @@
-<div *ngIf="tabList.length" id="tabContainer">
+<div id="tabContainer">
     <nz-tabset nzType="editable-card" [(nzSelectedIndex)]="activeIndex" (nzClose)="closeTab($event)" nzHideAdd cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="cdkOnDrop($event)">
         <nz-tab *ngFor="let tab of tabList" [nzTitle]="titleTemplate" nzClosable>
         <ng-template #titleTemplate>
