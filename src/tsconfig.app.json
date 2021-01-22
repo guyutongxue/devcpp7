@@ -5,6 +5,7 @@
     "module": "es2015",
     "baseUrl": "",
     "experimentalDecorators": true,
+    "downlevelIteration": true,
     "types": []
   },
   "include": [

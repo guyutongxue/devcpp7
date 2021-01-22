@@ -31,6 +31,7 @@ export class EditorComponent implements OnInit {
     this.route.params.subscribe(routeParams => {
       this.keyOnChange(routeParams['key']);
     });
+    console.log(this.editorService);
   }
 
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {

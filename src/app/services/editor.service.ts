@@ -3,9 +3,11 @@ import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
 
+import { OutlineModel } from './outlineModel';
 import { Tab } from './tabs.service'
 import { ElectronService } from '../core/services';
 import { StartLanguageServerResult } from '../../background/handlers/typing';
+import { CancellationTokenSource } from 'monaco-editor';
 
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   base: "vs",
@@ -127,10 +129,17 @@ export class EditorService {
     let uri = this.getUri(tab);
     let newModel = monaco.editor.getModel(uri) ?? monaco.editor.createModel(tab.code, 'cpp', uri);
     let oldModel = this.editor.getModel();
-    this.editor.setModel(newModel);
+    this.editor.setModel(newModel);    
     console.log('switch to ', uri.toString());
     newModel.onDidChangeContent(e => tab.saved = false);
     if (disposeOld) oldModel.dispose();
+  }
+
+  async getSymbol() {
+    let cts = new CancellationTokenSource;
+    const model = await OutlineModel.create(this.editor.getModel(), cts.token);
+    console.log(model);
+    return model.asListOfDocumentSymbols();
   }
 
   getCode() {
