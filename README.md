@@ -1,12 +1,12 @@
 # Dev-C++ 7
-<center>
+<p align="center">
 <img src="./src/assets/icons/favicon.png" height="70" alt="Dev C++ 7"> =
 <img src="https://s3.ax1x.com/2021/01/22/sombEd.png" height="70" alt="Angular">+
 <img src="https://s3.ax1x.com/2021/01/22/somL4I.png" height="70" alt="Electron">+
 <img src="https://s3.ax1x.com/2021/01/22/som7HH.png" height="70" alt="Monaco Editor">+
 <img src="https://s3.ax1x.com/2021/01/22/somqUA.png" height="70" alt="MinGW-w64">+
 <img src="https://s3.ax1x.com/2021/01/22/somXCt.png" height="70" alt="Clangd">
-</center>
+</p>
 
 ## Info
 
@@ -16,7 +16,11 @@ A project simulating legacy Dev-C++, a tiny C++ IDE, powered by Angular, Electro
 
 ## Current Status
 
+**Under construction, but may be in abeyance later**
+
 Due to the incompleteness of Monaco Editor API, I'm afraid that I won't be able to continue this project as ideally as I expected.
+
+Currently only contains basic new/open/save operations, and a small compile button.
 
 ## Build instructions
 
