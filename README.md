@@ -1,18 +1,14 @@
 # Dev-C++ 7
+<center>
+<img src="./src/assets/icons/favicon.png" height="70" alt="Dev C++ 7"> =
+<img src="https://s3.ax1x.com/2021/01/22/sombEd.png" height="70" alt="Angular">+
+<img src="https://s3.ax1x.com/2021/01/22/somL4I.png" height="70" alt="Electron">+
+<img src="https://s3.ax1x.com/2021/01/22/som7HH.png" height="70" alt="Monaco Editor">+
+<img src="https://s3.ax1x.com/2021/01/22/somqUA.png" height="70" alt="MinGW-w64">+
+<img src="https://s3.ax1x.com/2021/01/22/somXCt.png" height="70" alt="Clangd">
+</center>
 
-<style>
-.icon {
-    height: 70px;
-}
-</style>
-<img src="./src/assets/icons/favicon.png" class="icon" alt="Dev C++ 7"> =
-<img src="https://s3.ax1x.com/2021/01/22/sombEd.png" class="icon" alt="Angular">+
-<img src="https://s3.ax1x.com/2021/01/22/somL4I.png" class="icon" alt="Electron">+
-<img src="https://s3.ax1x.com/2021/01/22/som7HH.png" class="icon" alt="Monaco Editor">+
-<img src="https://s3.ax1x.com/2021/01/22/somqUA.png" class="icon" alt="MinGW-w64">+
-<img src="https://s3.ax1x.com/2021/01/22/somXCt.png" class="icon" alt="Clangd">
-
-# Info
+## Info
 
 A project simulating legacy Dev-C++, a tiny C++ IDE, powered by Angular, Electron, Monaco Editor, MinGW-w64 and Clangd.
 
