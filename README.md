@@ -1,19 +1,36 @@
 # Dev-C++ 7
 
+<style>
+.icon {
+    height: 70px;
+}
+</style>
+<img src="./src/assets/icons/favicon.png" class="icon" alt="Dev C++ 7"> =
+<img src="https://s3.ax1x.com/2021/01/22/sombEd.png" class="icon" alt="Angular">+
+<img src="https://s3.ax1x.com/2021/01/22/somL4I.png" class="icon" alt="Electron">+
+<img src="https://s3.ax1x.com/2021/01/22/som7HH.png" class="icon" alt="Monaco Editor">+
+<img src="https://s3.ax1x.com/2021/01/22/somqUA.png" class="icon" alt="MinGW-w64">+
+<img src="https://s3.ax1x.com/2021/01/22/somXCt.png" class="icon" alt="Clangd">
+
 # Info
 
-A project simulating legacy Dev-C++, powered by Angular, Electron, Monaco Editor, etc..
+A project simulating legacy Dev-C++, a tiny C++ IDE, powered by Angular, Electron, Monaco Editor, MinGW-w64 and Clangd.
 
+**This repository has no relationship to Bloodshed's Dev-C++.**
 
-# Build instructions
+## Current Status
+
+Due to the incompleteness of Monaco Editor API, I'm afraid that I won't be able to continue this project as ideally as I expected.
+
+## Build instructions
 
 This repo is based on [angular-electron](https://github.com/maximegris/angular-electron) template. Following instructions are copied from there.
 
-## Dealing with extraResousrce
+### Dealing with extraResousrce
 
 Follow [here](src/extraResources/README.md).
 
-## Included Commands
+### Included Commands
 
 | Command                  | Description                                                               |
 | ------------------------ | ------------------------------------------------------------------------- |
@@ -24,7 +41,7 @@ Follow [here](src/extraResources/README.md).
 | `npm run electron:local` | Builds your application and start electron                                |
 | `npm run electron:build` | Builds your application and creates an app by electron-builder            |
 
-## E2E Testing (I don't work for it now)
+### E2E Testing (I don't work for it now)
 
 E2E Test scripts can be found in `e2e` folder.
 
