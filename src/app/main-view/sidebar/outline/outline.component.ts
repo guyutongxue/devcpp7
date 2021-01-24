@@ -14,7 +14,7 @@ interface FlatNode {
   name: string;
   level: number;
   kind: monaco.languages.SymbolKind,
-  position: monaco.IPosition
+  range: monaco.IRange
 }
 
 @Component({
@@ -23,7 +23,6 @@ interface FlatNode {
   styleUrls: ['./outline.component.scss']
 })
 export class OutlineComponent implements OnInit {
-  len: number;
   private symbols$: Observable<DocumentSymbol[]>
   constructor(private editorService: EditorService) { }
 
@@ -31,12 +30,11 @@ export class OutlineComponent implements OnInit {
     this.symbols$ = this.editorService.editorText$.pipe(
       debounceTime(1000),
       distinctUntilChanged(),
-      switchMap(text => this.editorService.getSymbols())
+      switchMap(_ => this.editorService.getSymbols())
     );
     this.symbols$.subscribe(e => {
-      if (e === null) this.len = -1;
-      else this.len = e.length;
-      this.dataSource.setData(e);
+      if (e === null) this.dataSource.setData([]);
+      else this.dataSource.setData(e);
     })
   }
   private transformer(symbol: DocumentSymbol, level: number) :FlatNode {
@@ -45,9 +43,11 @@ export class OutlineComponent implements OnInit {
       name: symbol.name,
       level: level,
       kind: symbol.kind,
-      position: {
-        lineNumber: symbol.range.start.line + 1,
-        column: symbol.range.start.character + 1
+      range: {
+        startLineNumber: symbol.range.start.line + 1,
+        startColumn: symbol.range.start.character + 1,
+        endLineNumber: symbol.range.end.line + 1,
+        endColumn: symbol.range.end.character + 1
       }
     };
   };
@@ -70,7 +70,10 @@ export class OutlineComponent implements OnInit {
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
   selectNode(node: FlatNode) {
-    console.log(node.position);
-    this.editorService.setPosition(node.position);
+    console.log(node.range);
+    this.editorService.setPosition({
+      lineNumber: node.range.startLineNumber,
+      column: node.range.startColumn
+    });
   }
 }

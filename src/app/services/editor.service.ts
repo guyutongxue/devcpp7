@@ -12,7 +12,7 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   inherit: true,
   colors: {
     'editor.background': '#ffffff',
-		"editor.lineHighlightBackground": "#ccffff",
+    "editor.lineHighlightBackground": "#ccffff",
     // 'editor.selectionBackground': '#000080', // https://github.com/microsoft/vscode/issues/36490
     // 'editor.selectionForeground': '#ffffff',
   },
@@ -55,7 +55,7 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
 export class EditorService {
   isInit = false;
   isLanguageClientStarted = false;
-  initEvent: EventEmitter<string> = new EventEmitter();
+  eventEmitter: EventEmitter<string> = new EventEmitter();
 
   private editor: monaco.editor.IStandaloneCodeEditor;
   private languageClient: MonacoLanguageClient;
@@ -124,27 +124,31 @@ export class EditorService {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     this.isInit = true;
-    this.initEvent.emit("initCompleted");
+    this.eventEmitter.emit("initCompleted");
   }
 
-  switchToModel(tab: Tab, disposeOld = false) {
+  switchToModel(tab: Tab, disposeOld: boolean = false) {
     let uri = this.getUri(tab);
-    let newModel = monaco.editor.getModel(uri) ?? monaco.editor.createModel(tab.code, 'cpp', uri);
+    let newModel = monaco.editor.getModel(uri);
+    let isNew = false;
+    if (newModel === null) {
+      newModel = monaco.editor.createModel(tab.code, 'cpp', uri);
+      newModel.onDidChangeContent(_ => {
+        tab.saved = false;
+        this.editorText.next(newModel.getValue());
+      });
+    }
     let oldModel = this.editor.getModel();
-    this.editor.setModel(newModel);    
+    this.editor.setModel(newModel);
     console.log('switch to ', uri.toString());
-    newModel.onDidChangeContent(e => {
-      tab.saved = false;
-      this.editorText.next(newModel.getValue());
-    });
     this.editorText.next(newModel.getValue());
     if (disposeOld) oldModel.dispose();
     this.editor.focus();
   }
 
   async getSymbols(): Promise<DocumentSymbol[]> {
-    if (this.editor.getModel() === null) return Promise.reject("No model available.");
-    if (!this.isLanguageClientStarted) return Promise.reject("Language server not started.");
+    if (this.editor.getModel() === null) return Promise.resolve([]);
+    if (!this.isLanguageClientStarted) return Promise.resolve([]);
     return this.languageClient.sendRequest("textDocument/documentSymbol", {
       textDocument: {
         uri: this.editor.getModel().uri.toString()
@@ -158,17 +162,21 @@ export class EditorService {
   }
   setSelection(range: monaco.IRange) {
     this.editor.setSelection(range);
+    this.editor.revealRange(range);
     this.editor.focus();
   }
   setPosition(position: monaco.IPosition) {
     this.editor.setPosition(position);
+    this.editor.revealLine(position.lineNumber);
     this.editor.focus();
   }
 
   destroy(tab: Tab) {
-    let uri = this.getUri(tab);
+    const uri = this.getUri(tab);
     console.log('destroy ', uri.toString());
-    monaco.editor.getModel(uri).dispose();
+    const target = monaco.editor.getModel(uri);
+    target.setValue("");
+    target.dispose();
   }
 
 }

@@ -57,7 +57,7 @@ export class TabsService {
     // that use EditorService.
     // When initialization finished, it will send a event. TabsService will
     // do necessary initialization by calling `getActive` then.
-    editorService.initEvent.subscribe((v: string) => {
+    editorService.eventEmitter.subscribe((v: string) => {
       console.log("editorService event: ", v);
       this.getActive();
     })
@@ -109,7 +109,7 @@ export class TabsService {
       type: options.type,
       title: options.title,
       code: options.code ?? "",
-      saved: options.path ? true : false,
+      saved: options.path !== null,
       path: options.path ?? null
     };
     this.tabList.push(newTab);
@@ -136,12 +136,6 @@ export class TabsService {
       }
     }
     this.editorService.destroy(target);
-  }
-
-  updateCode(key: string, newCode: string) {
-    const target = this.getByKey(key).value;
-    target.code = newCode;
-    target.saved = false;
   }
 
   saveCode(key: string, savePath: string) {
