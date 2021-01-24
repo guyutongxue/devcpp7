@@ -53,7 +53,7 @@ export class BuildControlComponent implements OnInit {
         nzOnOk: () => {
           this.fileService.save();
           this.sendBuildRequest();
-        } ,
+        },
         nzCancelText: '取消',
       });
     } else {

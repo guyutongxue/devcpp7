@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
-import { fromEventPattern } from 'rxjs';
-import { TabsService } from '../../../services/tabs.service'
-import { Router } from '@angular/router'
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Tab, TabsService } from '../../../services/tabs.service'
+import { Router } from '@angular/router';
+import { FileService } from '../../../services/file.service';
 
 @Component({
   selector: 'app-tabs',
@@ -12,7 +12,8 @@ import { Router } from '@angular/router'
 export class TabsComponent implements OnInit {
 
   constructor(private router: Router,
-    private tabsService: TabsService) { }
+    private tabsService: TabsService,
+    private fileService: FileService) { }
 
   ngOnInit(): void {
     if (this.tabsService.getActive().index !== null)
@@ -34,7 +35,12 @@ export class TabsComponent implements OnInit {
   }
 
   closeTab(e: { index: number }) {
-    this.tabsService.removeAt(e.index);
+    const target = this.tabList[e.index];
+    if (target.saved === false) {
+      this.notSaveModalShow(target);
+    } else {
+      this.tabsService.remove(target.key);
+    }
     if (this.tabList.length === 0) {
       this.router.navigate(['']);
     }
@@ -44,5 +50,25 @@ export class TabsComponent implements OnInit {
   cdkOnDrop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.tabsService.tabList, event.previousIndex, event.currentIndex);
     // this.activeIndex = event.currentIndex;
+  }
+
+  notSaveModalTab: Tab;
+  notSaveModalVisible: boolean = false;
+  notSaveModalYes() {
+    this.notSaveModalVisible = false;
+    this.fileService.save(this.notSaveModalTab);
+    this.tabsService.remove(this.notSaveModalTab.key);
+  }
+  notSaveModalNo() {
+    this.notSaveModalVisible = false;
+    this.tabsService.remove(this.notSaveModalTab.key);
+  }
+  notSaveModalCancel() {
+    this.notSaveModalVisible = false;
+  }
+
+  private notSaveModalShow(target: Tab) {
+    this.notSaveModalTab = target;
+    this.notSaveModalVisible = true;
   }
 }

@@ -13,3 +13,13 @@
         <router-outlet></router-outlet>
     </div>
 </div>
+<nz-modal [(nzVisible)]="notSaveModalVisible" nzTitle="未保存" (nzOnCancel)="notSaveModalCancel()">
+    <ng-container *nzModalContent>
+        是否保存为 {{ notSaveModalTab.title }}？
+    </ng-container>
+    <div *nzModalFooter>
+        <button nz-button nzType="primary" (click)="notSaveModalYes()">是</button>
+        <button nz-button nzType="default" (click)="notSaveModalNo()">否</button>
+        <button nz-button nzType="default" (click)="notSaveModalCancel()">取消</button>
+      </div>
+  </nz-modal>

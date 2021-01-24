@@ -4,7 +4,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { Observable } from 'rxjs';
 
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
-import { DocumentSymbol, SymbolKind } from 'monaco-languageclient'
+import { DocumentSymbol, SymbolKind } from 'vscode-languageserver-protocol'
 
 import { EditorService } from '../../../services/editor.service';
 

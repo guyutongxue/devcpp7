@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AppRoutingModule } from '../../app-routing.module';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { CloseOutline } from '@ant-design/icons-angular/icons';
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
@@ -20,6 +22,8 @@ import { EditorComponent } from './editor/editor.component';
     FormsModule,
     DragDropModule,
     NzTabsModule,
+    NzButtonModule,
+    NzModalModule,
     NzIconModule.forChild([CloseOutline]),
     MonacoEditorModule
   ],

@@ -3,7 +3,7 @@ import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ElectronService } from '../core/services/electron/electron.service'
-import { TabsService } from './tabs.service'
+import { Tab, TabsService } from './tabs.service'
 
 @Injectable({
   providedIn: 'root'
@@ -16,14 +16,14 @@ export class FileService {
     this.nextUntitledNumber++;
   }
 
-  saveAs() {
-    let activeTab = this.tabsService.getActive().value;
+  saveAs(tab?: Tab) {
+    if (typeof tab === "undefined") this.tabsService.getActive().value;
     let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
-      content: activeTab.code,
+      content: tab.code,
       defaultFilename:
-        activeTab.path === null
-          ? activeTab.title
-          : activeTab.path,
+        tab.path === null
+          ? tab.title
+          : tab.path,
     });
     if (!result.success) {
       if ("error" in result) {
@@ -31,19 +31,19 @@ export class FileService {
       }
       return;
     }
-    this.tabsService.saveCode(activeTab.key, result.path);
+    this.tabsService.saveCode(tab.key, result.path);
   }
 
-  save() {
+  save(tab?: Tab) {
     this.tabsService.syncActiveCode();
+    if (typeof tab === "undefined") tab = this.tabsService.getActive().value;
     // new file, not stored yet
-    let activeTab = this.tabsService.getActive().value;
-    if (activeTab.path === null) {
-      this.saveAs();
+    if (tab.path === null) {
+      this.saveAs(tab);
     } else {
       let result = this.electronService.ipcRenderer.sendSync("file/save", {
-        content: activeTab.code,
-        path: activeTab.path,
+        content: tab.code,
+        path: tab.path,
       });
       if (!result.success) {
         if ("error" in result) {
@@ -51,7 +51,7 @@ export class FileService {
         }
         return;
       }
-      this.tabsService.saveCode(activeTab.key, activeTab.path);
+      this.tabsService.saveCode(tab.key, tab.path);
     }
   }
 

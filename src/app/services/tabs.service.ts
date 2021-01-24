@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import * as path from 'path';
-import { EditorService } from './editor.service'
+import { EditorService } from './editor.service';
 
 export interface Tab {
   key: string, // An unique udid for each tab
@@ -28,27 +29,28 @@ interface TabOptions {
   path?: string
 }
 
+// const initTab: Tab[] = [{
+//   key: "aaa",
+//   type: "file",
+//   title: "a.cpp",
+//   code: "int main() {}",
+//   path: null,
+//   saved: false
+// }, {
+//   key: "bbb",
+//   type: "file",
+//   title: "b.cpp",
+//   code: "#include <cstdio>\nint main() { ; ; ; }",
+//   path: null,
+//   saved: false
+// }];
+
 @Injectable({
   providedIn: 'root'
 })
 export class TabsService {
-  tabList: Tab[] = [{
-    key: "aaa",
-    type: "file",
-    title: "a.cpp",
-    code: "int main() {}",
-    path: null,
-    saved: false
-  }, {
-    key: "bbb",
-    type: "file",
-    title: "b.cpp",
-    code: "#include <cstdio>\nint main() { ; ; ; }",
-    path: null,
-    saved: false
-  }];
-
-  private activeTabKey: string = "bbb";
+  tabList: Tab[] = [];
+  private activeTabKey: string = null;
 
   constructor(private editorService: EditorService) {
     // TabsService controls how EditorService works.
@@ -114,12 +116,10 @@ export class TabsService {
     this.tabList.push(newTab);
   }
 
-  removeAt(index: number) {
+  remove(key: string) {
     // Clone it, for we will remove it's src later
+    const index = this.getByKey(key).index;
     const target = Object.assign({}, this.tabList[index]);
-    if (target.saved === false) {
-      // [TODO]
-    }
     this.tabList.splice(index, 1);
     // closing current tab
     if (this.activeTabKey === target.key) {
