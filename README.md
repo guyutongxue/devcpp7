@@ -22,6 +22,14 @@ Due to the incompleteness of Monaco Editor API, I'm afraid that I won't be able 
 
 Currently only contains basic new/open/save operations, and a small compile button.
 
+## :warning: Warning
+
+**This project is not aimed to replace legacy Dev-C++.** If you want a newer version of that, please check [royqh1979/Dev-CPP](https://github.com/royqh1979/Dev-CPP). This project is just a practice of using Angular and Electron to built a desktop application. So it:
+- **WON'T** support 32-bit system.
+- **WON'T** test on any system lower than Windows 10.
+- **WON'T** provide the options of changing compiler set.
+- **PRETTY LARGER** than legacy Dev-C++ (because of Electron, Clangd and so on).
+
 ## Build instructions
 
 This repo is based on [angular-electron](https://github.com/maximegris/angular-electron) template. Following instructions are copied from there.
