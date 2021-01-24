@@ -87,9 +87,8 @@ export class TabsService {
   changeActive(key?: string): void;
   changeActive(index: number): void;
   changeActive(arg: any) {
-    if (!this.editorService.isInit) return;
     if (typeof arg === "undefined") {
-      this.editorService.switchToModel(this.getActive().value);
+      if (!this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
       return;
     }
     if (this.activeTabKey !== null) {
@@ -101,7 +100,7 @@ export class TabsService {
     else if (typeof arg === "number") {
       this.activeTabKey = this.tabList[arg].key;
     }
-    this.editorService.switchToModel(this.getActive().value);
+    if (!this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
   }
 
   add(options: TabOptions) {

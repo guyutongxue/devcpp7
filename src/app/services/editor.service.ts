@@ -147,6 +147,7 @@ export class EditorService {
   }
 
   async getSymbols(): Promise<DocumentSymbol[]> {
+    if (!this.isInit) return Promise.resolve([]);
     if (this.editor.getModel() === null) return Promise.resolve([]);
     if (!this.isLanguageClientStarted) return Promise.resolve([]);
     return this.languageClient.sendRequest("textDocument/documentSymbol", {
