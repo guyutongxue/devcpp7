@@ -7,6 +7,7 @@ import { OutlineComponent } from './outline/outline.component'
   declarations: [ OutlineComponent ],
   imports: [
     CommonModule
-  ]
+  ],
+  exports: [ OutlineComponent ]
 })
 export class SidebarModule { }

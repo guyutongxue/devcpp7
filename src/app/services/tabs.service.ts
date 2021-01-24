@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { editor } from 'monaco-editor';
 import * as path from 'path';
 import { EditorService } from './editor.service'
 
@@ -58,7 +57,7 @@ export class TabsService {
     // that use EditorService.
     // When initialization finished, it will send a event. TabsService will
     // do necessary initialization by calling `getActive` then.
-    editorService.eventEmitter.subscribe((v: string) => {
+    editorService.initEvent.subscribe((v: string) => {
       console.log("editorService event: ", v);
       this.getActive();
     })

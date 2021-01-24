@@ -3,8 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { PageNotFoundComponent } from './shared/components';
 
 import { TabsRoutingModule } from './main-view/tabs/tabs-routing.module'
-import { SidebarRoutingModule } from './main-view/sidebar/sidebar-routing.module'
-import { ToolsRoutingModule } from './main-view/tools/tools-routing.module'
 
 const routes: Routes = [
   {
@@ -16,9 +14,7 @@ const routes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
-    TabsRoutingModule,
-    SidebarRoutingModule,
-    ToolsRoutingModule
+    TabsRoutingModule
   ],
   exports: [RouterModule]
 })

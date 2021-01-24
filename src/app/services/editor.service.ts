@@ -1,13 +1,12 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
-
-import { OutlineModel } from './outlineModel';
+import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection, ExecuteCommandRequest } from 'monaco-languageclient';
 import { Tab } from './tabs.service'
 import { ElectronService } from '../core/services';
 import { StartLanguageServerResult } from '../../background/handlers/typing';
-import { CancellationTokenSource } from 'monaco-editor';
+import { CancellationTokenSource } from 'monaco-editor-core';
+import { BehaviorSubject } from 'rxjs';
 
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
   base: "vs",
@@ -57,8 +56,11 @@ export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
 export class EditorService {
   isInit = false;
   isLanguageClientStarted = false;
-  eventEmitter: EventEmitter<string> = new EventEmitter();
+  initEvent: EventEmitter<string> = new EventEmitter();
   private editor: monaco.editor.IStandaloneCodeEditor;
+  private languageClient: MonacoLanguageClient;
+  private editorText = new BehaviorSubject<string>("");
+  editorText$ = this.editorText.asObservable();
 
   constructor(private electronService: ElectronService) { }
 
@@ -89,7 +91,7 @@ export class EditorService {
       webSocket,
       onConnection: (connection: MessageConnection) => {
         // create and start the language client
-        const languageClient = new MonacoLanguageClient({
+        this.languageClient = new MonacoLanguageClient({
           name: `C++ Client`,
           clientOptions: {
             // use a language id as a document selector
@@ -107,7 +109,7 @@ export class EditorService {
             }
           }
         });
-        const disposable = languageClient.start();
+        const disposable = this.languageClient.start();
         this.isLanguageClientStarted = true;
         connection.onClose(() => {
           this.isLanguageClientStarted = false;
@@ -122,7 +124,7 @@ export class EditorService {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     this.isInit = true;
-    this.eventEmitter.emit("initCompleted");
+    this.initEvent.emit("initCompleted");
   }
 
   switchToModel(tab: Tab, disposeOld = false) {
@@ -131,15 +133,21 @@ export class EditorService {
     let oldModel = this.editor.getModel();
     this.editor.setModel(newModel);    
     console.log('switch to ', uri.toString());
-    newModel.onDidChangeContent(e => tab.saved = false);
+    newModel.onDidChangeContent(e => {
+      tab.saved = false;
+      this.editorText.next(newModel.getValue());
+    });
+    this.editorText.next(newModel.getValue());
     if (disposeOld) oldModel.dispose();
   }
 
-  async getSymbol() {
-    let cts = new CancellationTokenSource;
-    const model = await OutlineModel.create(this.editor.getModel(), cts.token);
-    console.log(model);
-    return model.asListOfDocumentSymbols();
+  async getSymbols(): Promise<monaco.languages.DocumentSymbol[]> {
+    if (!this.isLanguageClientStarted) return Promise.reject("Language server not started.");
+    return this.languageClient.sendRequest("textDocument/documentSymbol", {
+      textDocument: {
+        uri: this.editor.getModel().uri.toString()
+      }
+    });
   }
 
   getCode() {

@@ -3,6 +3,13 @@
         <div as-split-area size="*">
             <as-split unit="pixel" direction="horizontal">
                 <div as-split-area [size]="200" minSize="150">
+                    <nz-tabset>
+                        <nz-tab nzTitle="大纲">
+                            <app-outline></app-outline>
+                        </nz-tab>
+                        <nz-tab nzTitle="Tab 2" ></nz-tab>
+                        <nz-tab nzTitle="Tab 3"></nz-tab>
+                    </nz-tabset>
                     <router-outlet name="sidebar"></router-outlet>
                 </div>
                 <div as-split-area size="*">
