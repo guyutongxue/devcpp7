@@ -1,1 +1,16 @@
-<p>outline works! {{ len }}</p>
+<nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true">
+    <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
+        <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
+        <nz-tree-node-option (nzClick)="selectNode(node)">
+            {{ node.name }}
+        </nz-tree-node-option>
+    </nz-tree-node>
+    <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodePadding>
+        <nz-tree-node-toggle>
+            <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
+        </nz-tree-node-toggle>
+        <nz-tree-node-option (nzClick)="selectNode(node)">
+            {{ node.name }}
+        </nz-tree-node-option>
+    </nz-tree-node>
+</nz-tree-view>

@@ -1,11 +1,10 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection, ExecuteCommandRequest } from 'monaco-languageclient';
+import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection, DocumentSymbol } from 'monaco-languageclient';
 import { Tab } from './tabs.service'
 import { ElectronService } from '../core/services';
 import { StartLanguageServerResult } from '../../background/handlers/typing';
-import { CancellationTokenSource } from 'monaco-editor-core';
 import { BehaviorSubject } from 'rxjs';
 
 export const devCppClassicTheme: monaco.editor.IStandaloneThemeData = {
@@ -57,6 +56,7 @@ export class EditorService {
   isInit = false;
   isLanguageClientStarted = false;
   initEvent: EventEmitter<string> = new EventEmitter();
+
   private editor: monaco.editor.IStandaloneCodeEditor;
   private languageClient: MonacoLanguageClient;
   private editorText = new BehaviorSubject<string>("");
@@ -139,9 +139,11 @@ export class EditorService {
     });
     this.editorText.next(newModel.getValue());
     if (disposeOld) oldModel.dispose();
+    this.editor.focus();
   }
 
-  async getSymbols(): Promise<monaco.languages.DocumentSymbol[]> {
+  async getSymbols(): Promise<DocumentSymbol[]> {
+    if (this.editor.getModel() === null) return Promise.reject("No model available.");
     if (!this.isLanguageClientStarted) return Promise.reject("Language server not started.");
     return this.languageClient.sendRequest("textDocument/documentSymbol", {
       textDocument: {
@@ -151,7 +153,16 @@ export class EditorService {
   }
 
   getCode() {
-    return this.editor.getModel().getValue();
+    if (!this.isInit) return "";
+    return this.editor.getValue();
+  }
+  setSelection(range: monaco.IRange) {
+    this.editor.setSelection(range);
+    this.editor.focus();
+  }
+  setPosition(position: monaco.IPosition) {
+    this.editor.setPosition(position);
+    this.editor.focus();
   }
 
   destroy(tab: Tab) {

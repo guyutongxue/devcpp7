@@ -16,6 +16,9 @@ export class EditorComponent implements OnInit {
 
   };
   key: string;
+  get code(){
+    return this.editorService.getCode();
+  }
 
   constructor(private route: ActivatedRoute,
     private tabsService: TabsService,
