@@ -2,6 +2,7 @@
     <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
         <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
         <nz-tree-node-option (nzClick)="selectNode(node)">
+            <i class='codicon' [ngClass]="'codicon-' + iconData[node.kind].class"></i>
             {{ node.name }}
         </nz-tree-node-option>
     </nz-tree-node>
@@ -10,6 +11,7 @@
             <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
         </nz-tree-node-toggle>
         <nz-tree-node-option (nzClick)="selectNode(node)">
+            <i class='codicon' [ngClass]="'codicon-' + iconData[node.kind].class"></i>
             {{ node.name }}
         </nz-tree-node-option>
     </nz-tree-node>
