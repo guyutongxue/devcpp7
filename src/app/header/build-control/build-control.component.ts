@@ -25,7 +25,7 @@ export class BuildControlComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.electronService.ipcRenderer.on("ng:build-control/built", (event, result: BuildResult) => {
+    this.electronService.ipcRenderer.on("ng:build-control/buildComplete", (event, result: BuildResult) => {
       if (result.success) {
         if (result.diagnostics.length === 0) {
           this.notification.success("编译成功", "", { nzDuration: 3 });

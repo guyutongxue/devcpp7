@@ -3,6 +3,7 @@ import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ElectronService } from '../core/services/electron/electron.service'
+import { EditorService } from './editor.service';
 import { Tab, TabsService } from './tabs.service'
 
 @Injectable({
@@ -10,7 +11,20 @@ import { Tab, TabsService } from './tabs.service'
 })
 export class FileService {
   private nextUntitledNumber: number = 1;
-  constructor(private tabsService: TabsService, private electronService: ElectronService) { }
+  constructor(
+    private editorService: EditorService,
+    private tabsService: TabsService,
+    private electronService: ElectronService) {
+    this.electronService.ipcRenderer.on('ng:file-control/save', (_) => {
+        this.save();
+    });
+    this.editorService.eventEmitter.subscribe((message: string) => {
+      console.log("get", message);
+      if (message === "requestSave") {
+        this.save();
+      }
+    })
+   }
 
   private succUntitledNumber() {
     this.nextUntitledNumber++;

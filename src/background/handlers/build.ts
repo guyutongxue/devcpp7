@@ -110,14 +110,14 @@ async function doCompile(srcPath: string): Promise<BuildResult> {
 
 export async function build(event: electron.IpcMainEvent, arg: { path: string }) {
   const result = await doCompile(arg.path);
-  getWindow().webContents.send('ng:build-control/built', result);
+  getWindow().webContents.send('ng:build-control/buildComplete', result);
 }
 
 export async function runExe(event: electron.IpcMainEvent, arg: { path: string }) {
   console.log(arg.path);
   if (!isCompiled(arg.path)) {
     const result = await doCompile(arg.path);
-    getWindow().webContents.send('ng:build-control/built', result);
+    getWindow().webContents.send('ng:build-control/buildComplete', result);
     if (!result.success) return;
   }
   const cmdPath = process.env['ComSpec'];

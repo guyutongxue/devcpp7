@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ElectronService } from '../../core/services';
 
 import { FileService } from '../../services/file.service';
 import { TabsService } from '../../services/tabs.service';
@@ -10,14 +11,15 @@ import { TabsService } from '../../services/tabs.service';
 })
 export class FileControlComponent implements OnInit {
 
-  constructor(private fileService: FileService, private tabsService: TabsService) { }
+  constructor(
+    private fileService: FileService,
+    private tabsService: TabsService) { }
 
-  get isSaveDisable(){
+  get isSaveDisable() {
     return !this.tabsService.hasActiveFile;
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   newFile() {
     this.fileService.new();
