@@ -20,19 +20,23 @@ export class BuildControlComponent implements OnInit {
     private fileService: FileService,
     private tabsService: TabsService) { }
 
+  get isDisabled() {
+    return !this.tabsService.hasActiveFile;
+  }
+
   ngOnInit(): void {
     this.electronService.ipcRenderer.on("ng:build-control/built", (event, result: BuildResult) => {
       if (result.success) {
         if (result.diagnostics.length === 0) {
-          this.notification.success("编译成功", "");
+          this.notification.success("编译成功", "", { nzDuration: 3 });
         } else {
-          this.notification.warning("编译成功，但存在警告", "");
+          this.notification.warning("编译成功，但存在警告", "", { nzDuration: 3 });
         }
       } else {
         if (result.stage === "compile") {
-          this.notification.error("编译错误", result.diagnostics.toString());
+          this.notification.error("编译错误", result.diagnostics.toString(), { nzDuration: 3 });
         } else {
-          this.notification.error("链接错误", result.linkerr);
+          this.notification.error("链接错误", result.linkerr, { nzDuration: 3 });
         }
       }
     });
@@ -44,27 +48,19 @@ export class BuildControlComponent implements OnInit {
     });
   }
 
-  compile(): void {
-    if (!this.tabsService.getActive().value.saved) {
-      this.modal.confirm({
-        nzTitle: '未保存',
-        nzContent: '需要先保存文件，然后才能编译。是否保存？',
-        nzOkText: '保存',
-        nzOnOk: () => {
-          this.fileService.save();
-          this.sendBuildRequest();
-        },
-        nzCancelText: '取消',
-      });
-    } else {
-      this.sendBuildRequest();
-    }
-
-  }
-
-  runExe(): void {
+  private sendRunExeRequest() {
     this.electronService.ipcRenderer.send("build/runExe", {
       path: this.tabsService.getActive().value.path
     });
+  }
+
+  compile(): void {
+    if (!this.tabsService.getActive().value.saved && this.fileService.save())
+      this.sendBuildRequest();
+  }
+
+  runExe(): void {
+    if (!this.tabsService.getActive().value.saved && this.fileService.save())
+      this.sendRunExeRequest();
   }
 }

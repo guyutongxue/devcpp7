@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import * as path from 'path';
 import { EditorService } from './editor.service';
 
@@ -60,7 +59,10 @@ export class TabsService {
     // When initialization finished, it will send a event. TabsService will
     // do necessary initialization by calling `getActive` then.
     editorService.eventEmitter.subscribe((v: string) => {
-      this.getActive();
+      console.log("Editor: ", v);
+      if (v === "initCompleted") {
+        this.getActive();
+      }
     })
   }
 
@@ -88,7 +90,7 @@ export class TabsService {
   changeActive(index: number): void;
   changeActive(arg: any) {
     if (typeof arg === "undefined") {
-      if (!this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
+      if (this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
       return;
     }
     if (this.activeTabKey !== null) {
@@ -100,7 +102,12 @@ export class TabsService {
     else if (typeof arg === "number") {
       this.activeTabKey = this.tabList[arg].key;
     }
-    if (!this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
+    if (this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
+  }
+
+  get hasActiveFile() {
+    const activeTab = this.getActive().value;
+    return activeTab !== null && activeTab.type === "file";
   }
 
   add(options: TabOptions) {
@@ -109,7 +116,7 @@ export class TabsService {
       type: options.type,
       title: options.title,
       code: options.code ?? "",
-      saved: options.path !== null,
+      saved: typeof options.path !== "undefined",
       path: options.path ?? null
     };
     this.tabList.push(newTab);
@@ -121,7 +128,7 @@ export class TabsService {
     const target = Object.assign({}, this.tabList[index]);
     this.tabList.splice(index, 1);
     // closing current tab
-    if (this.activeTabKey === target.key) {
+    if (this.activeTabKey === key) {
       this.activeTabKey = null;
       if (this.tabList.length === 0) {
         // The only tab in MainView

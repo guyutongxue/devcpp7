@@ -29,9 +29,10 @@ export class FileService {
       if ("error" in result) {
         alert(result.error);
       }
-      return;
+      return false;
     }
     this.tabsService.saveCode(tab.key, result.path);
+    return true;
   }
 
   save(tab?: Tab) {
@@ -39,7 +40,7 @@ export class FileService {
     if (typeof tab === "undefined") tab = this.tabsService.getActive().value;
     // new file, not stored yet
     if (tab.path === null) {
-      this.saveAs(tab);
+      return this.saveAs(tab);
     } else {
       let result = this.electronService.ipcRenderer.sendSync("file/save", {
         content: tab.code,
@@ -49,9 +50,10 @@ export class FileService {
         if ("error" in result) {
           alert(result.error);
         }
-        return;
+        return false;
       }
       this.tabsService.saveCode(tab.key, tab.path);
+      return true;
     }
   }
 
@@ -61,7 +63,7 @@ export class FileService {
       if ("error" in result) {
         alert(result.error);
       }
-      return;
+      return false;
     }
     let tabList = this.tabsService.tabList.map(tab => tab.path);
     for (let file of result.files) {
@@ -77,6 +79,7 @@ export class FileService {
       });
       this.tabsService.changeActive(file.key);
     }
+    return true;
   }
 
   new() {

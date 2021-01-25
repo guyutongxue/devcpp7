@@ -1,7 +1,8 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection, DocumentSymbol } from 'monaco-languageclient';
+import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
+import { DocumentSymbol } from 'vscode-languageserver-protocol';
 import { Tab } from './tabs.service'
 import { ElectronService } from '../core/services';
 import { StartLanguageServerResult } from '../../background/handlers/typing';
@@ -130,7 +131,6 @@ export class EditorService {
   switchToModel(tab: Tab, disposeOld: boolean = false) {
     let uri = this.getUri(tab);
     let newModel = monaco.editor.getModel(uri);
-    let isNew = false;
     if (newModel === null) {
       newModel = monaco.editor.createModel(tab.code, 'cpp', uri);
       newModel.onDidChangeContent(_ => {
