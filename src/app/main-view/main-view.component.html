@@ -1,19 +1,15 @@
 <div id="asContainer">
     <as-split unit="pixel" direction="vertical">
-        <div as-split-area size="*">
+        <div as-split-area size="*" id="upperPart">
+            <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
+                <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
+                    [nzTooltipTitle]="i.title" (click)="showSidebar(i.url)" [nzDisabled]="i.disabled"
+                    [nzSelected]="currentSidebarUrl === i.url">
+                    <i nz-icon [nzType]="i.icon"></i>
+                </li>
+            </ul>
             <as-split unit="pixel" direction="horizontal">
-                <div as-split-area [size]="200" minSize="150">
-                    <ul nz-menu nzMode="inline" nzTheme="dark" [nzInlineCollapsed]="true">
-                        <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzTooltipTitle="大纲" (nzClick)="showOutline()">
-                            <i nz-icon nzType="partition"></i>
-                        </li>
-                        <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzTooltipTitle="项目管理" >
-                            <i nz-icon nzType="project"></i>
-                        </li>
-                        <!-- <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzTooltipTitle="大纲" (nzClick)="showOutline()">
-                            <i nz-icon nzType="partition"></i>
-                        </li> -->
-                    </ul>
+                <div as-split-area [size]="200" minSize="150" id="sidebarArea">
                     <router-outlet name="sidebar"></router-outlet>
                 </div>
                 <div as-split-area size="*">
@@ -21,7 +17,7 @@
                 </div>
             </as-split>
         </div>
-        <div as-split-area [size]="200" minSize="150">
+        <div as-split-area [size]="200" minSize="150" id="toolsArea">
             <router-outlet name="tools"></router-outlet>
         </div>
     </as-split>

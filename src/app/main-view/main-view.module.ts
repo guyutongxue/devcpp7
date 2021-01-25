@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from '../app-routing.module';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip'
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AngularSplitModule } from 'angular-split'
 
@@ -15,10 +16,11 @@ import { SidebarModule } from './sidebar/sidebar.module';
     CommonModule,
     AppRoutingModule,
     NzMenuModule,
+    NzToolTipModule,
+    NzIconModule,
     AngularSplitModule,
     TabsModule,
-    SidebarModule,
-    NzIconModule
+    SidebarModule
   ],
   exports: [ MainViewComponent ]
 })

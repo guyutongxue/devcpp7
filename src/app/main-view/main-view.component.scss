@@ -2,6 +2,15 @@
     width : 100%;
     height: 100%;
     // border: 1px solid gray
+
+    #upperPart {
+        display: flex;
+        flex-direction: row;
+
+        #sidebarMenu {
+            width: 32px;
+        }
+    }
 }
 
 // https://github.com/angular-split/angular-split/issues/224

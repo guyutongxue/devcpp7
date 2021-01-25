@@ -10,7 +10,7 @@ const routes: Routes = [
     component: EditorComponent
   },
   {
-    path: '**',
+    path: '',
     component: EmptyPageComponent
   }
 ];
