@@ -28,6 +28,8 @@ Currently only contains basic new/open/save operations, and a small compile butt
 - **WON'T** support 32-bit system.
 - **WON'T** test on any system lower than Windows 10.
 - **WON'T** provide the options of changing compiler set.
+- **MAY NOT** support C project or file.
+- **MAY NOT** support l11n. (Only Simplified Chinese now.)
 - **PRETTY LARGER** than legacy Dev-C++ (because of Electron, Clangd and so on).
 
 ## Build instructions

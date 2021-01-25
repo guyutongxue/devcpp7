@@ -13,6 +13,7 @@ import { SplitAreaDirective } from 'angular-split';
 export class MainViewComponent implements OnInit {
   @ViewChildren(SplitAreaDirective) private areasEl: QueryList<SplitAreaDirective>;
   private splitArea(id: string): SplitAreaDirective {
+    if (typeof this.areasEl === "undefined") return null;
     return this.areasEl.find(i => i.elRef.nativeElement.id === id);
   }
 
@@ -52,15 +53,16 @@ export class MainViewComponent implements OnInit {
           sidebar: null
         }
       }]);
-      this.splitArea("sidebarArea").collapse();
+      this.splitArea("sidebarArea")?.collapse();
     } else {
+      if (this.sidebarItems.find(i => i.url === who).disabled) return;
       this.currentSidebarUrl = who;
       this.router.navigate([{
         outlets: {
           sidebar: who
         }
       }]);
-      this.splitArea("sidebarArea").expand();
+      this.splitArea("sidebarArea")?.expand();
     }
   }
 }

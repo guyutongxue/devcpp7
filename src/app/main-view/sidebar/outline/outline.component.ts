@@ -68,7 +68,7 @@ export class OutlineComponent implements OnInit {
 
   ngOnInit(): void {
     this.symbols$ = this.editorService.editorText$.pipe(
-      debounceTime(1000),
+      debounceTime(500),
       distinctUntilChanged(),
       switchMap(_ => this.editorService.getSymbols())
     );
