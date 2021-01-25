@@ -1,13 +1,14 @@
 <div id="tabContainer">
-    <nz-tabset nzType="editable-card" [(nzSelectedIndex)]="activeIndex" (nzClose)="closeTab($event)" nzHideAdd cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="cdkOnDrop($event)">
+    <nz-tabset nzType="editable-card" [(nzSelectedIndex)]="activeIndex" (nzClose)="closeTab($event)" nzHideAdd
+        cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="cdkOnDrop($event)">
         <nz-tab *ngFor="let tab of tabList" [nzTitle]="titleTemplate" nzClosable>
-        <ng-template #titleTemplate>
-            <div cdkDrag class="tab-title">
-                <!-- <div class="example-custom-placeholder" *cdkDragPlaceholder></div> -->
-                {{ (tab.saved? '' : '*') + tab.title }}
-            </div>
-        </ng-template>
-    </nz-tab>
+            <ng-template #titleTemplate>
+                <div cdkDrag class="tab-title">
+                    <!-- <div class="example-custom-placeholder" *cdkDragPlaceholder></div> -->
+                    {{ (tab.saved? '' : '*') + tab.title }}
+                </div>
+            </ng-template>
+        </nz-tab>
     </nz-tabset>
     <div id="routerWrapper">
         <router-outlet></router-outlet>
@@ -21,5 +22,5 @@
         <button nz-button nzType="primary" (click)="notSaveModalYes()">是</button>
         <button nz-button nzType="default" (click)="notSaveModalNo()">否</button>
         <button nz-button nzType="default" (click)="notSaveModalCancel()">取消</button>
-      </div>
-  </nz-modal>
+    </div>
+</nz-modal>

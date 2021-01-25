@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ViewEncapsulation } from '@angular/core'
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-view',
@@ -10,8 +11,16 @@ import { ViewEncapsulation } from '@angular/core'
 })
 export class MainViewComponent implements OnInit {
   sidebarHeight: number = null;
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
+  }
+
+  showOutline(): void {
+    this.router.navigate([{
+      outlets: {
+        sidebar: 'outline'
+      }
+    }])
   }
 }

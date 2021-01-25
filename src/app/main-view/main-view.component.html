@@ -3,13 +3,17 @@
         <div as-split-area size="*">
             <as-split unit="pixel" direction="horizontal">
                 <div as-split-area [size]="200" minSize="150">
-                    <nz-tabset>
-                        <nz-tab nzTitle="大纲">
-                            <app-outline></app-outline>
-                        </nz-tab>
-                        <nz-tab nzTitle="Tab 2" ></nz-tab>
-                        <nz-tab nzTitle="Tab 3"></nz-tab>
-                    </nz-tabset>
+                    <ul nz-menu nzMode="inline" nzTheme="dark" [nzInlineCollapsed]="true">
+                        <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzTooltipTitle="大纲" (nzClick)="showOutline()">
+                            <i nz-icon nzType="partition"></i>
+                        </li>
+                        <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzTooltipTitle="项目管理" >
+                            <i nz-icon nzType="project"></i>
+                        </li>
+                        <!-- <li nz-menu-item nz-tooltip nzTooltipPlacement="right" nzTooltipTitle="大纲" (nzClick)="showOutline()">
+                            <i nz-icon nzType="partition"></i>
+                        </li> -->
+                    </ul>
                     <router-outlet name="sidebar"></router-outlet>
                 </div>
                 <div as-split-area size="*">
