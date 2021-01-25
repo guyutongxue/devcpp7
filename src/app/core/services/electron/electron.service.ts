@@ -31,6 +31,13 @@ export class ElectronService {
 
       this.childProcess = window.require('child_process');
       this.fs = window.require('fs');
+    } else {
+      // do not make error in browser
+      this.ipcRenderer = {
+        on() { },
+        send() { },
+        sendSync() { }
+      } as any;
     }
   }
 }

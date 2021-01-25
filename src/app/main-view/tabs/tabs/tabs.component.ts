@@ -24,6 +24,8 @@ export class TabsComponent implements OnInit {
     return this.tabsService.tabList;
   }
 
+  
+
   get activeIndex(): number {
     return this.tabsService.getActive().index;
   }
@@ -34,15 +36,19 @@ export class TabsComponent implements OnInit {
     }
   }
 
+  private doRemoveTab(tab: Tab) {
+    this.tabsService.remove(tab.key);
+    if (this.tabList.length === 0) {
+      this.router.navigate(['']);
+    }
+  }
+
   closeTab(e: { index: number }) {
     const target = this.tabList[e.index];
     if (target.saved === false) {
       this.notSaveModalShow(target);
     } else {
-      this.tabsService.remove(target.key);
-    }
-    if (this.tabList.length === 0) {
-      this.router.navigate(['']);
+      this.doRemoveTab(target);
     }
   }
 
@@ -57,11 +63,11 @@ export class TabsComponent implements OnInit {
   notSaveModalYes() {
     this.notSaveModalVisible = false;
     if (this.fileService.save(this.notSaveModalTab))
-      this.tabsService.remove(this.notSaveModalTab.key);
+      this.doRemoveTab(this.notSaveModalTab);
   }
   notSaveModalNo() {
     this.notSaveModalVisible = false;
-    this.tabsService.remove(this.notSaveModalTab.key);
+    this.doRemoveTab(this.notSaveModalTab);
   }
   notSaveModalCancel() {
     this.notSaveModalVisible = false;

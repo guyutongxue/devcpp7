@@ -85,7 +85,6 @@ export class EditorService {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     for (let i of defaultKeybindings) {
-      console.log("hello");
       this.editor.addCommand(i.keybinding, () => {
         this.eventEmitter.emit(i.message);
       })

@@ -1,4 +1,4 @@
-div {
+:host {
     height: 100%;
     width: 100%;
     display: flex;
@@ -6,9 +6,16 @@ div {
     justify-content: center;
     align-items :center;
 
-    p {
-        display:block;
-        font-size: 30pt;
-        color: lightgray;
+    // p {
+    //     display:block;
+    //     font-size: 30pt;
+    //     color: lightgray;
+    // }
+    
+    img {
+        display: block;
+        filter: grayscale(100%) brightness(2);
+        max-width: 40%;
+        max-height: 40%;
     }
 }

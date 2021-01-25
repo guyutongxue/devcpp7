@@ -47,6 +47,11 @@ export class MainViewComponent implements OnInit {
   showSidebar(who: string): void {
     if (who === this.currentSidebarUrl) {
       this.currentSidebarUrl = null;
+      this.router.navigate([{
+        outlets: {
+          sidebar: null
+        }
+      }]);
       this.splitArea("sidebarArea").collapse();
     } else {
       this.currentSidebarUrl = who;

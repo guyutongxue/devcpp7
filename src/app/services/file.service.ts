@@ -19,7 +19,6 @@ export class FileService {
         this.save();
     });
     this.editorService.eventEmitter.subscribe((message: string) => {
-      console.log("get", message);
       if (message === "requestSave") {
         this.save();
       }
