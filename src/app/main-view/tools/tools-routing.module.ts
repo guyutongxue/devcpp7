@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 
-import { MessageComponent } from './message/message.component'
+import { ProblemsComponent } from './problems/problems.component'
 
 const routes: Routes = [
   {
     path: 'message',
-    component: MessageComponent,
+    component: ProblemsComponent,
     outlet: 'tools'
   }
 ];

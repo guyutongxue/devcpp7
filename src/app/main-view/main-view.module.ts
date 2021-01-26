@@ -9,6 +9,7 @@ import { AngularSplitModule } from 'angular-split'
 import { MainViewComponent } from './main-view.component';
 import { TabsModule } from './tabs/tabs.module';
 import { SidebarModule } from './sidebar/sidebar.module';
+import { ToolsModule } from './tools/tools.module'
 
 @NgModule({
   declarations: [ MainViewComponent ],
@@ -20,7 +21,8 @@ import { SidebarModule } from './sidebar/sidebar.module';
     NzIconModule,
     AngularSplitModule,
     TabsModule,
-    SidebarModule
+    SidebarModule,
+    ToolsModule
   ],
   exports: [ MainViewComponent ]
 })

@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NzTableModule } from 'ng-zorro-antd/table'
 
-import { MessageComponent } from './message/message.component'
+import { ProblemsComponent } from './problems/problems.component'
 
 @NgModule({
-  declarations: [ MessageComponent ],
+  declarations: [ ProblemsComponent ],
   imports: [
-    CommonModule
+    CommonModule,
+    NzTableModule
   ]
 })
 export class ToolsModule { }
