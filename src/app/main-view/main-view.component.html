@@ -1,6 +1,6 @@
 <div id="asContainer">
     <as-split unit="pixel" direction="vertical" (dragEnd)="toolsSizeOnChange($event)">
-        <div as-split-area size="*" id="upperPart">
+        <as-split-area id="upperPart" [order]="0">
             <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
                 <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
                     [nzTooltipTitle]="i.title" (click)="showSidebar(i.url)" [nzDisabled]="i.disabled"
@@ -9,17 +9,17 @@
                 </li>
             </ul>
             <as-split unit="pixel" direction="horizontal">
-                <div as-split-area [size]="200" minSize="150" id="sidebarArea">
+                <as-split-area *ngIf="currentSidebarUrl !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
                     <router-outlet name="sidebar"></router-outlet>
-                </div>
-                <div as-split-area size="*">
+                </as-split-area>
+                <as-split-area [order]="1" size="*">
                     <app-tabs></app-tabs>
-                </div>
+                </as-split-area>
             </as-split>
-        </div>
-        <div as-split-area [size]="200" minSize="150" id="toolsArea">
+        </as-split-area>
+        <as-split-area [order]="1" [size]="200" minSize="150" id="toolsArea" *ngIf="currentToolsUrl !== null">
             <router-outlet name="tools"></router-outlet>
-        </div>
+        </as-split-area>
     </as-split>
     <nz-button-group>
         <button nz-button *ngFor="let i of toolsItems" [disabled]="i.disabled" (click)="showTools(i.url)"

@@ -8,7 +8,7 @@ export class ProblemsService {
 
   panelHeight: number = 200;
 
-  problems: GccDiagnostics;
+  problems: GccDiagnostics = [];
 
   constructor() { }
 

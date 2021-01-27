@@ -15,9 +15,18 @@ export interface ITreeNode extends GccDiagnostic {
   styleUrls: ['./problems.component.scss']
 })
 export class ProblemsComponent implements OnInit {
-  // [[TODO]]
-  private diagRawData: GccDiagnostic[] = require("./temp.json");
-  flattenData: ITreeNode[] = [];
+  
+  private get diagRawData(): GccDiagnostic[] {
+    return this.problemsService.problems;
+  }
+
+  get flattenData(): ITreeNode[] {
+    const result: ITreeNode[] = [];
+    this.diagRawData.forEach(item => {
+      result.splice(-1, 0, ...this.flattener(item));
+    });
+    return result;
+  }
 
   constructor(private problemsService: ProblemsService) { }
 
@@ -45,8 +54,6 @@ export class ProblemsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.diagRawData.forEach(item => {
-      this.flattenData.splice(-1, 0, ...this.flattener(item));
-    });
+    
   }
 }
