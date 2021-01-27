@@ -16,19 +16,19 @@ export interface ITreeNode extends GccDiagnostic {
 })
 export class ProblemsComponent implements OnInit {
   
-  private get diagRawData(): GccDiagnostic[] {
-    return this.problemsService.problems;
-  }
-
-  get flattenData(): ITreeNode[] {
-    const result: ITreeNode[] = [];
-    this.diagRawData.forEach(item => {
-      result.splice(-1, 0, ...this.flattener(item));
-    });
-    return result;
-  }
+  flattenData: ITreeNode[] = [];
 
   constructor(private problemsService: ProblemsService) { }
+
+  ngOnInit(): void {
+    this.problemsService.problems.subscribe(rawData => {
+      console.log("Got new val");
+      this.flattenData = [];
+      rawData.forEach(item => {
+        this.flattenData.splice(-1, 0, ...this.flattener(item));
+      });
+    })
+  }
 
   get tableHeight(): number {
     return this.problemsService.panelHeight - this.tableHeaderHeight;
@@ -53,7 +53,4 @@ export class ProblemsComponent implements OnInit {
     return array;
   }
 
-  ngOnInit(): void {
-    
-  }
 }

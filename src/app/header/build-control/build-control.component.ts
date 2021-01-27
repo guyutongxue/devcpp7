@@ -6,6 +6,7 @@ import { BuildResult } from '../../../background/handlers/typing';
 import { ElectronService } from '../../core/services';
 import { FileService } from '../../services/file.service';
 import { TabsService } from '../../services/tabs.service';
+import { ProblemsService } from '../../services/problems.service';
 
 @Component({
   selector: 'app-build-control',
@@ -15,10 +16,11 @@ import { TabsService } from '../../services/tabs.service';
 export class BuildControlComponent implements OnInit {
 
   constructor(private notification: NzNotificationService,
-    private modal: NzModalService,
     private electronService: ElectronService,
     private fileService: FileService,
-    private tabsService: TabsService) { }
+    private tabsService: TabsService,
+    private problemsService: ProblemsService
+  ) { }
 
   get isDisabled() {
     return !this.tabsService.hasActiveFile;
@@ -39,6 +41,7 @@ export class BuildControlComponent implements OnInit {
           this.notification.error("链接错误", result.linkerr, { nzDuration: 3 });
         }
       }
+      this.problemsService.problems.next(result.diagnostics);
     });
   }
 
