@@ -1,1 +1,26 @@
-<p>problems works!</p>
+<nz-table #table [nzData]="mapOfExpandedData" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false" [nzScroll]="{ y: panelHeight + 'px' }" nzNoResult="">
+    <thead>
+      <tr>
+        <th>错误信息</th>
+        <!-- <th>Age</th>
+        <th>Address</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let item of table.data">
+          <tr *ngIf="(item.parent && item.parent.expand) || !item.parent">
+            <td
+              [nzEllipsis]="true"
+              [nzIndentSize]="item.level! * 20"
+              [nzShowExpand]="!!item.children"
+              [(nzExpand)]="item.expand"
+              [title]="item.message"
+            >
+              {{ item.message }}
+            </td>
+            <!-- <td>{{ item.kind }}</td>
+            <td>{{ item.locations[0].caret.file }}</td> -->
+          </tr>
+      </ng-container>
+    </tbody>
+  </nz-table>

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, OnInit, QueryList, ViewChildren } from '@angu
 import { ViewEncapsulation } from '@angular/core'
 import { Router } from '@angular/router';
 import { SplitAreaDirective } from 'angular-split';
+import { ProblemsService } from '../services/problems.service';
 
 @Component({
   selector: 'app-main-view',
@@ -39,10 +40,18 @@ export class MainViewComponent implements OnInit {
   ];
   currentSidebarUrl = null;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private problemsService: ProblemsService) { }
 
   ngOnInit(): void {
     this.showSidebar('outline');
+
+    this.router.navigate([
+      {
+        outlets: {
+          tools: 'problems'
+        }
+      }
+    ]);
   }
 
   showSidebar(who: string): void {
@@ -64,5 +73,9 @@ export class MainViewComponent implements OnInit {
       }]);
       this.splitArea("sidebarArea")?.expand();
     }
+  }
+
+  toolsSizeOnChange(event: { sizes: number[] }) {
+    this.problemsService.panelHeight = event.sizes[1];
   }
 }

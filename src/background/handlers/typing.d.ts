@@ -14,49 +14,49 @@ export interface StartLanguageServerResult {
 }
 
 interface GccDiagnosticPosition {
-    file: string,
-    line: number,
-    column: number,
-    "display-column": number,
-    "byte-column": number
+    file: string;
+    line: number;
+    column: number;
+    "display-column"?: number;
+    "byte-column"?: number;
 }
 
 interface GccDiagnosticLocation {
-    label?: string,
+    label?: string;
     caret: GccDiagnosticPosition;
     start?: GccDiagnosticPosition;
     finish?: GccDiagnosticPosition;
 }
 
 interface GccDiagnosticFixit {
-    start: GccDiagnosticPosition,
-    next: GccDiagnosticPosition,
-    string: string
+    start: GccDiagnosticPosition;
+    next: GccDiagnosticPosition;
+    string: string;
 }
 
 interface GccDiagnosticEvent {
-    depth: number,
-    description: string,
-    function: string,
-    location: GccDiagnosticPosition
+    depth: number;
+    description: string;
+    function: string;
+    location: GccDiagnosticPosition;
 }
 
 interface GccDiagnostic {
-    kind: "note" | "warning" | "error",
-    message: string,
-    option?: string,
-    option_url?: string,
-    locations: GccDiagnosticLocation[],
-    fixits?: GccDiagnosticFixit[],
-    path?: GccDiagnosticEvent[],
-    children: GccDiagnostic[]
+    kind: "note" | "warning" | "error";
+    message: string;
+    option?: string;
+    option_url?: string;
+    locations: GccDiagnosticLocation[];
+    fixits?: GccDiagnosticFixit[];
+    path?: GccDiagnosticEvent[];
+    children?: GccDiagnostic[];
 }
 
 export type GccDiagnostics = GccDiagnostic[];
 
 export interface BuildResult {
-    success: boolean,
-    stage?: "compile" | "link",
-    diagnostics: GccDiagnostics,
-    linkerr?: string
+    success: boolean;
+    stage?: "compile" | "link";
+    diagnostics: GccDiagnostics;
+    linkerr?: string;
 }

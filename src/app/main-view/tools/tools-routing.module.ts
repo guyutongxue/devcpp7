@@ -6,7 +6,7 @@ import { ProblemsComponent } from './problems/problems.component'
 
 const routes: Routes = [
   {
-    path: 'message',
+    path: 'problems',
     component: ProblemsComponent,
     outlet: 'tools'
   }

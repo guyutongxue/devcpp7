@@ -11,6 +11,10 @@
             width: 32px;
         }
     }
+
+    #toolsArea {
+        overflow: hidden;
+    }
 }
 
 // https://github.com/angular-split/angular-split/issues/224

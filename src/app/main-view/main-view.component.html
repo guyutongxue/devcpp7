@@ -1,5 +1,5 @@
 <div id="asContainer">
-    <as-split unit="pixel" direction="vertical">
+    <as-split unit="pixel" direction="vertical" (dragEnd)="toolsSizeOnChange($event)">
         <div as-split-area size="*" id="upperPart">
             <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
                 <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
