@@ -16,20 +16,19 @@ export interface ITreeNode extends GccDiagnostic {
 })
 export class ProblemsComponent implements OnInit {
   // [[TODO]]
-  listOfMapData: GccDiagnostic[] = require("./temp.json");
-  mapOfExpandedData: ITreeNode[] = [];
+  private diagRawData: GccDiagnostic[] = require("./temp.json");
+  flattenData: ITreeNode[] = [];
 
   constructor(private problemsService: ProblemsService) { }
 
-  get panelHeight(): number {
-    console.log(this.problemsService.panelHeight);
+  get tableHeight(): number {
     return this.problemsService.panelHeight - this.tableHeaderHeight;
   }
 
   // Ant-design: font-size * line-height + 2 * padding
   private readonly tableHeaderHeight: number = 14 * 1.5715 + 2 * 8; 
 
-  convertTreeToList(root: GccDiagnostic): ITreeNode[] {
+  private flattener(root: GccDiagnostic): ITreeNode[] {
     const stack: ITreeNode[] = [];
     const array: ITreeNode[] = [];
     stack.push({ ...root, level: 0, expand: false });
@@ -46,9 +45,8 @@ export class ProblemsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.listOfMapData.forEach(item => {
-      this.mapOfExpandedData.splice(-1, 0, ...this.convertTreeToList(item));
+    this.diagRawData.forEach(item => {
+      this.flattenData.splice(-1, 0, ...this.flattener(item));
     });
-    console.log(this.mapOfExpandedData);
   }
 }
