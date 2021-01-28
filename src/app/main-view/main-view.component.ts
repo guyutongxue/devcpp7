@@ -30,7 +30,13 @@ export class MainViewComponent implements OnInit {
       disabled: true
     }
   ];
-  currentSidebarUrl = null;
+  currentOutletUrl(name: string) {
+    const routerChildren = this.router.parseUrl(this.router.url).root.children;
+    if (name in routerChildren) {
+      return routerChildren[name].segments[0].path;
+    }
+    return null;
+  }
 
   readonly toolsItems = [
     {
@@ -41,20 +47,16 @@ export class MainViewComponent implements OnInit {
     {
       title: '输出',
       url: 'output',
-      disabled: true
+      disabled: false
     }
   ]
-  currentToolsUrl = null;
 
   constructor(private router: Router, private problemsService: ProblemsService) { }
 
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void { }
 
   showSidebar(who: string): void {
-    if (who === this.currentSidebarUrl || who === null) {
-      this.currentSidebarUrl = null;
+    if (who === this.currentOutletUrl("sidebar") || who === null) {
       this.router.navigate([{
         outlets: {
           sidebar: null
@@ -62,7 +64,6 @@ export class MainViewComponent implements OnInit {
       }]);
     } else {
       if (this.sidebarItems.find(i => i.url === who).disabled) return;
-      this.currentSidebarUrl = who;
       this.router.navigate([{
         outlets: {
           sidebar: who
@@ -72,8 +73,7 @@ export class MainViewComponent implements OnInit {
   }
 
   showTools(who: string): void {
-    if (who === this.currentToolsUrl || who === null) {
-      this.currentToolsUrl = null;
+    if (who === this.currentOutletUrl("tools") || who === null) {
       this.router.navigate([{
         outlets: {
           tools: null
@@ -81,7 +81,6 @@ export class MainViewComponent implements OnInit {
       }]);
     } else {
       if (this.toolsItems.find(i => i.url === who).disabled) return;
-      this.currentToolsUrl = who;
       this.router.navigate([{
         outlets: {
           tools: who

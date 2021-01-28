@@ -28,8 +28,7 @@ function isCompiled(srcPath: string): boolean {
 
 interface ExecCompilerResult {
   success: boolean,
-  stderr: string,
-  [key: string]: any
+  stderr: string
 }
 
 async function execCompiler(srcPath: string, noLink: boolean = true): Promise<ExecCompilerResult> {
@@ -60,7 +59,6 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
       if (error) {
         resolve({
           success: false,
-          error,
           stderr
         });
       } else {
@@ -76,11 +74,24 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
 
 
 async function doCompile(srcPath: string): Promise<BuildResult> {
+  getWindow().webContents.send('ng:build-control/buildStarted');
   // 
   // generate .o
   const compileResult = await execCompiler(srcPath);
-  console.log(compileResult);
-  const diagnostics: GccDiagnostics = JSON.parse(compileResult.stderr);
+  let diagnostics: GccDiagnostics = [];
+  try {
+    diagnostics = JSON.parse(compileResult.stderr);
+  } catch (e) {
+    return {
+      success: false,
+      stage: "unknown",
+      diagnostics: diagnostics,
+      what: {
+        error: e,
+        stderr: compileResult.stderr
+      }
+    }
+  }
   if (!compileResult.success) {
     return {
       success: false,
@@ -108,19 +119,20 @@ async function doCompile(srcPath: string): Promise<BuildResult> {
   }
 }
 
-export async function build(event: electron.IpcMainEvent, arg: { path: string }) {
+export async function build(_: electron.IpcMainEvent, arg: { path: string }) {
+  console.log("Receive build request. Compiling");
   const result = await doCompile(arg.path);
+  console.log("Compilation finish. Returning value");
   getWindow().webContents.send('ng:build-control/buildComplete', result);
 }
 
-export async function runExe(event: electron.IpcMainEvent, arg: { path: string }) {
+export async function runExe(_: electron.IpcMainEvent, arg: { path: string }) {
   console.log(arg.path);
   if (!isCompiled(arg.path)) {
     const result = await doCompile(arg.path);
     getWindow().webContents.send('ng:build-control/buildComplete', result);
     if (!result.success) return;
   }
-  const cmdPath = process.env['ComSpec'];
   spawn(path.join(extraResourcesPath, 'bin/ConsolePauser.exe'), [
     getExecutablePath(arg.path)
   ], {

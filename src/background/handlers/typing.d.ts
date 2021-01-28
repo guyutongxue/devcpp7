@@ -56,7 +56,11 @@ export type GccDiagnostics = GccDiagnostic[];
 
 export interface BuildResult {
     success: boolean;
-    stage?: "compile" | "link";
+    stage?: "compile" | "link" | "unknown";
     diagnostics: GccDiagnostics;
     linkerr?: string;
+    what?: {
+        error: any,
+        stderr: string
+    } 
 }

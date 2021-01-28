@@ -4,12 +4,12 @@
             <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
                 <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
                     [nzTooltipTitle]="i.title" (click)="showSidebar(i.url)" [nzDisabled]="i.disabled"
-                    [nzSelected]="currentSidebarUrl === i.url">
+                    [nzSelected]="currentOutletUrl('sidebar') === i.url">
                     <i nz-icon [nzType]="i.icon"></i>
                 </li>
             </ul>
             <as-split unit="pixel" direction="horizontal">
-                <as-split-area *ngIf="currentSidebarUrl !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
+                <as-split-area *ngIf="currentOutletUrl('sidebar') !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
                     <router-outlet name="sidebar"></router-outlet>
                 </as-split-area>
                 <as-split-area [order]="1" size="*">
@@ -17,13 +17,13 @@
                 </as-split-area>
             </as-split>
         </as-split-area>
-        <as-split-area [order]="1" [size]="200" minSize="150" id="toolsArea" *ngIf="currentToolsUrl !== null">
+        <as-split-area *ngIf="currentOutletUrl('tools') !== null" [order]="1" [size]="200" minSize="150" id="toolsArea">
             <router-outlet name="tools"></router-outlet>
         </as-split-area>
     </as-split>
     <nz-button-group>
         <button nz-button *ngFor="let i of toolsItems" [disabled]="i.disabled" (click)="showTools(i.url)"
-            [nzType]="currentToolsUrl == i.url ? 'primary' : 'default'">
+            [nzType]="currentOutletUrl('tools') == i.url ? 'primary' : 'default'">
             {{ i.title }}
         </button>
     </nz-button-group>
