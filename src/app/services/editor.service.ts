@@ -146,3 +146,19 @@ export class EditorService {
   }
 
 }
+/*
+// https://github.com/microsoft/monaco-editor/issues/2000
+const editorService = editor._codeEditorService;
+const openEditorBase = editorService.openCodeEditor.bind(editorService);
+editorService.openCodeEditor = async (input, source) => {
+    const result = await openEditorBase(input, source);
+    if (result === null) {
+        alert("intercepted")
+        console.log("Open definition for:", input);
+        console.log("Corresponding model:", monaco.editor.getModel(input.resource));
+        console.log("Source: ", source);
+        source.setModel(monaco.editor.getModel(input.resource));
+    }
+    return result; // always return the base result
+};
+*/
