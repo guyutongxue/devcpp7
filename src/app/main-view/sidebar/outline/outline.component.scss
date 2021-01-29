@@ -1,5 +1,5 @@
 :host {
-    font-family: Consolas, 'Courier New', Courier, monospace;
+    font-family: var(--monospace-font);
     .codicon {
         transform: translateY(25%);
     }

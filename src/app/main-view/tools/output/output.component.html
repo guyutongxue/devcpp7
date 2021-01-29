@@ -1,19 +1,13 @@
 <div id="collapseContainer">
     <nz-collapse>
         <nz-collapse-panel nzHeader="编译输出（JSON）" [nzActive]="false" [nzExtra]="copyCompileIcon">
-            <p class="output">
-                {{ compileMessage }}
-            </p>
+            <pre class="output">{{ compileMessage }}</pre>
         </nz-collapse-panel>
         <nz-collapse-panel nzHeader="链接输出" [nzActive]="linkMessage !== ''" [nzExtra]="copyLinkIcon">
-            <p class="output">
-                {{ linkMessage }}
-            </p>
+            <pre class="output">{{ linkMessage }}</pre>
         </nz-collapse-panel>
         <nz-collapse-panel *ngIf="otherMessage !== ''" nzHeader="未知错误信息">
-            <p class="output">
-                {{ otherMessage }}
-            </p>
+            <pre class="output">{{ otherMessage }}</pre>
         </nz-collapse-panel>
     </nz-collapse>
     <ng-template #copyCompileIcon>

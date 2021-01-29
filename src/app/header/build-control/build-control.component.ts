@@ -43,23 +43,23 @@ export class BuildControlComponent implements OnInit {
         if (result.diagnostics.length === 0) {
           this.notification.success("编译成功", "", this.notifyOption);
         } else {
-          this.notification.warning("编译成功，但存在警告", "", this.notifyOption);
           this.showProblems(result.diagnostics);
+          this.notification.warning("编译成功，但存在警告", "", this.notifyOption);
         }
       } else {
         switch (result.stage) {
           case "compile":
-            this.notification.error("编译错误", "", this.notifyOption);
             this.showProblems(result.diagnostics);
+            this.notification.error("编译错误", "", this.notifyOption);
             break;
           case "link":
-            this.notification.error("链接错误", result.linkerr, this.notifyOption);
             this.showProblems(result.diagnostics);
+            this.notification.error("链接错误", result.linkerr, this.notifyOption);
             this.showOutput(result);
             break;
           default:
-            this.notification.error("未知错误", result.what.stderr, this.notifyOption);
             this.showOutput(result);
+            this.notification.error("未知错误", result.what.stderr, this.notifyOption);
             break;
         }
       }

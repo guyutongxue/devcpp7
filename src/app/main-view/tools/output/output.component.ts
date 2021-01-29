@@ -16,7 +16,7 @@ export class OutputComponent implements OnInit {
 
   ngOnInit(): void {
     this.problemsService.problems.subscribe(data => {
-      this.compileMessage = JSON.stringify(data);
+      this.compileMessage = JSON.stringify(data).replace(/\n/g,'\\');
     });
     this.problemsService.linkerr.subscribe(data => {
       this.linkMessage = data;

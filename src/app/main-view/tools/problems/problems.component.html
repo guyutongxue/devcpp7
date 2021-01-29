@@ -1,25 +1,27 @@
 <nz-table #table [nzData]="flattenData" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false" [nzScroll]="{ y: tableHeight + 'px' }" nzNoResult=" ">
     <thead>
       <tr>
+        <th nzWidth="2em"></th>
         <th>错误信息</th>
-        <!-- <th>Age</th>
-        <th>Address</th> -->
+        <th nzWidth="150px">位置</th>
       </tr>
     </thead>
     <tbody>
       <ng-container *ngFor="let item of table.data">
           <tr *ngIf="(item.parent && item.parent.expand) || !item.parent">
+            <td>
+              <i nz-icon [nzType]="iconMap[item.kind].type" [ngStyle]="{ color: iconMap[item.kind].color }"></i>
+            </td>
             <td
               [nzEllipsis]="true"
               [nzIndentSize]="item.level! * 20"
-              [nzShowExpand]="!!item.children"
+              [nzShowExpand]="!!item.children && item.children.length !== 0"
               [(nzExpand)]="item.expand"
               [title]="item.message"
             >
               {{ item.message }}
             </td>
-            <!-- <td>{{ item.kind }}</td>
-            <td>{{ item.locations[0].caret.file }}</td> -->
+            <td [nzEllipsis]="true">{{ printPosition(item.locations[0].caret) }}</td>
           </tr>
       </ng-container>
     </tbody>

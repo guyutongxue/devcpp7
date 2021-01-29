@@ -3,6 +3,8 @@
     overflow-y: scroll;
 
     .output {
-        font-family: Consolas, 'Courier New', Courier, monospace;
+        font-family: var(--monospace-font);
+        word-break: break-all;
+        white-space: pre-wrap;
     }
 }

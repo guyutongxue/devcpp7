@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
-import { GccDiagnostic } from '../../../../background/handlers/typing';
-import { ProblemsService } from '../../../services/problems.service'
+import { GccDiagnostic, GccDiagnosticPosition } from '../../../../background/handlers/typing';
+import { ProblemsService } from '../../../services/problems.service';
+import * as path from 'path'
 
 export interface ITreeNode extends GccDiagnostic {
   level: number;
@@ -15,6 +16,25 @@ export interface ITreeNode extends GccDiagnostic {
   styleUrls: ['./problems.component.scss']
 })
 export class ProblemsComponent implements OnInit {
+
+  readonly iconMap: { [key: string]: { type: string, color: string } } = {
+    error: {
+      type: 'close-circle',
+      color: 'red'
+    },
+    warning: {
+      type: 'warning',
+      color: 'orange'
+    },
+    note: {
+      type: 'info-circle',
+      color: 'blue'
+    } 
+  }
+
+  printPosition(position: GccDiagnosticPosition) {
+    return `${path.basename(position.file.replace(/\n/g,'\\'))}:${position.line}:${position.column}`;
+  }
   
   flattenData: ITreeNode[] = [];
 
@@ -22,11 +42,11 @@ export class ProblemsComponent implements OnInit {
 
   ngOnInit(): void {
     this.problemsService.problems.subscribe(rawData => {
-      console.log("Got new val");
       this.flattenData = [];
       rawData.forEach(item => {
         this.flattenData.splice(-1, 0, ...this.flattener(item));
       });
+      console.log(this.flattenData);
     })
   }
 
