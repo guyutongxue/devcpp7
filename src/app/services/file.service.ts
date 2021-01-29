@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ElectronService } from '../core/services/electron/electron.service'
 import { EditorService } from './editor.service';
-import { Tab, TabsService } from './tabs.service'
+import { Tab, TabsService } from './tabs.service';
+import { OpenFileOptions, SaveFileOptions, SaveAsFileOptions } from '../../background/handlers/typing'
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,7 @@ export class FileService {
         tab.path === null
           ? tab.title
           : tab.path,
-    });
+    } as SaveAsFileOptions);
     if (!result.success) {
       if ("error" in result) {
         alert(result.error);
@@ -58,7 +59,7 @@ export class FileService {
       let result = this.electronService.ipcRenderer.sendSync("file/save", {
         content: tab.code,
         path: tab.path,
-      });
+      } as SaveFileOptions);
       if (!result.success) {
         if ("error" in result) {
           alert(result.error);
@@ -71,7 +72,10 @@ export class FileService {
   }
 
   open() {
-    let result = this.electronService.ipcRenderer.sendSync("file/open", {});
+    const result = this.electronService.ipcRenderer.sendSync("file/open", {
+      showDialog: true,
+      paths: []
+    } as OpenFileOptions);
     if (!result.success) {
       if ("error" in result) {
         alert(result.error);
@@ -96,7 +100,7 @@ export class FileService {
   }
 
   new() {
-    let newKey = uuidv4();
+    const newKey = uuidv4();
     this.tabsService.add({
       key: newKey,
       type: "file",
@@ -104,5 +108,38 @@ export class FileService {
     });
     this.tabsService.changeActive(newKey);
     this.succUntitledNumber();
+  }
+
+  locate(filepath: string, row: number, col: number) {
+    const target = this.tabsService.tabList.find(t => t.path === filepath);
+    if (typeof target === "undefined") {
+      const result = this.electronService.ipcRenderer.sendSync("file/open", {
+        showDialog: false,
+        paths: [
+          filepath
+        ]
+      } as OpenFileOptions);
+      if (!result.success || result.files.length < 1) {
+        if ("error" in result) {
+          alert(result.error);
+        }
+        return false;
+      }
+      const file = result.files[0];
+      this.tabsService.add({
+        key: file.key,
+        type: "file",
+        title: path.basename(file.path),
+        code: file.content,
+        path: file.path,
+      });
+      this.tabsService.changeActive(file.key);
+    } else {
+      this.tabsService.changeActive(target.key);
+    }
+    this.editorService.setPosition({
+      lineNumber: row,
+      column: col
+    })
   }
 }

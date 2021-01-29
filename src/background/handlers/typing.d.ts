@@ -8,6 +8,10 @@ export interface SaveAsFileOptions {
     content: string;
     defaultFilename: string;
 }
+export interface OpenFileOptions {
+    showDialog: boolean;
+    paths: string[];
+}
 
 export interface StartLanguageServerResult {
     port: number;

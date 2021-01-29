@@ -34,7 +34,6 @@ export async function saveAsFile(event: electron.IpcMainEvent, arg: SaveAsFileOp
   try {
     let options: electron.SaveDialogOptions = {
       defaultPath: arg.defaultFilename,
-
       filters: [
         { name: "C++ 源文件", extensions: ["cpp", "h", "hpp", "cc", "cxx"] },
         { name: "C 源文件", extensions: ["c", "h"] },
@@ -75,54 +74,51 @@ export async function saveAsFile(event: electron.IpcMainEvent, arg: SaveAsFileOp
  * @param event 
  * @param arg 
  */
-export async function openFile(event: electron.IpcMainEvent, arg: any) {
+export async function openFile(event: electron.IpcMainEvent, arg: { showDialog: boolean, paths: string[] }) {
+  interface FileInfo {
+    path: string;
+    content: string;
+    key: string;
+  };
   try {
-    let options: electron.OpenDialogOptions = {
-      filters: [
-        { name: "C++ Source Files", extensions: ["cpp"] },
-        { name: "All Files", extensions: ["*"] },
-      ],
-      properties: [
-        "openFile",
-        "multiSelections"
-      ]
-    };
-    electron.dialog.showOpenDialog(getWindow(), options).then(r => {
-      try {
-        if (!r.canceled) {
-          interface FileInfo {
-            path: string,
-            content: string,
-            key: string
-          }
-          let files: FileInfo[] = [];
-          r.filePaths.forEach(filePath => {
-            let key: string;
-            let content = fs.readFileSync(filePath).toString("utf-8");
-            key = uuidv4();
-            files.push({
-              content: content,
-              key: key,
-              path: filePath
-            });
-          });
-          event.returnValue = {
-            success: true,
-            files: files
-          };
-        } else {
-          event.returnValue = {
-            success: false,
-            reason: "User cancelled operation."
-          }
-        }
-      } catch (e) {
-        event.returnValue = {
-          success: false,
-          error: e
-        };
-      }
+    const files: FileInfo[] = [];
+    arg.paths.forEach(path => {
+      const content = fs.readFileSync(path).toString("utf-8");
+      const key = uuidv4();
+      files.push({
+        content: content,
+        key: key,
+        path: path
+      });
     });
+    if (arg.showDialog) {
+      const options: electron.OpenDialogOptions = {
+        filters: [
+          { name: "C++ Source Files", extensions: ["cpp"] },
+          { name: "All Files", extensions: ["*"] },
+        ],
+        properties: [
+          "openFile",
+          "multiSelections"
+        ]
+      };
+      const result = await electron.dialog.showOpenDialog(getWindow(), options);
+      if (!result.canceled) {
+        result.filePaths.forEach(path => {
+          const content = fs.readFileSync(path).toString("utf-8");
+          const key = uuidv4();
+          files.push({
+            content: content,
+            key: key,
+            path: path
+          });
+        });
+      }
+    }
+    event.returnValue = {
+      success: true,
+      files: files
+    };
   } catch (e) {
     event.returnValue = {
       success: false,

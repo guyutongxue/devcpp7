@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit } from '@angular/core';
 import { GccDiagnostic, GccDiagnosticPosition } from '../../../../background/handlers/typing';
 import { ProblemsService } from '../../../services/problems.service';
 import * as path from 'path'
+import { FileService } from '../../../services/file.service';
 
 export interface ITreeNode extends GccDiagnostic {
   level: number;
@@ -38,7 +39,9 @@ export class ProblemsComponent implements OnInit {
   
   flattenData: ITreeNode[] = [];
 
-  constructor(private problemsService: ProblemsService) { }
+  constructor(
+    private fileService: FileService,
+    private problemsService: ProblemsService) { }
 
   ngOnInit(): void {
     this.problemsService.problems.subscribe(rawData => {
@@ -71,6 +74,11 @@ export class ProblemsComponent implements OnInit {
       }
     }
     return array;
+  }
+
+  showProblem(item: ITreeNode) {
+    const mainLocation = item.locations[0].caret;
+    this.fileService.locate(mainLocation.file.replace(/\n|\//g,'\\'), mainLocation.line, mainLocation.column);
   }
 
 }
