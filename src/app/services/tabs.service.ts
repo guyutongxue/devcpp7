@@ -58,8 +58,8 @@ export class TabsService {
     // that use EditorService.
     // When initialization finished, it will send a event. TabsService will
     // do necessary initialization by calling `getActive` then.
-    this.editorService.eventEmitter.subscribe((message: string) => {
-      if (message === "initCompleted") {
+    this.editorService.editorMessage.subscribe(({type, arg}) => {
+      if (type === "initCompleted") {
         this.getActive();
       }
     })

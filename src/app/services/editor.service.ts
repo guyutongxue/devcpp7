@@ -1,9 +1,9 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
 import { DocumentSymbol } from 'vscode-languageserver-protocol';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { Tab } from './tabs.service'
 import { ElectronService } from '../core/services';
 import { classicTheme } from '../configs/editorTheme';
@@ -16,7 +16,7 @@ import { StartLanguageServerResult } from '../../background/handlers/typing';
 export class EditorService {
   isInit = false;
   isLanguageClientStarted = false;
-  eventEmitter: EventEmitter<string> = new EventEmitter();
+  editorMessage: Subject<{ type: string; arg?: any }> = new Subject();
 
   private editor: monaco.editor.IStandaloneCodeEditor;
   private languageClient: MonacoLanguageClient;
@@ -80,17 +80,42 @@ export class EditorService {
     });
   }
 
+  // https://github.com/microsoft/monaco-editor/issues/2000
+  private interceptOpenEditor() {
+    const editorService = (this.editor as any)._codeEditorService;
+    const openEditorBase = editorService.openCodeEditor.bind(editorService);
+    editorService.openCodeEditor = async (input: { options: any, resource: monaco.Uri }, source) => {
+      const result = await openEditorBase(input, source);
+      if (result === null) {
+        const selection: monaco.IRange = input.options?.selection;
+        this.editorMessage.next({
+          type: "requestOpen",
+          arg: {
+            selection: selection ?? ({ startColumn: 1, startLineNumber: 1, endColumn: 1, endLineNumber: 1 } as monaco.IRange),
+            path: input.resource.path.substr(1) // Remove prefix '/' from URI
+          }
+        });
+        // console.log("Open definition for:", input);
+        // console.log("Corresponding model:",);
+        console.log("Source: ", source);
+        // source.setModel(monaco.editor.getModel(input.resource));
+      }
+      return result;
+    };
+  }
+
   monacoInit(editor: monaco.editor.IStandaloneCodeEditor) {
     monaco.editor.defineTheme('devcpp-classic', classicTheme);
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     for (let i of defaultKeybindings) {
       this.editor.addCommand(i.keybinding, () => {
-        this.eventEmitter.emit(i.message);
+        this.editorMessage.next({ type: i.message });
       })
     }
+    this.interceptOpenEditor();
     this.isInit = true;
-    this.eventEmitter.emit("initCompleted");
+    this.editorMessage.next({ type: "initCompleted" });
   }
 
   switchToModel(tab: Tab, disposeOld: boolean = false) {
@@ -146,19 +171,3 @@ export class EditorService {
   }
 
 }
-/*
-// https://github.com/microsoft/monaco-editor/issues/2000
-const editorService = editor._codeEditorService;
-const openEditorBase = editorService.openCodeEditor.bind(editorService);
-editorService.openCodeEditor = async (input, source) => {
-    const result = await openEditorBase(input, source);
-    if (result === null) {
-        alert("intercepted")
-        console.log("Open definition for:", input);
-        console.log("Corresponding model:", monaco.editor.getModel(input.resource));
-        console.log("Source: ", source);
-        source.setModel(monaco.editor.getModel(input.resource));
-    }
-    return result; // always return the base result
-};
-*/

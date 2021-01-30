@@ -2,7 +2,7 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { getWindow } from '../basicUtil';
-import { SaveFileOptions, SaveAsFileOptions } from './typing'
+import { SaveFileOptions, SaveAsFileOptions, OpenFileOptions } from './typing'
 
 // interface Result { success: boolean, [key: string]: any };
 
@@ -74,7 +74,7 @@ export async function saveAsFile(event: electron.IpcMainEvent, arg: SaveAsFileOp
  * @param event 
  * @param arg 
  */
-export async function openFile(event: electron.IpcMainEvent, arg: { showDialog: boolean, paths: string[] }) {
+export async function openFile(event: electron.IpcMainEvent, arg: OpenFileOptions) {
   interface FileInfo {
     path: string;
     content: string;

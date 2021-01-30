@@ -9,7 +9,9 @@ export interface SaveAsFileOptions {
     defaultFilename: string;
 }
 export interface OpenFileOptions {
+    /** Whether show a dialog to let user choose which file should open */
     showDialog: boolean;
+    /**Always open these files */ 
     paths: string[];
 }
 
@@ -66,5 +68,5 @@ export interface BuildResult {
     what?: {
         error: any,
         stderr: string
-    } 
+    }
 }

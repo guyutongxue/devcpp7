@@ -17,14 +17,21 @@ export class FileService {
     private tabsService: TabsService,
     private electronService: ElectronService) {
     this.electronService.ipcRenderer.on('ng:file-control/save', (_) => {
-        this.save();
+      this.save();
     });
-    this.editorService.eventEmitter.subscribe((message: string) => {
-      if (message === "requestSave") {
-        this.save();
+    this.editorService.editorMessage.subscribe(({ type, arg }) => {
+      switch (type) {
+        case "requestSave":
+          this.save();
+          break;
+        case "requestOpen":
+          // Do not locate if we are in a temporary file
+          if (this.tabsService.getActive().value.path === null) break;
+          this.locate(arg.path, arg.selection.startLineNumber, arg.selection.startColumn);
+          break;
       }
-    })
-   }
+    });
+  }
 
   private succUntitledNumber() {
     this.nextUntitledNumber++;
