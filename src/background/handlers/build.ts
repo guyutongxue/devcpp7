@@ -38,6 +38,7 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
   if (noLink) {
     outputFileName = path.basename(changeExt(srcPath, '.o'));
     args = [
+      '-g',
       '-c',
       srcPath,
       '-o',
@@ -47,6 +48,7 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
   } else {
     outputFileName = path.basename(getExecutablePath(srcPath));
     args = [
+      '-g',
       srcPath,
       '-o',
       outputFileName,

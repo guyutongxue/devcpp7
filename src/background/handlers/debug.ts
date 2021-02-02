@@ -4,6 +4,8 @@ import * as path from 'path';
 
 import { doCompile } from './build';
 import { extraResourcesPath, getWindow } from '../basicUtil';
+import { SendRequestOptions, SendRequestResult } from './typing';
+import { IpcMainInvokeEvent } from "electron/main";
 
 
 const gdb = new GdbController();
@@ -53,7 +55,7 @@ export async function startDebugger(event: IpcMainEvent, arg: { srcPath: string 
     });
     for (const command of startupCommand) {
         const response = await gdb.sendRequest(command);
-        if (response.message !== "done") {
+        if (response.message === "error") {
             event.returnValue = {
                 success: false,
                 reason: `Startup command '${command}' execution failed`
@@ -84,13 +86,31 @@ function escape(src: string) {
     return src.replace(/"/g, '\\"').replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
 }
 
-export async function sendRequest(event: IpcMainEvent, arg: { command: string }) {
+export async function sendRequest(_: IpcMainInvokeEvent, arg: SendRequestOptions): Promise<SendRequestResult> {
     if (!gdb.isRunning) {
-        event.returnValue = {
+        return {
             success: false,
-            reason: "GDB not started."
+            message: "GDB not started."
         };
-        return;
     }
-    console.log(await gdb.sendRequest(`-interpreter-exec console "${escape(arg.command)}"`));
+    try {
+        console.log("request: " + arg.command);
+        const result = await gdb.sendRequest(arg.type === "cli" ? `-interpreter-exec console "${escape(arg.command)}"` : arg.command);
+        console.log("result: ", result);
+        if (result.message === "error") {
+            return {
+                success: false,
+                message: result.payload['msg']
+            };
+        } else {
+            return {
+                success: true
+            };
+        }
+    } catch (e) {
+        return {
+            success: false,
+            error: e
+        };
+    }
 }

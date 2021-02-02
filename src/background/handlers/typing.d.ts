@@ -71,3 +71,14 @@ export interface BuildResult {
         stderr: string
     }
 }
+
+export interface SendRequestOptions {
+    type: "cli" | "mi";
+    command: string;
+}
+
+export interface SendRequestResult {
+    success: boolean;
+    message?: string;
+    error?: any;
+}

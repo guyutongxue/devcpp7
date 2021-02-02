@@ -17,4 +17,4 @@ ipcMain.on('langServer/stop', stopLanguageServer);
 
 ipcMain.on('debug/start', startDebugger);
 ipcMain.on('debug/exit', exitDebugger);
-ipcMain.on('debug/sendRequest', sendRequest);
+ipcMain.handle('debug/sendRequest', sendRequest);
