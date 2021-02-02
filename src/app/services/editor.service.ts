@@ -95,10 +95,6 @@ export class EditorService {
             path: input.resource.path.substr(1) // Remove prefix '/' from URI
           }
         });
-        // console.log("Open definition for:", input);
-        // console.log("Corresponding model:",);
-        console.log("Source: ", source);
-        // source.setModel(monaco.editor.getModel(input.resource));
       }
       return result;
     };

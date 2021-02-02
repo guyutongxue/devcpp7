@@ -48,6 +48,11 @@ export class MainViewComponent implements OnInit {
       title: '输出',
       url: 'output',
       disabled: false
+    },
+    {
+      title: '调试',
+      url: 'debug',
+      disabled: false
     }
   ]
 

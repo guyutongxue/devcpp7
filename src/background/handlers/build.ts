@@ -1,4 +1,4 @@
-import * as electron from 'electron';
+import { IpcMainEvent } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { execFile, spawn } from 'child_process';
@@ -73,7 +73,7 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
 
 
 
-async function doCompile(srcPath: string): Promise<BuildResult> {
+export async function doCompile(srcPath: string): Promise<BuildResult> {
   getWindow().webContents.send('ng:build-control/buildStarted');
   // 
   // generate .o
@@ -114,19 +114,20 @@ async function doCompile(srcPath: string): Promise<BuildResult> {
     return {
       success: true,
       linkerr: linkResult.stderr,
-      diagnostics: diagnostics
+      diagnostics: diagnostics,
+      output: getExecutablePath(srcPath)
     };
   }
 }
 
-export async function build(_: electron.IpcMainEvent, arg: { path: string }) {
+export async function build(_: IpcMainEvent, arg: { path: string }) {
   console.log("Receive build request. Compiling");
   const result = await doCompile(arg.path);
   console.log("Compilation finish. Returning value");
   getWindow().webContents.send('ng:build-control/buildComplete', result);
 }
 
-export async function runExe(_: electron.IpcMainEvent, arg: { path: string }) {
+export async function runExe(_: IpcMainEvent, arg: { path: string }) {
   console.log(arg.path);
   if (!isCompiled(arg.path)) {
     const result = await doCompile(arg.path);

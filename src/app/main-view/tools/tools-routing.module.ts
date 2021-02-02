@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ProblemsComponent } from './problems/problems.component'
 import { OutputComponent } from './output/output.component';
+import { DebugComponent } from './debug/debug.component';
 
 const routes: Routes = [
   {
@@ -14,6 +15,11 @@ const routes: Routes = [
   {
     path: 'output',
     component: OutputComponent,
+    outlet: 'tools'
+  },
+  {
+    path: 'debug',
+    component: DebugComponent,
     outlet: 'tools'
   }
 ];
