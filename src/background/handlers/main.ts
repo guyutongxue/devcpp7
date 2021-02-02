@@ -3,7 +3,7 @@ import { ipcMain } from 'electron';
 import { saveFile, saveAsFile, openFile } from './file';
 import { build, runExe } from './build';
 import { startLanguageServer, stopLanguageServer } from './server'
-import { exitDebugger, startDebugger } from './debug';
+import { exitDebugger, sendRequest, startDebugger } from './debug';
 
 ipcMain.on('file/save', saveFile);
 ipcMain.on('file/saveAs', saveAsFile);
@@ -17,3 +17,4 @@ ipcMain.on('langServer/stop', stopLanguageServer);
 
 ipcMain.on('debug/start', startDebugger);
 ipcMain.on('debug/exit', exitDebugger);
+ipcMain.on('debug/sendRequest', sendRequest);

@@ -1,5 +1,56 @@
-<p>debug works!</p>
-<nz-button-group *ngIf="enabled">
-    <button *ngIf="!isDebugging" nz-button nzType="secondary" (click)="startDebug()">开始调试</button>
-    <button *ngIf="isDebugging" nz-button nzType="secondary" (click)="exitDebug()">退出调试</button>
-</nz-button-group>
+<div id="debugPanel">
+    <div id="leftPart">
+        <div id="exprEval">
+            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !isDebugging">
+
+        </div>
+        <nz-button-group id="debugControl">
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行" [disabled]="!enabled || !isDebugging">
+                <i class="codicon codicon-debug-continue"></i>
+            </button>
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步执行" [disabled]="!enabled || !isDebugging">
+                <i class="codicon codicon-debug-step-over"></i>
+            </button>
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步进入" [disabled]="!enabled || !isDebugging">
+                <i class="codicon codicon-debug-step-into"></i>
+            </button>
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="跳出函数" [disabled]="!enabled || !isDebugging">
+                <i class="codicon codicon-debug-step-out"></i>
+            </button>
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="重新运行" [disabled]="!enabled || !isDebugging">
+                <i class="codicon codicon-debug-restart"></i>
+            </button>
+            <button *ngIf="!isDebugging" nz-button nzType="secondary" (click)="startDebug()" nz-tooltip
+                nzTooltipPlacement="topRight" nzTooltipTitle="开始调试" [disabled]="!enabled">
+                <i class="codicon codicon-debug-start"></i>
+            </button>
+            <button *ngIf="isDebugging" nz-button nzType="secondary" (click)="exitDebug()" nz-tooltip
+                nzTooltipPlacement="topRight" nzTooltipTitle="退出调试" [disabled]="!enabled">
+                <i class="codicon codicon-debug-stop"></i>
+            </button>
+        </nz-button-group>
+    </div>
+    <div id="rightPart">
+        <nz-tabset nzSize="small" [(nzSelectedIndex)]="selectedIndex">
+            <nz-tab nzTitle="调试控制台"></nz-tab>
+            <nz-tab nzTitle="调用栈"></nz-tab>
+            <nz-tab nzTitle="断点"></nz-tab>
+        </nz-tabset>
+        <div id="tabContentWrapper">
+            <div *ngIf="selectedIndex === 0" id="console" class="tab-content" (click)="cInput.focus();">
+                <div id="consoleOutput">{{consoleOutput}}</div>
+                <div id="consoleInput">
+                    <i nz-icon nzType="right"></i>
+                    <input #cInput nz-input
+                        type="text"
+                        nzBorderless
+                        placeholder="发送命令给 GDB"
+                        (keyup.enter)="sendCommand();"
+                        [(ngModel)]="consoleInput"
+                        [disabled]="!enabled || !isDebugging"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

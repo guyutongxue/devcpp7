@@ -1,0 +1,78 @@
+:host {
+    .codicon {
+        transform: translateY(25%);
+    }
+
+    #debugPanel {
+        display       : flex;
+        height        : 100%;
+        flex-direction: row;
+
+        #leftPart {
+            flex-basis    : 200px;
+            display       : flex;
+            flex-direction: column;
+            border-right  : 2px solid lightgrey;
+            padding       : 10px;
+
+            #exprEval {
+                flex-grow: 1;
+
+                input {
+                    width: 100%;
+                }
+            }
+
+            #debugControl {
+                display    : flex;
+                align-items: center;
+            }
+        }
+
+        #rightPart {
+            flex-grow     : 1;
+            height: 100%;
+            padding       : 10px;
+            padding-top   : 0;
+            display       : flex;
+            flex-direction: column;
+
+            #tabContentWrapper {
+                flex-grow: 1;
+                height: 100%;
+
+                #console {
+                    display       : flex;
+                    flex-direction: column;
+                    border: 1px solid lightgray;
+                    border-radius: 2px;
+                    font-family: var(--monospace-font);
+
+                    #consoleOutput {
+                        flex-grow: 1;
+                        border-bottom: 1px solid lightgrey;
+                        padding: 4px 11px;
+                        white-space: pre-wrap;
+                        overflow-y: scroll;
+                    }
+                    #consoleInput {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        i {
+                            padding-left: 4px;
+                        }
+                        input {
+                            flex-grow: 1;
+                            padding-left: 2px;
+                        }
+                    }
+                }
+            }
+
+            .tab-content {
+                height: 100%;
+            }
+        }
+    }
+}
