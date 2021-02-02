@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ElectronService } from '../../../core/services';
+import { DebugService } from '../../../services/debug.service'
+import { TabsService } from '../../../services/tabs.service';
 
 @Component({
   selector: 'app-debug',
@@ -8,17 +9,33 @@ import { ElectronService } from '../../../core/services';
 })
 export class DebugComponent implements OnInit {
 
-  constructor(private electronService: ElectronService) { }
+  constructor(
+    private tabsService: TabsService,
+    private debugService: DebugService) { }
+  
+  private get targetTab() {
+    return this.tabsService.getActive().value;
+  }
+  
+  get enabled(): boolean {
+    if (this.targetTab === null) return false;
+    if (this.targetTab.path === null) return false;
+    return true;
+  }
+
+  get isDebugging() {
+    return this.debugService.isDebugging;
+  }
 
   ngOnInit(): void {
   }
 
   startDebug() {
-    this.electronService.ipcRenderer.send('debug/start', { srcPath: 'C:\\Users\\Guyutongxue\\Downloads\\a.cpp' });
+    this.debugService.startDebug(this.targetTab.path);
   }
 
   exitDebug() {
-    this.electronService.ipcRenderer.send('debug/exit');
+    this.debugService.exitDebug();
   }
 
 }

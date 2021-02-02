@@ -10,6 +10,9 @@ const gdb = new GdbController();
 // gdb.onResponse((response) => {
 //     // console.log(response);
 // })
+gdb.onClose(() => {
+    getWindow().webContents.send('ng:debug/debuggerClosed');
+})
 const gdbPath = path.join(extraResourcesPath, 'mingw64/bin/gdb.exe');
 const startupCommand = [
     '-gdb-set new-console on',
@@ -42,6 +45,7 @@ export async function startDebugger(event: IpcMainEvent, arg: { srcPath: string 
     for (const command of startupCommand) {
         console.log(await gdb.sendRequest(command));
     }
+    getWindow().webContents.send('ng:debug/debuggerStarted');
     event.returnValue = {
         success: true
     }
@@ -55,7 +59,6 @@ export async function exitDebugger(event: IpcMainEvent) {
         }
     }
     gdb.exit();
-    console.log("exit");
     event.returnValue = {
         success: true
     }

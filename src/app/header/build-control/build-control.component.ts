@@ -42,6 +42,8 @@ export class BuildControlComponent implements OnInit {
       if (result.success) {
         if (result.diagnostics.length === 0) {
           this.notification.success("编译成功", "", this.notifyOption);
+          this.problemsService.linkerr.next("");
+          this.problemsService.problems.next([]);
         } else {
           this.showProblems(result.diagnostics);
           this.notification.warning("编译成功，但存在警告", "", this.notifyOption);
