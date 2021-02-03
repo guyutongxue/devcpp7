@@ -31,23 +31,25 @@
         </nz-button-group>
     </div>
     <div id="rightPart">
-        <nz-tabset nzSize="small" [(nzSelectedIndex)]="selectedIndex">
-            <nz-tab nzTitle="调试控制台"></nz-tab>
-            <nz-tab nzTitle="调用栈"></nz-tab>
-            <nz-tab nzTitle="断点"></nz-tab>
-        </nz-tabset>
+        <div id="tabHeadWrapper">
+            <nz-tabset nzSize="small" [(nzSelectedIndex)]="selectedIndex">
+                <nz-tab nzTitle="调试控制台"></nz-tab>
+                <nz-tab nzTitle="调用栈"></nz-tab>
+                <nz-tab nzTitle="断点"></nz-tab>
+            </nz-tabset>
+        </div>
         <div id="tabContentWrapper">
             <div *ngIf="selectedIndex === 0" id="console" class="tab-content" (click)="cInput.focus();">
-                <div id="consoleOutput">{{consoleOutput}}</div>
+                <div id="consoleOutput" #cOutput>{{consoleOutput}}</div>
                 <div id="consoleInput">
-                    <i nz-icon nzType="right"></i>
+                    <i nz-icon nzType="right" [ngStyle]="{ color: (enabled && isDebugging ? promptColor : '#262626' ) }"></i>
                     <input #cInput nz-input
                         type="text"
                         nzBorderless
                         placeholder="发送命令给 GDB"
                         (keyup.enter)="sendCommand();"
                         [(ngModel)]="consoleInput"
-                        [disabled]="!enabled || !isDebugging"
+                        [disabled]="!enabled || !isDebugging || !consoleInputEnabled"
                     >
                 </div>
             </div>

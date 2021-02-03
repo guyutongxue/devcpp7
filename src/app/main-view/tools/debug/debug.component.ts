@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { DebugService } from '../../../services/debug.service'
 import { TabsService } from '../../../services/tabs.service';
 
@@ -11,16 +11,23 @@ import { TabsService } from '../../../services/tabs.service';
   ],
   // encapsulation: ViewEncapsulation.None
 })
-export class DebugComponent implements OnInit {
+export class DebugComponent implements OnInit, AfterViewChecked {
 
   constructor(
     private tabsService: TabsService,
     private debugService: DebugService) { }
 
+  @ViewChild("cOutput") private cOutput: ElementRef;
+
   selectedIndex: number = 0;
+
+  isDebugging: boolean = false;
+
   consoleOutput: string = "";
+  promptColor: string = "#262626";
   consoleInput: string = "";
-  
+  consoleInputEnabled = true;
+
   private get targetTab() {
     return this.tabsService.getActive().value;
   }
@@ -31,14 +38,24 @@ export class DebugComponent implements OnInit {
     return true;
   }
 
-  get isDebugging() {
-    return this.debugService.isDebugging;
+  ngOnInit(): void {
+    this.debugService.consoleOutput$.subscribe(value => {
+      this.consoleOutput = value;
+    });
+    this.debugService.isDebugging$.subscribe(value => {
+      this.isDebugging = value;
+      if (value) {
+        this.promptColor = "#262626";
+      }
+    })
   }
 
-  ngOnInit(): void {
-    this.debugService.consoleOutput.subscribe(value => {
-      this.consoleOutput = value;
-    })
+  ngAfterViewChecked(): void {    
+    try {
+      this.cOutput.nativeElement.scrollTop = this.cOutput.nativeElement.scrollHeight;
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   startDebug() {
@@ -49,7 +66,12 @@ export class DebugComponent implements OnInit {
     this.debugService.exitDebug();
   }
 
-  sendCommand() {
-    this.debugService.sendCommand(this.consoleInput);
+  async sendCommand() {
+    this.consoleInputEnabled = false;
+    const result = await this.debugService.sendCommand(this.consoleInput);
+    this.consoleInputEnabled = true;
+    this.consoleInput = "";
+    if (result.success) this.promptColor = "green";
+    else this.promptColor = "red";
   }
 }
