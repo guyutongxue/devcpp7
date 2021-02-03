@@ -132,8 +132,8 @@ export class EditorService {
         range: { startLineNumber: i, startColumn: 1, endLineNumber: i, endColumn: 1 },
         options: {
           isWholeLine: true,
-          className: 'debug-line-decoration',
-          glyphMarginClassName: 'debug-glyph-margin',
+          className: 'bkpt-line-decoration',
+          glyphMarginClassName: 'bkpt-glyph-margin codicon codicon-circle-filled',
         }
       })));
     }

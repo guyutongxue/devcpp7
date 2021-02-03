@@ -92,4 +92,20 @@ export class DebugService {
       command: command
     }) as Promise<SendRequestResult>;
   }
+
+  debugContinue() {
+    return this.sendMiRequest("-exec-continue");
+  }
+  debugStepover() {
+    return this.sendMiRequest("-exec-next");
+  }
+  debugStepinto() {
+    return this.sendMiRequest("-exec-step");
+  }
+  debugStepout() {
+    return this.sendMiRequest("-exec-finish");
+  }
+  debugRestart() {
+    return this.sendMiRequest("-exec-run");
+  }
 }

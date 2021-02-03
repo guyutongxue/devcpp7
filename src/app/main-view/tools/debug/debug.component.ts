@@ -5,11 +5,7 @@ import { TabsService } from '../../../services/tabs.service';
 @Component({
   selector: 'app-debug',
   templateUrl: './debug.component.html',
-  styleUrls: [
-    './debug.component.scss',
-    '../../../codicon/codicon.css'
-  ],
-  // encapsulation: ViewEncapsulation.None
+  styleUrls: ['./debug.component.scss']
 })
 export class DebugComponent implements OnInit, AfterViewChecked {
 
@@ -71,5 +67,21 @@ export class DebugComponent implements OnInit, AfterViewChecked {
     this.consoleInput = "";
     if (result.success) this.promptColor = "green";
     else this.promptColor = "red";
+  }
+
+  debugContinue() {
+    this.debugService.debugContinue();
+  }
+  debugStepover() {
+    this.debugService.debugStepover();
+  }
+  debugStepinto() {
+    this.debugService.debugStepinto();
+  }
+  debugStepout() {
+    this.debugService.debugStepout();
+  }
+  debugRestart() {
+    this.debugService.debugRestart();
   }
 }

@@ -55,10 +55,7 @@ const iconData: {
 @Component({
   selector: 'app-outline',
   templateUrl: './outline.component.html',
-  styleUrls: [
-    './outline.component.scss',
-    '../../../codicon/codicon.css'
-  ]
+  styleUrls: ['./outline.component.scss']
 })
 export class OutlineComponent implements OnInit {
   private symbols$: Observable<DocumentSymbol[]>
