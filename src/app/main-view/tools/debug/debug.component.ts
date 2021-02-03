@@ -53,9 +53,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   ngAfterViewChecked(): void {    
     try {
       this.cOutput.nativeElement.scrollTop = this.cOutput.nativeElement.scrollHeight;
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (_) { }
   }
 
   startDebug() {

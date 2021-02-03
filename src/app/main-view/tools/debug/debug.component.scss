@@ -9,9 +9,10 @@
         flex-direction: row;
 
         #leftPart {
-            width         : 200px;
+            width         : 225px;
             display       : flex;
             flex-direction: column;
+            justify-content: center;
             border-right  : 2px solid lightgrey;
             padding       : 10px;
 
@@ -24,8 +25,13 @@
             }
 
             #debugControl {
-                display    : flex;
-                align-items: center;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+
+                button {
+                    padding: 4px 6px;
+                }
             }
         }
 

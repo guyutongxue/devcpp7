@@ -48,7 +48,21 @@ export class DebugService {
   }
 
   private descape(src: string) {
-    return src.replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/\\n/g, '\n');
+    let result = "";
+    for (let i = 0; i < src.length; i++) {
+      if (src[i] === '\\') {
+        i++;
+        switch (src[i]) {
+          case '\\': result += '\\'; break;
+          case '"': result += '"'; break;
+          case 'n': result += '\n'; break;
+          case 't': result += '\t'; break;
+        }
+      } else {
+        result += src[i];
+      }
+    }
+    return result;
   }
 
   startDebug(srcPath: string) {

@@ -4,7 +4,7 @@
             <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !isDebugging">
 
         </div>
-        <nz-button-group id="debugControl">
+        <div id="debugControl">
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行" [disabled]="!enabled || !isDebugging">
                 <i class="codicon codicon-debug-continue"></i>
             </button>
@@ -28,7 +28,7 @@
                 nzTooltipPlacement="topRight" nzTooltipTitle="退出调试" [disabled]="!enabled">
                 <i class="codicon codicon-debug-stop"></i>
             </button>
-        </nz-button-group>
+        </div>
     </div>
     <div id="rightPart">
         <div id="tabHeadWrapper">
