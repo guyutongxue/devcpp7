@@ -10,6 +10,17 @@ import { classicTheme } from '../configs/editorTheme';
 import { defaultKeybindings } from '../configs/editorKeybindings'
 import { StartLanguageServerResult } from '../../background/handlers/typing';
 
+// All standard C++ headers filename
+const stdCppHeaders = [
+  'concepts', 'coroutine', 'cstdlib', 'csignal', 'csetjmp', 'cstdarg', 'typeinfo', 'typeindex', 'type_traits', 'bitset', 'functional', 'utility', 'ctime', 'chrono', 'cstddef', 'initializer_list', 'tuple', 'any', 'optional', 'variant', 'compare', 'version', 'source_location', 'new', 'memory', 'scoped_allocator', 'memory_resource', 'climits', 'cfloat', 'cstdint', 'cinttypes', 'limits', 'exception', 'stdexcept', 'cassert', 'system_error', 'cerrno', 'cctype', 'cwctype', 'cstring', 'cwchar', 'cuchar', 'string', 'string_view', 'charconv', 'format', 'array', 'vector', 'deque', 'list', 'forward_list', 'set', 'map', 'unordered_set', 'unordered_map', 'stack', 'queue', 'span', 'iterator', 'ranges', 'algorithm', 'execution', 'cmath', 'complex', 'valarray', 'random', 'numeric', 'ratio', 'cfenv', 'bit', 'numbers', 'locale', 'clocale', 'codecvt', 'iosfwd', 'ios', 'istream', 'ostream', 'iostream', 'fstream', 'sstream', 'syncstream', 'strstream', 'iomanip', 'streambuf', 'cstdio', 'filesystem', 'regex', 'atomic', 'thread', 'stop_token', 'mutex', 'shared_mutex', 'future', 'condition_variable', 'semaphore', 'latch', 'barrier'
+];
+
+function isCpp(filename: string) {
+  if (stdCppHeaders.includes(filename)) return true;
+  const ext = filename.split('.').pop();
+  return ['cc', 'cxx', 'cpp', 'h'].includes(ext);
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,6 +33,9 @@ export class EditorService {
   private languageClient: MonacoLanguageClient;
   private editorText = new BehaviorSubject<string>("");
   editorText$ = this.editorText.asObservable();
+
+  private breakpointLines: { [uri: string]: number[] } = {};
+  private breakpointDecorations: { [uri: string]: string[] } = {};
 
   constructor(private electronService: ElectronService) { }
 
@@ -100,6 +114,31 @@ export class EditorService {
     };
   }
 
+  private mouseDownListener = (e: monaco.editor.IEditorMouseEvent) => {
+    // Add or remove breakpoints
+    if (e.target.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+      const lineNumber = e.target.range.startLineNumber;
+      const currentModel = this.editor.getModel();
+      const uri = currentModel.uri.toString();
+      const index = this.breakpointLines[uri].indexOf(lineNumber);
+      if (index !== -1) {
+        this.breakpointLines[uri].splice(index, 1);
+      } else {
+        this.breakpointLines[uri].push(lineNumber);
+      }
+      console.log(this.breakpointLines);
+      this.breakpointDecorations[uri] = currentModel.deltaDecorations(this.breakpointDecorations[uri], this.breakpointLines[uri].map(i =>
+      ({
+        range: { startLineNumber: i, startColumn: 1, endLineNumber: i, endColumn: 1 },
+        options: {
+          isWholeLine: true,
+          className: 'debug-line-decoration',
+          glyphMarginClassName: 'debug-glyph-margin',
+        }
+      })));
+    }
+  }
+
   monacoInit(editor: monaco.editor.IStandaloneCodeEditor) {
     monaco.editor.defineTheme('devcpp-classic', classicTheme);
     monaco.editor.setTheme('devcpp-classic');
@@ -110,19 +149,24 @@ export class EditorService {
       })
     }
     this.interceptOpenEditor();
+    this.editor.onMouseDown(this.mouseDownListener);
     this.isInit = true;
     this.editorMessage.next({ type: "initCompleted" });
   }
+
 
   switchToModel(tab: Tab, disposeOld: boolean = false) {
     let uri = this.getUri(tab);
     let newModel = monaco.editor.getModel(uri);
     if (newModel === null) {
-      newModel = monaco.editor.createModel(tab.code, 'cpp', uri);
+      
+      newModel = monaco.editor.createModel(tab.code, isCpp(tab.title) ? 'cpp': 'text', uri);
       newModel.onDidChangeContent(_ => {
         tab.saved = false;
         this.editorText.next(newModel.getValue());
       });
+      this.breakpointLines[uri.toString()] = [];
+      this.breakpointDecorations[uri.toString()] = [];
     }
     let oldModel = this.editor.getModel();
     this.editor.setModel(newModel);
@@ -162,8 +206,13 @@ export class EditorService {
     const uri = this.getUri(tab);
     console.log('destroy ', uri.toString());
     const target = monaco.editor.getModel(uri);
+    delete this.breakpointLines[uri.toString()];
+    delete this.breakpointDecorations[uri.toString()];
     target.setValue("");
     target.dispose();
   }
 
+  getBreakpoints() {
+    return this.breakpointLines[this.editor.getModel().uri.toString()];
+  }
 }

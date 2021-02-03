@@ -2,5 +2,21 @@ ngx-monaco-editor {
     height: 100%;
     .editor-container {
         overflow: overlay !important;
+
+        .debug-line-decoration {
+            background: lightcoral;
+        }
+
+        .debug-glyph-margin {
+            $font-size: 14px;
+            $icon-size: $font-size * 0.8;
+            $padding: $font-size * 0.3;
+        
+            background: red;
+            width: $icon-size !important;
+            height: $icon-size !important;
+            margin: $padding;
+            border-radius: $icon-size / 2;
+        }
     }
 }

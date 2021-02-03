@@ -13,7 +13,8 @@ import { TabsService } from '../../../services/tabs.service'
 export class EditorComponent implements OnInit {
 
   editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
-
+    glyphMargin: true,
+    lineNumbersMinChars: 2
   };
   key: string;
   get code(){
