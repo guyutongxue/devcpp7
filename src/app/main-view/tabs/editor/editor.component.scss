@@ -19,5 +19,13 @@ ngx-monaco-editor {
             // margin: $padding;
             // border-radius: $icon-size / 2;
         }
+
+        .trace-line-decoration {
+            background: lightblue;
+        }
+
+        .trace-glyph-margin {
+            color: blue;
+        }
     }
 }

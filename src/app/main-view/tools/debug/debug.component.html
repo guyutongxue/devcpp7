@@ -5,24 +5,24 @@
 
         </div>
         <div id="debugControl">
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行" [disabled]="!enabled || !isDebugging"
-                (click)="debugContinue()">
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行"
+                [disabled]="!enabled || !isDebugging" (click)="debugContinue()">
                 <i class="codicon codicon-debug-continue"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步执行" [disabled]="!enabled || !isDebugging">
-                (click)="debugStepover()"
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步执行"
+                [disabled]="!enabled || !isDebugging" (click)="debugStepover()">
                 <i class="codicon codicon-debug-step-over"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步进入" [disabled]="!enabled || !isDebugging">
-                (click)="debugStepinto()"
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步进入"
+                [disabled]="!enabled || !isDebugging" (click)="debugStepinto()">
                 <i class="codicon codicon-debug-step-into"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="跳出函数" [disabled]="!enabled || !isDebugging">
-                (click)="debugStepout()"
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="跳出函数"
+                [disabled]="!enabled || !isDebugging" (click)="debugStepout()">
                 <i class="codicon codicon-debug-step-out"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="重新运行" [disabled]="!enabled || !isDebugging">
-                (click)="debugRestart()"
+            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="重新运行"
+                [disabled]="!enabled || !isDebugging" (click)="debugRestart()">
                 <i class="codicon codicon-debug-restart"></i>
             </button>
             <button *ngIf="!isDebugging" nz-button nzType="secondary" (click)="startDebug()" nz-tooltip
@@ -47,15 +47,11 @@
             <div *ngIf="selectedIndex === 0" id="console" class="tab-content" (click)="cInput.focus();">
                 <div id="consoleOutput" #cOutput>{{consoleOutput}}</div>
                 <div id="consoleInput">
-                    <i nz-icon nzType="right" [ngStyle]="{ color: (enabled && isDebugging ? promptColor : '#262626' ) }"></i>
-                    <input #cInput nz-input
-                        type="text"
-                        nzBorderless
-                        placeholder="发送命令给 GDB"
-                        (keyup.enter)="sendCommand();"
-                        [(ngModel)]="consoleInput"
-                        [disabled]="!enabled || !isDebugging || !consoleInputEnabled"
-                    >
+                    <i nz-icon nzType="right"
+                        [ngStyle]="{ color: (enabled && isDebugging ? promptColor : '#262626' ) }"></i>
+                    <input #cInput nz-input type="text" nzBorderless placeholder="发送命令给 GDB"
+                        (keyup.enter)="sendCommand();" [(ngModel)]="consoleInput"
+                        [disabled]="!enabled || !isDebugging || !consoleInputEnabled">
                 </div>
             </div>
         </div>

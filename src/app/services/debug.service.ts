@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { GdbResponse } from 'tsgdbmi';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions, SendRequestResult } from '../../background/handlers/typing';
 import { EditorService } from './editor.service';
+import { FileService } from './file.service';
+import { debounceTime } from 'rxjs/operators';
 
 function descape(src: string) {
   let result = "";
@@ -42,7 +44,13 @@ export class DebugService {
   private sourcePath: string;
   private editorBreakpoints: number[] = [];
 
-  constructor(private electronService: ElectronService, private editorService: EditorService) {
+  // use this subject to set rate limit of "running"/"stopped" event.
+  private traceLine: Subject<{ file?: string, line?: number }> = new Subject();
+
+  constructor(
+    private electronService: ElectronService,
+    private fileService: FileService,
+    private editorService: EditorService) {
     this.electronService.ipcRenderer.on('ng:debug/debuggerStarted', async () => {
       this.consoleOutput.next("");
       for (const breakline of this.editorBreakpoints) {
@@ -52,20 +60,42 @@ export class DebugService {
     });
     this.electronService.ipcRenderer.on('ng:debug/debuggerClosed', () => {
       this.isDebugging.next(false);
+      this.traceLine.next({});
     });
     this.electronService.ipcRenderer.on('ng:debug/console', (_, response: GdbResponse) => {
       const newstr = descape(response.payload as string);
       this.consoleOutput.next(this.allOutput += newstr);
     });
     this.electronService.ipcRenderer.on('ng:debug/notify', (_, response: GdbResponse) => {
-      console.log(response);
       if (response.message === "running") {
+        // Program is running (continue or init start or restart)
         this.isDebugging.next(true);
+        this.traceLine.next({});
+      } else if (response.message === "stopped") {
+        const reason = response.payload["reason"] as string;
+        if (reason.startsWith("exited")) {
+          // Program exited. Stop debugging
+          this.sendMiRequest("-gdb-exit");
+          this.isDebugging.next(false);
+          this.traceLine.next({});
+        } else if (["breakpoint-hit", "end-stepping-range", "function-finished"].includes(reason)) {
+          // Program stopped during step-by-step debugging
+          console.log(response.payload);
+          if ("file" in response.payload["frame"]) {
+            const stopFile = response.payload["frame"]["file"] as string;
+            const stopLine = Number.parseInt(response.payload["frame"]["line"] as string);
+            this.traceLine.next({ file: stopFile, line: stopLine });
+          }
+        }
+      } else {
+        console.log(response);
       }
-      if (response.message === "stopped" && (response.payload["reason"] as string).startsWith("exited")) {
-        this.sendMiRequest("-gdb-exit");
-        this.isDebugging.next(false);
-      }
+    });
+    this.traceLine.pipe(
+      debounceTime(100)
+    ).subscribe(value => {
+      if (typeof value.file === "undefined") this.editorService.hideTrace();
+      else this.fileService.locate(value.file, value.line, 1, "debug");
     })
   }
   private sendMiRequest(command: string) {

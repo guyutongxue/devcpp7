@@ -36,6 +36,8 @@ export class EditorService {
 
   private breakpointLines: { [uri: string]: number[] } = {};
   private breakpointDecorations: { [uri: string]: string[] } = {};
+  private traceDecoration: string[];
+  private lastTraceUri: monaco.Uri = null;
 
   constructor(private electronService: ElectronService) { }
 
@@ -126,7 +128,6 @@ export class EditorService {
       } else {
         this.breakpointLines[uri].push(lineNumber);
       }
-      console.log(this.breakpointLines);
       this.breakpointDecorations[uri] = currentModel.deltaDecorations(this.breakpointDecorations[uri], this.breakpointLines[uri].map(i =>
       ({
         range: { startLineNumber: i, startColumn: 1, endLineNumber: i, endColumn: 1 },
@@ -208,11 +209,31 @@ export class EditorService {
     const target = monaco.editor.getModel(uri);
     delete this.breakpointLines[uri.toString()];
     delete this.breakpointDecorations[uri.toString()];
+    if (this.lastTraceUri === uri) this.lastTraceUri = null;
     target.setValue("");
     target.dispose();
   }
 
   getBreakpoints() {
     return this.breakpointLines[this.editor.getModel().uri.toString()];
+  }
+
+  showTrace(line: number) {
+    const currentModel = this.editor.getModel();
+    this.traceDecoration = currentModel.deltaDecorations(this.traceDecoration, [{
+      range: { startLineNumber: line, startColumn: 1, endLineNumber: line, endColumn: 1 },
+      options: {
+        isWholeLine: true,
+        className: 'trace-line-decoration',
+        glyphMarginClassName: 'trace-glyph-margin codicon codicon-debug-stackframe',
+      }
+    }]);
+    this.lastTraceUri = currentModel.uri;
+    this.editor.revealLine(line);
+  }
+  hideTrace() {
+    if (this.lastTraceUri !== null)
+      monaco.editor.getModel(this.lastTraceUri)?.deltaDecorations(this.traceDecoration, []);
+    this.traceDecoration = [];
   }
 }

@@ -117,7 +117,14 @@ export class FileService {
     this.succUntitledNumber();
   }
 
-  locate(filepath: string, row: number, col: number) {
+  /**
+   * Locate to a specify position of a file
+   * @param filepath 
+   * @param row position
+   * @param col position
+   * @param type "cursor" means set cursor to that position, "debug" means set trace line 
+   */
+  locate(filepath: string, row: number, col: number, type: "cursor" | "debug" = "cursor") {
     const target = this.tabsService.tabList.find(t => t.path === filepath);
     if (typeof target === "undefined") {
       const result = this.electronService.ipcRenderer.sendSync("file/open", {
@@ -144,9 +151,13 @@ export class FileService {
     } else {
       this.tabsService.changeActive(target.key);
     }
-    this.editorService.setPosition({
-      lineNumber: row,
-      column: col
-    })
+    if (type === "cursor") {
+      this.editorService.setPosition({
+        lineNumber: row,
+        column: col
+      });
+    } else if (type === "debug") {
+      this.editorService.showTrace(row);
+    }
   }
 }
