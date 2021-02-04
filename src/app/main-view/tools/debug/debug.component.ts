@@ -1,6 +1,6 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { DebugService } from '../../../services/debug.service'
-import { TabsService } from '../../../services/tabs.service';
+import { DebugService } from '../../../services/debug.service';
+import { FileService } from '../../../services/file.service';
 
 @Component({
   selector: 'app-debug',
@@ -10,7 +10,7 @@ import { TabsService } from '../../../services/tabs.service';
 export class DebugComponent implements OnInit, AfterViewChecked {
 
   constructor(
-    private tabsService: TabsService,
+    private fileService: FileService,
     private debugService: DebugService) { }
 
   @ViewChild("cOutput") private cOutput: ElementRef;
@@ -24,14 +24,9 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   consoleInput: string = "";
   consoleInputEnabled = true;
 
-  private get targetTab() {
-    return this.tabsService.getActive().value;
-  }
 
   get enabled(): boolean {
-    if (this.targetTab === null) return false;
-    if (this.targetTab.path === null) return false;
-    return true;
+    return this.fileService.currentFileType() === "file";
   }
 
   ngOnInit(): void {
@@ -53,7 +48,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   }
 
   startDebug() {
-    this.debugService.startDebug(this.targetTab.path);
+    this.debugService.startDebug();
   }
 
   exitDebug() {

@@ -37,7 +37,20 @@ export class FileService {
     this.nextUntitledNumber++;
   }
 
-  saveAs(tab?: Tab) {
+  /**
+   * Return current file type.
+   * If no active file, return "none";
+   * If active file is not in disk (a temp new file), return "temp";
+   * If active file is located at disk, return "file".
+   */
+  currentFileType(): "none" | "temp" | "file" {
+    const activeTab = this.tabsService.getActive().value;
+    if (activeTab === null || activeTab.type !== "file") return "none";
+    if (activeTab.path === null) return "temp";
+    return "file";
+  }
+
+  saveAs(tab?: Tab) : string | null {
     if (typeof tab === "undefined") this.tabsService.getActive().value;
     let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
       content: tab.code,
@@ -50,13 +63,14 @@ export class FileService {
       if ("error" in result) {
         alert(result.error);
       }
-      return false;
+      return null;
     }
     this.tabsService.saveCode(tab.key, result.path);
-    return true;
+    return result.path;
   }
 
-  save(tab?: Tab) {
+  /** @return saved file path, null if not successful */
+  save(tab?: Tab): string | null {
     this.tabsService.syncActiveCode();
     if (typeof tab === "undefined") tab = this.tabsService.getActive().value;
     // new file, not stored yet
@@ -71,11 +85,18 @@ export class FileService {
         if ("error" in result) {
           alert(result.error);
         }
-        return false;
+        return null;
       }
       this.tabsService.saveCode(tab.key, tab.path);
-      return true;
+      return tab.path;
     }
+  }
+
+  /** Save active file when it's not saved */
+  saveOnNeed(): string | null {
+    const target = this.tabsService.getActive().value;
+    if (!target.saved) return this.save(target);
+    else return target.path;
   }
 
   open() {

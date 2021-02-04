@@ -105,8 +105,9 @@ export class DebugService {
     }) as Promise<SendRequestResult>;
   }
 
-  startDebug(srcPath: string) {
-    this.sourcePath = srcPath;
+  startDebug() {
+    this.sourcePath = this.fileService.saveOnNeed();
+    if (this.sourcePath === null) return;
     this.editorBreakpoints = this.editorService.getBreakpoints();
     this.electronService.ipcRenderer.send('debug/start', {
       srcPath: this.sourcePath
