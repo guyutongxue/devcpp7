@@ -156,24 +156,41 @@ export class EditorService {
   }
 
 
-  switchToModel(tab: Tab, disposeOld: boolean = false) {
-    let uri = this.getUri(tab);
+  switchToModel(tab: Tab, replace: boolean = false) {
+    const uri = this.getUri(tab);
     let newModel = monaco.editor.getModel(uri);
+    const oldModel = this.editor.getModel();
     if (newModel === null) {
-      
-      newModel = monaco.editor.createModel(tab.code, isCpp(tab.title) ? 'cpp': 'text', uri);
+      newModel = monaco.editor.createModel(tab.code, isCpp(tab.title) ? 'cpp' : 'text', uri);
       newModel.onDidChangeContent(_ => {
         tab.saved = false;
         this.editorText.next(newModel.getValue());
       });
-      this.breakpointLines[uri.toString()] = [];
-      this.breakpointDecorations[uri.toString()] = [];
+      if (replace) {
+        const oldUri = oldModel.uri.toString();
+        this.breakpointLines[uri.toString()] = this.breakpointLines[oldUri];
+        this.breakpointDecorations[uri.toString()] = newModel.deltaDecorations([], this.breakpointLines[oldUri].map(i =>
+        ({
+          range: { startLineNumber: i, startColumn: 1, endLineNumber: i, endColumn: 1 },
+          options: {
+            isWholeLine: true,
+            className: 'bkpt-line-decoration',
+            glyphMarginClassName: 'bkpt-glyph-margin codicon codicon-circle-filled',
+          }
+        })));
+        delete this.breakpointLines[oldUri];
+        delete this.breakpointDecorations[oldUri];
+      } else {
+        this.breakpointLines[uri.toString()] = [];
+        this.breakpointDecorations[uri.toString()] = [];
+      }
     }
-    let oldModel = this.editor.getModel();
     this.editor.setModel(newModel);
     console.log('switch to ', uri.toString());
     this.editorText.next(newModel.getValue());
-    if (disposeOld) oldModel.dispose();
+    if (replace) {
+      oldModel.dispose();
+    }
     this.editor.focus();
   }
 

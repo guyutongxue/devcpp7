@@ -26,14 +26,14 @@ export class DebugComponent implements OnInit, AfterViewChecked {
 
 
   get enabled(): boolean {
-    return this.fileService.currentFileType() === "file";
+    return this.fileService.currentFileType() !== "none";
   }
 
   ngOnInit(): void {
     this.debugService.consoleOutput$.subscribe(value => {
       this.consoleOutput = value;
     });
-    this.debugService.isDebugging$.subscribe(value => {
+    this.debugService.isDebugging.subscribe(value => {
       this.isDebugging = value;
       if (value) {
         this.promptColor = "#262626";

@@ -3,6 +3,8 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Tab, TabsService } from '../../../services/tabs.service'
 import { Router } from '@angular/router';
 import { FileService } from '../../../services/file.service';
+import { BuildService } from '../../../services/build.service';
+import { DebugService } from '../../../services/debug.service';
 
 @Component({
   selector: 'app-tabs',
@@ -13,7 +15,10 @@ export class TabsComponent implements OnInit {
 
   constructor(private router: Router,
     private tabsService: TabsService,
-    private fileService: FileService) { }
+    private fileService: FileService,
+    private buildService: BuildService, // determine is building or debugging
+    private debugService: DebugService
+  ) { }
 
   ngOnInit(): void {
     if (this.tabsService.getActive().index !== null)
@@ -44,6 +49,9 @@ export class TabsComponent implements OnInit {
   }
 
   closeTab(e: { index: number }) {
+    if (this.buildService.isCompiling || this.debugService.isDebugging.value) {
+      return;
+    }
     const target = this.tabList[e.index];
     if (target.saved === false) {
       this.notSaveModalShow(target);

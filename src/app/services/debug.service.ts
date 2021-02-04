@@ -34,8 +34,7 @@ function escape(src: string) {
 })
 export class DebugService {
 
-  private isDebugging: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  isDebugging$: Observable<boolean> = this.isDebugging.asObservable();
+  isDebugging: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private allOutput: string = "";
   private consoleOutput: BehaviorSubject<string> = new BehaviorSubject("");
