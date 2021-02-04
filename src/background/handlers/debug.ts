@@ -104,12 +104,14 @@ export async function sendRequest(_: IpcMainInvokeEvent, arg: SendRequestOptions
             };
         } else {
             return {
-                success: true
+                success: true,
+                payload: result.payload
             };
         }
     } catch (e) {
         return {
             success: false,
+            message: "Catched exception",
             error: e
         };
     }

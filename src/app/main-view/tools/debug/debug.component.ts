@@ -19,6 +19,9 @@ export class DebugComponent implements OnInit, AfterViewChecked {
 
   isDebugging: boolean = false;
 
+  expr: string = "";
+  exprVal: string = "";
+
   consoleOutput: string = "";
   promptColor: string = "#262626";
   consoleInput: string = "";
@@ -78,5 +81,10 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   }
   debugRestart() {
     this.debugService.debugRestart();
+  }
+
+  async evalExpr() {
+    const result = await this.debugService.evalExpr(this.expr);
+    if (result !== null) this.exprVal = result;
   }
 }

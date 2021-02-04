@@ -138,4 +138,13 @@ export class DebugService {
   debugRestart() {
     return this.sendMiRequest("-exec-run");
   }
+
+  async evalExpr(expr: string): Promise<string> {
+    const result = await this.sendMiRequest(`-data-evaluate-expression "${escape(expr)}"`);
+    if (result.success) {
+      return result.payload['value'];
+    } else {
+      return null;
+    }
+  }
 }

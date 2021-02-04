@@ -1,3 +1,4 @@
+import { GdbVal } from "tsgdbmi";
 import { Message } from "vscode-ws-jsonrpc";
 
 export interface SaveFileOptions {
@@ -81,4 +82,5 @@ export interface SendRequestResult {
     success: boolean;
     message?: string;
     error?: any;
+    payload?: GdbVal;
 }
