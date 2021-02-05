@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import { GdbResponse } from 'tsgdbmi';
 import { ElectronService } from '../core/services/electron/electron.service';
-import { SendRequestOptions, SendRequestResult } from '../../background/handlers/typing';
+import { SendRequestOptions } from '../../background/handlers/typing';
 import { EditorService } from './editor.service';
 import { FileService } from './file.service';
-import { debounceTime } from 'rxjs/operators';
+import { concatMap, debounceTime, filter } from 'rxjs/operators';
 
 function descape(src: string) {
   let result = "";
@@ -45,6 +45,8 @@ export class DebugService {
 
   // use this subject to set rate limit of "running"/"stopped" event.
   private traceLine: Subject<{ file?: string, line?: number }> = new Subject();
+
+  private requestResults: Subject<GdbResponse> = new Subject();
 
   constructor(
     private electronService: ElectronService,
@@ -90,18 +92,24 @@ export class DebugService {
         console.log(response);
       }
     });
+    this.electronService.ipcRenderer.on("ng:debug/result", (_, response: GdbResponse) => {
+      this.requestResults.next(response);
+    })
     this.traceLine.pipe(
       debounceTime(100)
     ).subscribe(value => {
       if (typeof value.file === "undefined") this.editorService.hideTrace();
       else this.fileService.locate(value.file, value.line, 1, "debug");
-    })
+    });
   }
-  private sendMiRequest(command: string) {
-    return this.electronService.ipcRenderer.invoke("debug/sendRequest", <SendRequestOptions>{
-      type: "mi",
-      command: command
-    }) as Promise<SendRequestResult>;
+  private sendMiRequest(command: string): Promise<GdbResponse> {
+    const token = Math.floor(Math.random() * 1000000);
+    this.electronService.ipcRenderer.send("debug/sendRequest", <SendRequestOptions>{
+      command: `${token}${command}`
+    })
+    return firstValueFrom(this.requestResults.pipe(
+      filter(result => result.token === token)
+    ));
   }
 
   startDebug() {
@@ -117,10 +125,7 @@ export class DebugService {
   }
 
   sendCommand(command: string) {
-    return this.electronService.ipcRenderer.invoke('debug/sendRequest', <SendRequestOptions>{
-      type: "cli",
-      command: command
-    }) as Promise<SendRequestResult>;
+    return this.sendMiRequest(`-interpreter-exec console "${escape(command)}"`);
   }
 
   debugContinue() {
@@ -141,7 +146,7 @@ export class DebugService {
 
   async evalExpr(expr: string): Promise<string> {
     const result = await this.sendMiRequest(`-data-evaluate-expression "${escape(expr)}"`);
-    if (result.success) {
+    if (result.message !== "error") {
       return result.payload['value'];
     } else {
       return null;

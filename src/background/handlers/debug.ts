@@ -5,7 +5,6 @@ import * as path from 'path';
 import { doCompile } from './build';
 import { extraResourcesPath, getWindow } from '../basicUtil';
 import { SendRequestOptions, SendRequestResult } from './typing';
-import { IpcMainInvokeEvent } from "electron/main";
 
 
 const gdb = new GdbController();
@@ -16,6 +15,9 @@ gdb.onResponse(response => {
             break;
         case "notify":
             getWindow().webContents.send('ng:debug/notify', response);
+            break;
+        case "result":
+            getWindow().webContents.send('ng:debug/result', response);
             break;
         default:
             break;
@@ -82,37 +84,25 @@ export async function exitDebugger(event: IpcMainEvent) {
     }
 }
 
-function escape(src: string) {
-    return src.replace(/"/g, '\\"').replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
-}
-
-export async function sendRequest(_: IpcMainInvokeEvent, arg: SendRequestOptions): Promise<SendRequestResult> {
+export function sendRequest(event: IpcMainEvent, arg: SendRequestOptions): void {
     if (!gdb.isRunning) {
-        return {
+        event.returnValue = {
             success: false,
-            message: "GDB not started."
-        };
+            message: "GDB not started"
+        } as SendRequestResult;
+        return;
     }
     try {
         console.log("request: " + arg.command);
-        const result = await gdb.sendRequest(arg.type === "cli" ? `-interpreter-exec console "${escape(arg.command)}"` : arg.command);
-        console.log("result: ", result);
-        if (result.message === "error") {
-            return {
-                success: false,
-                message: result.payload['msg']
-            };
-        } else {
-            return {
-                success: true,
-                payload: result.payload
-            };
-        }
+        gdb.sendRequest(arg.command, false);
+        // console.log("result: ", result);
+        event.returnValue = { success: true } as SendRequestResult;
+        return;
     } catch (e) {
-        return {
+        event.returnValue = {
             success: false,
-            message: "Catched exception",
             error: e
-        };
+        } as SendRequestResult;
+        return;
     }
 }

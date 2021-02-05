@@ -63,7 +63,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
     const result = await this.debugService.sendCommand(this.consoleInput);
     this.consoleInputEnabled = true;
     this.consoleInput = "";
-    if (result.success) this.promptColor = "green";
+    if (result.message !== "error") this.promptColor = "green";
     else this.promptColor = "red";
   }
 
