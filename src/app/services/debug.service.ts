@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
-import { GdbResponse } from 'tsgdbmi';
+import { GdbArray, GdbResponse } from 'tsgdbmi';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
 import { EditorService } from './editor.service';
 import { FileService } from './file.service';
-import { concatMap, debounceTime, filter } from 'rxjs/operators';
+import { debounceTime, filter, timeout } from 'rxjs/operators';
 
 function descape(src: string) {
   let result = "";
@@ -29,6 +29,14 @@ function escape(src: string) {
   return src.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\t/g, '\\t');
 }
 
+interface TraceLine { file: string; line: number };
+export interface FrameInfo {
+  file: string;
+  line: number;
+  func: string;
+  level: number;
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,7 +52,9 @@ export class DebugService {
   private editorBreakpoints: number[] = [];
 
   // use this subject to set rate limit of "running"/"stopped" event.
-  private traceLine: Subject<{ file?: string, line?: number }> = new Subject();
+  private traceLine: Subject<TraceLine | null> = new Subject();
+  private callStack: Subject<FrameInfo[]> = new Subject();
+  callStack$: Observable<FrameInfo[]> = this.callStack.asObservable();
 
   private requestResults: Subject<GdbResponse> = new Subject();
 
@@ -52,6 +62,7 @@ export class DebugService {
     private electronService: ElectronService,
     private fileService: FileService,
     private editorService: EditorService) {
+    
     this.electronService.ipcRenderer.on('ng:debug/debuggerStarted', async () => {
       this.consoleOutput.next("");
       for (const breakline of this.editorBreakpoints) {
@@ -59,26 +70,27 @@ export class DebugService {
       }
       await this.sendMiRequest("-exec-run");
     });
+
     this.electronService.ipcRenderer.on('ng:debug/debuggerClosed', () => {
-      this.isDebugging.next(false);
-      this.traceLine.next({});
+      this.exitCleaning();
     });
+
     this.electronService.ipcRenderer.on('ng:debug/console', (_, response: GdbResponse) => {
       const newstr = descape(response.payload as string);
       this.consoleOutput.next(this.allOutput += newstr);
     });
+
     this.electronService.ipcRenderer.on('ng:debug/notify', (_, response: GdbResponse) => {
       if (response.message === "running") {
         // Program is running (continue or init start or restart)
         this.isDebugging.next(true);
-        this.traceLine.next({});
+        this.traceLine.next(null);
       } else if (response.message === "stopped") {
         const reason = response.payload["reason"] as string;
         if (reason.startsWith("exited")) {
           // Program exited. Stop debugging
           this.sendMiRequest("-gdb-exit");
-          this.isDebugging.next(false);
-          this.traceLine.next({});
+          this.exitCleaning();
         } else if (["breakpoint-hit", "end-stepping-range", "function-finished"].includes(reason)) {
           // Program stopped during step-by-step debugging
           console.log(response.payload);
@@ -86,29 +98,40 @@ export class DebugService {
             const stopFile = response.payload["frame"]["file"] as string;
             const stopLine = Number.parseInt(response.payload["frame"]["line"] as string);
             this.traceLine.next({ file: stopFile, line: stopLine });
+            this.updateCallStack();
           }
         }
       } else {
         console.log(response);
       }
     });
+
     this.electronService.ipcRenderer.on("ng:debug/result", (_, response: GdbResponse) => {
       this.requestResults.next(response);
     })
+
     this.traceLine.pipe(
       debounceTime(100)
     ).subscribe(value => {
-      if (typeof value.file === "undefined") this.editorService.hideTrace();
+      if (value === null) this.editorService.hideTrace();
       else this.fileService.locate(value.file, value.line, 1, "debug");
     });
   }
+
+  private exitCleaning(): void {
+    this.isDebugging.next(false);
+    this.traceLine.next(null);
+    this.callStack.next([]);
+  }
+
   private sendMiRequest(command: string): Promise<GdbResponse> {
     const token = Math.floor(Math.random() * 1000000);
     this.electronService.ipcRenderer.send("debug/sendRequest", <SendRequestOptions>{
       command: `${token}${command}`
     })
     return firstValueFrom(this.requestResults.pipe(
-      filter(result => result.token === token)
+      filter(result => result.token === token),
+      timeout(1000)
     ));
   }
 
@@ -147,9 +170,22 @@ export class DebugService {
   async evalExpr(expr: string): Promise<string> {
     const result = await this.sendMiRequest(`-data-evaluate-expression "${escape(expr)}"`);
     if (result.message !== "error") {
-      return result.payload['value'];
+      return result.payload["value"];
     } else {
       return null;
+    }
+  }
+
+  private async updateCallStack(): Promise<void> {
+    const result = await this.sendMiRequest("-stack-list-frames");
+    if (result.message !== "error") {
+      const frames: FrameInfo[] = (result.payload["stack"] as GdbArray).map(value => ({
+        file: value["file"],
+        line: Number.parseInt(value["line"]),
+        func: value["func"],
+        level: Number.parseInt(value["level"])
+      }))
+      this.callStack.next(frames);
     }
   }
 }

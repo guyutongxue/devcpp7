@@ -44,7 +44,7 @@
             </nz-tabset>
         </div>
         <div id="tabContentWrapper">
-            <div *ngIf="selectedIndex === 0" id="console" class="tab-content" (click)="cInput.focus();">
+            <div [hidden]="selectedIndex !== 0" id="console" class="tab-content" (click)="cInput.focus();">
                 <div id="consoleOutput" #cOutput>{{consoleOutput}}</div>
                 <div id="consoleInput">
                     <i nz-icon nzType="right"
@@ -53,6 +53,26 @@
                         (keyup.enter)="sendCommand();" [(ngModel)]="consoleInput"
                         [disabled]="!enabled || !isDebugging || !consoleInputEnabled">
                 </div>
+            </div>
+            <div [hidden]="selectedIndex !== 1">
+                <nz-table #sTable [nzData]="callStack" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false" nzNoResult=" ">
+                    <thead>
+                      <tr>
+                        <th nzWidth="50px">层</th>
+                        <th>函数名</th>
+                        <th nzWidth="150px" nzRight>调用点</th>
+                      </tr>
+                    </thead>
+                    <tbody id="callStackTableBody">
+                      <tr *ngFor="let data of sTable.data">
+                        <td>{{ data.level }}</td>
+                        <td>{{ data.func }}</td>
+                        <td [nzEllipsis]="true" nzRight>
+                          <a (click)="locate(data)">{{ printPosition(data) }}</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </nz-table>
             </div>
         </div>
     </div>

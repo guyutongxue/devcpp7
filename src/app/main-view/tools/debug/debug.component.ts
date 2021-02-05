@@ -1,5 +1,6 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { DebugService } from '../../../services/debug.service';
+import * as path from 'path';
+import { DebugService, FrameInfo } from '../../../services/debug.service';
 import { FileService } from '../../../services/file.service';
 
 @Component({
@@ -27,6 +28,8 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   consoleInput: string = "";
   consoleInputEnabled = true;
 
+  callStack: FrameInfo[] = [];
+
 
   get enabled(): boolean {
     return this.fileService.currentFileType() !== "none";
@@ -41,6 +44,9 @@ export class DebugComponent implements OnInit, AfterViewChecked {
       if (value) {
         this.promptColor = "#262626";
       }
+    });
+    this.debugService.callStack$.subscribe(value => {
+      this.callStack = value;
     })
   }
 
@@ -86,5 +92,12 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   async evalExpr() {
     const result = await this.debugService.evalExpr(this.expr);
     if (result !== null) this.exprVal = result;
+  }
+
+  printPosition(frame: FrameInfo) {
+    return `${path.basename(frame.file.replace(/\n/g,'\\'))}:${frame.line}`;
+  }
+  locate(frame: FrameInfo) {
+    this.fileService.locate(frame.file, frame.line, 1);
   }
 }
