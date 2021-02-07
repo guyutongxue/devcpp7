@@ -91,10 +91,10 @@
                                 <a (click)="locateLine(data.line)">{{ printPosition(data) }}</a>
                             </td>
                             <td>
-                                <div class="editable-cell" [hidden]="!isDebugging && currentEditBkptline === data.line" (click)="startEditBkpt(data.line)">
+                                <div class="editable-cell" [hidden]="!isDebugging && currentEditBkptline === data.line" (click)="startEditBkpt(data)">
                                     {{ data.expression === null ? "　" : data.expression }}
                                 </div>
-                              <input [hidden]="isDebugging || currentEditBkptline !== data.line" type="text" nz-input [(ngModel)]="data.expression" (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)" placeholder="仅表达式成立时程序中断……">
+                              <input [hidden]="isDebugging || currentEditBkptline !== data.line" type="text" nz-input [(ngModel)]="currentEditValue" (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)" placeholder="仅表达式成立时程序中断……">
                             </td>
                         </tr>
                     </tbody>

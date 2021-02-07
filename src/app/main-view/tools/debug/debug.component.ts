@@ -33,13 +33,14 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   bkptList: FrameInfo[] = [];
 
   currentEditBkptline: number = null;
+  currentEditValue: string = "";
 
   get enabled(): boolean {
     return this.fileService.currentFileType() !== "none";
   }
 
   getEditorBreakpoints() {
-    return this.debugService.getEditorBreakpoints();
+    return this.debugService.editorBkptList;
   }
 
   ngOnInit(): void {
@@ -114,12 +115,15 @@ export class DebugComponent implements OnInit, AfterViewChecked {
     this.debugService.locateEditorBreakpoint(line);
   }
 
-  startEditBkpt(line: number) {
-    if (!this.isDebugging)
-      this.currentEditBkptline = line;
+  startEditBkpt(data: EditorBreakpointInfo) {
+    if (this.isDebugging) return;
+    this.currentEditValue = data.expression;
+    this.currentEditBkptline = data.line;
   }
   stopEditBkpt(data: EditorBreakpointInfo) {
-    if (data.expression.trim() === "") data.expression = null;
+    if (this.currentEditValue.trim() !== "") {
+      this.debugService.changeBkptCondition(data.id, this.currentEditValue);
+    }
     this.currentEditBkptline = null;
   }
 }

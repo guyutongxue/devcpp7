@@ -64,6 +64,7 @@ export class DebugService {
 
   private bkptList: Subject<BreakpointInfo[]> = new Subject();
   bkptList$: Observable<BreakpointInfo[]> = this.bkptList.asObservable();
+  editorBkptList: EditorBreakpointInfo[] = [];
 
   private requestResults: Subject<GdbResponse> = new Subject();
 
@@ -125,6 +126,10 @@ export class DebugService {
       if (value === null) this.editorService.hideTrace();
       else this.fileService.locate(value.file, value.line, 1, "debug");
     });
+
+    this.editorService.breakpointInfos$.subscribe(value => {
+      this.editorBkptList = value;
+    })
   }
 
   private exitCleaning(): void {
@@ -158,7 +163,7 @@ export class DebugService {
   startDebug() {
     this.sourcePath = this.fileService.saveOnNeed();
     if (this.sourcePath === null) return;
-    this.initBreakpoints = this.getEditorBreakpoints();
+    this.initBreakpoints = this.editorBkptList;
     this.electronService.ipcRenderer.send('debug/start', {
       srcPath: this.sourcePath
     });
@@ -209,8 +214,8 @@ export class DebugService {
     }
   }
 
-  getEditorBreakpoints() {
-    return this.editorService.getCurrentBreakpoints();
+  changeBkptCondition(id: string, expression: string) {
+    this.editorService.changeBkptCondition(id, expression);
   }
 
   locateEditorBreakpoint(line: number) {

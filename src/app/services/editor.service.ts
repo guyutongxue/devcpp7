@@ -21,10 +21,14 @@ function isCpp(filename: string) {
   return ['cc', 'cxx', 'cpp', 'h'].includes(ext);
 }
 
-export interface EditorBreakpointInfo {
-  line: number;
+interface EditorBreakpointDecInfo {
+  id: string;
   hitCount: number | null;
   expression: string | null;
+}
+
+export interface EditorBreakpointInfo extends EditorBreakpointDecInfo {
+  line: number;
 }
 
 @Injectable({
@@ -40,8 +44,10 @@ export class EditorService {
   private editorText = new BehaviorSubject<string>("");
   editorText$ = this.editorText.asObservable();
 
-  private breakpointInfos: { [uri: string]: EditorBreakpointInfo[] } = {};
-  private breakpointDecorations: { [uri: string]: string[] } = {};
+  private breakpointDecInfos: { [uri: string]: EditorBreakpointDecInfo[] } = {};
+  private breakpointInfos = new BehaviorSubject<EditorBreakpointInfo[]>([]);
+  breakpointInfos$ = this.breakpointInfos.asObservable();
+
   private traceDecoration: string[];
   private lastTraceUri: monaco.Uri = null;
 
@@ -54,17 +60,17 @@ export class EditorService {
     return monaco.Uri.parse(uri);
   }
 
-  /** Turn breakpoint infos to editor decorations */
-  private bkptInfosToDecoration(info: EditorBreakpointInfo[]): monaco.editor.IModelDeltaDecoration[] {
-    return info.map(i => ({
-      range: { startLineNumber: i.line, startColumn: 1, endLineNumber: i.line, endColumn: 1 },
+  /** Turn breakpoint info to editor decoration */
+  private bkptInfoToDecoration(line: number): monaco.editor.IModelDeltaDecoration {
+    return {
+      range: { startLineNumber: line, startColumn: 1, endLineNumber: line, endColumn: 1 },
       options: {
         isWholeLine: true,
         className: 'bkpt-line-decoration',
         glyphMarginClassName: 'bkpt-glyph-margin codicon codicon-circle-filled',
         stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
       }
-    }));
+    };
   }
 
   startLanguageClient() {
@@ -141,20 +147,20 @@ export class EditorService {
       const lineNumber = e.target.range.startLineNumber;
       const currentModel = this.editor.getModel();
       const uri = currentModel.uri.toString();
-      const index = this.breakpointInfos[uri].findIndex(v => v.line === lineNumber);
+      const index = this.breakpointDecInfos[uri].findIndex(v =>
+        currentModel.getDecorationRange(v.id).startLineNumber === lineNumber
+      );
       if (index !== -1) {
-        this.breakpointInfos[uri].splice(index, 1);
+        currentModel.deltaDecorations([this.breakpointDecInfos[uri][index].id], []);
+        this.breakpointDecInfos[uri].splice(index, 1);
       } else {
-        this.breakpointInfos[uri].push({
-          line: lineNumber,
+        this.breakpointDecInfos[uri].push({
+          id: currentModel.deltaDecorations([], [this.bkptInfoToDecoration(lineNumber)])[0],
           hitCount: null,
           expression: null
         });
       }
-      this.breakpointDecorations[uri] = currentModel.deltaDecorations(
-        this.breakpointDecorations[uri],
-        this.bkptInfosToDecoration(this.breakpointInfos[uri])
-      );
+      this.nextCurrentBreakpoints();
     }
   }
 
@@ -169,6 +175,13 @@ export class EditorService {
     }
     this.interceptOpenEditor();
     this.editor.onMouseDown(this.mouseDownListener);
+    this.editor.onDidChangeModel(() => {
+      this.editorText.next(this.editor.getValue());
+      this.nextCurrentBreakpoints();
+    });
+    this.editor.onDidChangeModelDecorations(() => {
+      this.nextCurrentBreakpoints();
+    })
     this.isInit = true;
     this.editorMessage.next({ type: "initCompleted" });
   }
@@ -176,6 +189,7 @@ export class EditorService {
 
   switchToModel(tab: Tab, replace: boolean = false) {
     const uri = this.getUri(tab);
+    const newUri = uri.toString();
     let newModel = monaco.editor.getModel(uri);
     const oldModel = this.editor.getModel();
     if (newModel === null) {
@@ -184,22 +198,23 @@ export class EditorService {
         tab.saved = false;
         this.editorText.next(newModel.getValue());
       });
+      this.breakpointDecInfos[newUri] = [];
       if (replace) {
         // "Inherit" old decorations to new model
         const oldUri = oldModel.uri.toString();
-        this.breakpointInfos[uri.toString()] = this.breakpointInfos[oldUri];
-        this.breakpointDecorations[uri.toString()] = newModel.deltaDecorations([], this.bkptInfosToDecoration(this.breakpointInfos[oldUri]));
-        delete this.breakpointInfos[oldUri];
-        delete this.breakpointDecorations[oldUri];
-      } else {
-        // set empty breakpoints
-        this.breakpointInfos[uri.toString()] = [];
-        this.breakpointDecorations[uri.toString()] = [];
+        for (const info of this.breakpointDecInfos[oldUri]) {
+          const line = oldModel.getDecorationRange(info.id).startLineNumber;
+          this.breakpointDecInfos[newUri].push({
+            id: newModel.deltaDecorations([], [this.bkptInfoToDecoration(line)])[0],
+            expression: info.expression,
+            hitCount: info.hitCount
+          });
+        }
+        delete this.breakpointDecInfos[oldUri];
       }
     }
     this.editor.setModel(newModel);
-    console.log('switch to ', uri.toString());
-    this.editorText.next(newModel.getValue());
+    console.log('switch to ', newUri);
     if (replace) {
       oldModel.dispose();
     }
@@ -236,15 +251,24 @@ export class EditorService {
     const uri = this.getUri(tab);
     console.log('destroy ', uri.toString());
     const target = monaco.editor.getModel(uri);
-    delete this.breakpointInfos[uri.toString()];
-    delete this.breakpointDecorations[uri.toString()];
+    delete this.breakpointDecInfos[uri.toString()];
     if (this.lastTraceUri === uri) this.lastTraceUri = null;
     target.setValue("");
     target.dispose();
   }
 
-  getCurrentBreakpoints() {
-    return this.breakpointInfos[this.editor.getModel().uri.toString()];
+  private nextCurrentBreakpoints() {
+    const currentModel = this.editor.getModel();
+    this.breakpointInfos.next(this.breakpointDecInfos[currentModel.uri.toString()].map(dec => ({
+      line: currentModel.getDecorationRange(dec.id).startLineNumber,
+      ...dec
+    })));
+  }
+
+  changeBkptCondition(id: string, expression: string) {
+    const currentModel = this.editor.getModel();
+    this.breakpointDecInfos[currentModel.uri.toString()].find(v => v.id === id).expression = expression;
+    this.nextCurrentBreakpoints();
   }
 
   showTrace(line: number) {
