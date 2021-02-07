@@ -3,7 +3,7 @@ import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import { GdbArray, GdbResponse } from 'tsgdbmi';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
-import { EditorService } from './editor.service';
+import { EditorBreakpointInfo, EditorService } from './editor.service';
 import { FileService } from './file.service';
 import { debounceTime, filter, timeout } from 'rxjs/operators';
 
@@ -37,6 +37,12 @@ export interface FrameInfo {
   level: number;
 };
 
+export interface BreakpointInfo {
+  file: string;
+  line: number;
+  func?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,12 +55,15 @@ export class DebugService {
   consoleOutput$: Observable<string> = this.consoleOutput.asObservable();
 
   private sourcePath: string;
-  private editorBreakpoints: number[] = [];
+  private initBreakpoints: EditorBreakpointInfo[] = [];
 
   // use this subject to set rate limit of "running"/"stopped" event.
   private traceLine: Subject<TraceLine | null> = new Subject();
   private callStack: Subject<FrameInfo[]> = new Subject();
   callStack$: Observable<FrameInfo[]> = this.callStack.asObservable();
+
+  private bkptList: Subject<BreakpointInfo[]> = new Subject();
+  bkptList$: Observable<BreakpointInfo[]> = this.bkptList.asObservable();
 
   private requestResults: Subject<GdbResponse> = new Subject();
 
@@ -65,8 +74,8 @@ export class DebugService {
     
     this.electronService.ipcRenderer.on('ng:debug/debuggerStarted', async () => {
       this.consoleOutput.next("");
-      for (const breakline of this.editorBreakpoints) {
-        await this.sendMiRequest(`-break-insert "${escape(this.sourcePath)}:${breakline}"`);
+      for (const breakInfo of this.initBreakpoints) {
+        await this.sendMiRequest(`-break-insert ${this.bkptConditionCmd(breakInfo)} "${escape(this.sourcePath)}:${breakInfo.line}"`);
       }
       await this.sendMiRequest("-exec-run");
     });
@@ -124,6 +133,17 @@ export class DebugService {
     this.callStack.next([]);
   }
 
+  private bkptConditionCmd(info: EditorBreakpointInfo) {
+    const cmds: string[] = [];
+    if (info.expression !== null) {
+      cmds.push(`-c "${escape(info.expression)}"`);
+    }
+    if (info.hitCount !== null) {
+      cmds.push(`-i ${info.hitCount}`);
+    }
+    return cmds.join(' ');
+  }
+
   private sendMiRequest(command: string): Promise<GdbResponse> {
     const token = Math.floor(Math.random() * 1000000);
     this.electronService.ipcRenderer.send("debug/sendRequest", <SendRequestOptions>{
@@ -138,7 +158,7 @@ export class DebugService {
   startDebug() {
     this.sourcePath = this.fileService.saveOnNeed();
     if (this.sourcePath === null) return;
-    this.editorBreakpoints = this.editorService.getBreakpoints();
+    this.initBreakpoints = this.getEditorBreakpoints();
     this.electronService.ipcRenderer.send('debug/start', {
       srcPath: this.sourcePath
     });
@@ -187,5 +207,16 @@ export class DebugService {
       }))
       this.callStack.next(frames);
     }
+  }
+
+  getEditorBreakpoints() {
+    return this.editorService.getCurrentBreakpoints();
+  }
+
+  locateEditorBreakpoint(line: number) {
+    this.editorService.setPosition({
+      lineNumber: line,
+      column: 1
+    });
   }
 }

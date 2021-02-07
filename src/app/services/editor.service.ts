@@ -21,6 +21,12 @@ function isCpp(filename: string) {
   return ['cc', 'cxx', 'cpp', 'h'].includes(ext);
 }
 
+export interface EditorBreakpointInfo {
+  line: number;
+  hitCount: number | null;
+  expression: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,7 +40,7 @@ export class EditorService {
   private editorText = new BehaviorSubject<string>("");
   editorText$ = this.editorText.asObservable();
 
-  private breakpointLines: { [uri: string]: number[] } = {};
+  private breakpointInfos: { [uri: string]: EditorBreakpointInfo[] } = {};
   private breakpointDecorations: { [uri: string]: string[] } = {};
   private traceDecoration: string[];
   private lastTraceUri: monaco.Uri = null;
@@ -46,6 +52,19 @@ export class EditorService {
     if (tab.path === null) uri += '/anon_workspace/' + tab.title;
     else uri += '/' + tab.path.replace(/\\/g, '/');
     return monaco.Uri.parse(uri);
+  }
+
+  /** Turn breakpoint infos to editor decorations */
+  private bkptInfosToDecoration(info: EditorBreakpointInfo[]): monaco.editor.IModelDeltaDecoration[] {
+    return info.map(i => ({
+      range: { startLineNumber: i.line, startColumn: 1, endLineNumber: i.line, endColumn: 1 },
+      options: {
+        isWholeLine: true,
+        className: 'bkpt-line-decoration',
+        glyphMarginClassName: 'bkpt-glyph-margin codicon codicon-circle-filled',
+        stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+      }
+    }));
   }
 
   startLanguageClient() {
@@ -122,21 +141,20 @@ export class EditorService {
       const lineNumber = e.target.range.startLineNumber;
       const currentModel = this.editor.getModel();
       const uri = currentModel.uri.toString();
-      const index = this.breakpointLines[uri].indexOf(lineNumber);
+      const index = this.breakpointInfos[uri].findIndex(v => v.line === lineNumber);
       if (index !== -1) {
-        this.breakpointLines[uri].splice(index, 1);
+        this.breakpointInfos[uri].splice(index, 1);
       } else {
-        this.breakpointLines[uri].push(lineNumber);
+        this.breakpointInfos[uri].push({
+          line: lineNumber,
+          hitCount: null,
+          expression: null
+        });
       }
-      this.breakpointDecorations[uri] = currentModel.deltaDecorations(this.breakpointDecorations[uri], this.breakpointLines[uri].map(i =>
-      ({
-        range: { startLineNumber: i, startColumn: 1, endLineNumber: i, endColumn: 1 },
-        options: {
-          isWholeLine: true,
-          className: 'bkpt-line-decoration',
-          glyphMarginClassName: 'bkpt-glyph-margin codicon codicon-circle-filled',
-        }
-      })));
+      this.breakpointDecorations[uri] = currentModel.deltaDecorations(
+        this.breakpointDecorations[uri],
+        this.bkptInfosToDecoration(this.breakpointInfos[uri])
+      );
     }
   }
 
@@ -167,21 +185,15 @@ export class EditorService {
         this.editorText.next(newModel.getValue());
       });
       if (replace) {
+        // "Inherit" old decorations to new model
         const oldUri = oldModel.uri.toString();
-        this.breakpointLines[uri.toString()] = this.breakpointLines[oldUri];
-        this.breakpointDecorations[uri.toString()] = newModel.deltaDecorations([], this.breakpointLines[oldUri].map(i =>
-        ({
-          range: { startLineNumber: i, startColumn: 1, endLineNumber: i, endColumn: 1 },
-          options: {
-            isWholeLine: true,
-            className: 'bkpt-line-decoration',
-            glyphMarginClassName: 'bkpt-glyph-margin codicon codicon-circle-filled',
-          }
-        })));
-        delete this.breakpointLines[oldUri];
+        this.breakpointInfos[uri.toString()] = this.breakpointInfos[oldUri];
+        this.breakpointDecorations[uri.toString()] = newModel.deltaDecorations([], this.bkptInfosToDecoration(this.breakpointInfos[oldUri]));
+        delete this.breakpointInfos[oldUri];
         delete this.breakpointDecorations[oldUri];
       } else {
-        this.breakpointLines[uri.toString()] = [];
+        // set empty breakpoints
+        this.breakpointInfos[uri.toString()] = [];
         this.breakpointDecorations[uri.toString()] = [];
       }
     }
@@ -224,15 +236,15 @@ export class EditorService {
     const uri = this.getUri(tab);
     console.log('destroy ', uri.toString());
     const target = monaco.editor.getModel(uri);
-    delete this.breakpointLines[uri.toString()];
+    delete this.breakpointInfos[uri.toString()];
     delete this.breakpointDecorations[uri.toString()];
     if (this.lastTraceUri === uri) this.lastTraceUri = null;
     target.setValue("");
     target.dispose();
   }
 
-  getBreakpoints() {
-    return this.breakpointLines[this.editor.getModel().uri.toString()];
+  getCurrentBreakpoints() {
+    return this.breakpointInfos[this.editor.getModel().uri.toString()];
   }
 
   showTrace(line: number) {
@@ -243,6 +255,7 @@ export class EditorService {
         isWholeLine: true,
         className: 'trace-line-decoration',
         glyphMarginClassName: 'trace-glyph-margin codicon codicon-debug-stackframe',
+        stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
       }
     }]);
     this.lastTraceUri = currentModel.uri;

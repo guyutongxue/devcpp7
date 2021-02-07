@@ -1,7 +1,8 @@
 <div id="debugPanel">
     <div id="leftPart">
         <div id="exprEval">
-            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !isDebugging" [(ngModel)]="expr" (keyup.enter)="evalExpr()">
+            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !isDebugging" [(ngModel)]="expr"
+                (keyup.enter)="evalExpr()">
             <div>{{exprVal}}</div>
         </div>
         <div id="debugControl">
@@ -44,7 +45,7 @@
             </nz-tabset>
         </div>
         <div id="tabContentWrapper">
-            <div [hidden]="selectedIndex !== 0" id="console" class="tab-content" (click)="cInput.focus();">
+            <div *ngIf="selectedIndex === 0" id="console" class="tab-content" (click)="cInput.focus();">
                 <div id="consoleOutput" #cOutput>{{consoleOutput}}</div>
                 <div id="consoleInput">
                     <i nz-icon nzType="right"
@@ -54,25 +55,50 @@
                         [disabled]="!enabled || !isDebugging || !consoleInputEnabled">
                 </div>
             </div>
-            <div [hidden]="selectedIndex !== 1">
-                <nz-table #sTable [nzData]="callStack" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false" nzNoResult=" ">
+            <div *ngIf="selectedIndex === 1">
+                <nz-table #sTable [nzData]="callStack" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false"
+                    nzNoResult=" ">
                     <thead>
-                      <tr>
-                        <th nzWidth="50px">层</th>
-                        <th>函数名</th>
-                        <th nzWidth="150px" nzRight>调用点</th>
-                      </tr>
+                        <tr>
+                            <th nzWidth="50px">层</th>
+                            <th>函数名</th>
+                            <th nzWidth="150px" nzRight>调用点</th>
+                        </tr>
                     </thead>
                     <tbody id="callStackTableBody">
-                      <tr *ngFor="let data of sTable.data">
-                        <td>{{ data.level }}</td>
-                        <td>{{ data.func }}</td>
-                        <td [nzEllipsis]="true" nzRight>
-                          <a (click)="locate(data)">{{ printPosition(data) }}</a>
-                        </td>
-                      </tr>
+                        <tr *ngFor="let data of sTable.data">
+                            <td>{{ data.level }}</td>
+                            <td>{{ data.func }}</td>
+                            <td [nzEllipsis]="true" nzRight>
+                                <a (click)="locate(data)">{{ printPosition(data) }}</a>
+                            </td>
+                        </tr>
                     </tbody>
-                  </nz-table>
+                </nz-table>
+            </div>
+            <div *ngIf="selectedIndex === 2">
+                <nz-table #bTable [nzData]="getEditorBreakpoints()" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false"
+                    nzNoResult=" ">
+                    <thead>
+                        <tr>
+                            <th nzWidth="150px" nzRight>位置</th>
+                            <th>条件</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakpointTableBody">
+                        <tr *ngFor="let data of bTable.data"  class="editable-row">
+                            <td [nzEllipsis]="true" nzRight>
+                                <a (click)="locateLine(data.line)">{{ printPosition(data) }}</a>
+                            </td>
+                            <td>
+                                <div class="editable-cell" [hidden]="!isDebugging && currentEditBkptline === data.line" (click)="startEditBkpt(data.line)">
+                                    {{ data.expression === null ? "　" : data.expression }}
+                                </div>
+                              <input [hidden]="isDebugging || currentEditBkptline !== data.line" type="text" nz-input [(ngModel)]="data.expression" (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)" placeholder="仅表达式成立时程序中断……">
+                            </td>
+                        </tr>
+                    </tbody>
+                </nz-table>
             </div>
         </div>
     </div>

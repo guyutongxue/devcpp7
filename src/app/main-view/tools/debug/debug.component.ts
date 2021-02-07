@@ -1,6 +1,7 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as path from 'path';
 import { DebugService, FrameInfo } from '../../../services/debug.service';
+import { EditorBreakpointInfo } from '../../../services/editor.service';
 import { FileService } from '../../../services/file.service';
 
 @Component({
@@ -29,10 +30,16 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   consoleInputEnabled = true;
 
   callStack: FrameInfo[] = [];
+  bkptList: FrameInfo[] = [];
 
+  currentEditBkptline: number = null;
 
   get enabled(): boolean {
     return this.fileService.currentFileType() !== "none";
+  }
+
+  getEditorBreakpoints() {
+    return this.debugService.getEditorBreakpoints();
   }
 
   ngOnInit(): void {
@@ -94,10 +101,25 @@ export class DebugComponent implements OnInit, AfterViewChecked {
     if (result !== null) this.exprVal = result;
   }
 
-  printPosition(frame: FrameInfo) {
-    return `${path.basename(frame.file.replace(/\n/g,'\\'))}:${frame.line}`;
+  printPosition(data: FrameInfo | EditorBreakpointInfo) {
+    if ("file" in data)
+      return `${path.basename(data.file.replace(/\n/g, '\\'))}:${data.line}`;
+    else
+      return `${this.fileService.currentFileName()}:${data.line}`;
   }
   locate(frame: FrameInfo) {
     this.fileService.locate(frame.file, frame.line, 1);
+  }
+  locateLine(line: number) {
+    this.debugService.locateEditorBreakpoint(line);
+  }
+
+  startEditBkpt(line: number) {
+    if (!this.isDebugging)
+      this.currentEditBkptline = line;
+  }
+  stopEditBkpt(data: EditorBreakpointInfo) {
+    if (data.expression.trim() === "") data.expression = null;
+    this.currentEditBkptline = null;
   }
 }

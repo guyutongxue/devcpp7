@@ -50,6 +50,10 @@ export class FileService {
     return "file";
   }
 
+  currentFileName(): string | null {
+    return this.tabsService.getActive().value?.title ?? null;
+  }
+
   saveAs(tab?: Tab) : string | null {
     if (typeof tab === "undefined") this.tabsService.getActive().value;
     let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
