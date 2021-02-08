@@ -27,7 +27,7 @@ export class MainViewComponent implements OnInit {
       title: '调试查看',
       url: 'watch',
       icon: 'eye',
-      disabled: true
+      disabled: false
     }
   ];
   currentOutletUrl(name: string) {
