@@ -3,6 +3,8 @@ import { GccDiagnostic, GccDiagnosticPosition } from '../../../../background/han
 import { ProblemsService } from '../../../services/problems.service';
 import * as path from 'path'
 import { FileService } from '../../../services/file.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface ITreeNode extends GccDiagnostic {
   level: number;
@@ -30,27 +32,30 @@ export class ProblemsComponent implements OnInit {
     note: {
       type: 'info-circle',
       color: 'blue'
-    } 
+    }
   }
 
   printPosition(position: GccDiagnosticPosition) {
-    return `${path.basename(position.file.replace(/\n/g,'\\'))}:${position.line}:${position.column}`;
+    return `${path.basename(position.file.replace(/\n/g, '\\'))}:${position.line}:${position.column}`;
   }
-  
-  flattenData: ITreeNode[] = [];
+
+  flattenData$: Observable<ITreeNode[]>;
 
   constructor(
     private fileService: FileService,
     private problemsService: ProblemsService) { }
 
   ngOnInit(): void {
-    this.problemsService.problems.subscribe(rawData => {
-      this.flattenData = [];
-      rawData.forEach(item => {
-        this.flattenData.splice(-1, 0, ...this.flattener(item));
-      });
-      console.log(this.flattenData);
-    })
+    this.flattenData$ = this.problemsService.problems.pipe(
+      map(rawData => {
+        const flatten: ITreeNode[] = [];
+        rawData.forEach(item => {
+          flatten.splice(-1, 0, ...this.flattener(item));
+        });
+        console.log(flatten);
+        return flatten;
+      })
+    );
   }
 
   get tableHeight(): number {
@@ -58,7 +63,7 @@ export class ProblemsComponent implements OnInit {
   }
 
   // Ant-design: font-size * line-height + 2 * padding
-  private readonly tableHeaderHeight: number = 14 * 1.5715 + 2 * 8; 
+  private readonly tableHeaderHeight: number = 14 * 1.5715 + 2 * 8;
 
   private flattener(root: GccDiagnostic): ITreeNode[] {
     const stack: ITreeNode[] = [];
@@ -78,7 +83,7 @@ export class ProblemsComponent implements OnInit {
 
   showProblem(item: ITreeNode) {
     const mainLocation = item.locations[0].caret;
-    this.fileService.locate(mainLocation.file.replace(/\n|\//g,'\\'), mainLocation.line, mainLocation.column);
+    this.fileService.locate(mainLocation.file.replace(/\n|\//g, '\\'), mainLocation.line, mainLocation.column);
   }
 
 }

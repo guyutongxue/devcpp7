@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
 import { DocumentSymbol, SymbolKind } from 'vscode-languageserver-protocol'
@@ -57,8 +57,9 @@ const iconData: {
   templateUrl: './outline.component.html',
   styleUrls: ['./outline.component.scss']
 })
-export class OutlineComponent implements OnInit {
-  private symbols$: Observable<DocumentSymbol[]>
+export class OutlineComponent implements OnInit, OnDestroy {
+  private symbols$: Observable<DocumentSymbol[]>;
+  private symbolsSubscription: Subscription;
   iconData = iconData;
 
   constructor(private editorService: EditorService) { }
@@ -69,11 +70,15 @@ export class OutlineComponent implements OnInit {
       distinctUntilChanged(),
       switchMap(_ => this.editorService.getSymbols())
     );
-    this.symbols$.subscribe(e => {
+    this.symbolsSubscription = this.symbols$.subscribe(e => {
       if (e === null) this.dataSource.setData([]);
       else this.dataSource.setData(e);
     })
   }
+  ngOnDestroy(): void {
+    this.symbolsSubscription.unsubscribe();
+  }
+
   private transformer(symbol: DocumentSymbol, level: number): FlatNode {
     return {
       expandable: !!symbol.children && symbol.children.length > 0,

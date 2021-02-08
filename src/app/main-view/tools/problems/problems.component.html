@@ -1,4 +1,4 @@
-<nz-table #table [nzData]="flattenData" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false" [nzScroll]="{ y: tableHeight + 'px' }" nzNoResult=" ">
+<nz-table #table [nzData]="flattenData$ | async" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false" [nzScroll]="{ y: tableHeight + 'px' }" nzNoResult=" ">
     <thead>
       <tr>
         <th nzWidth="2em" nzLeft></th>

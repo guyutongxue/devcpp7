@@ -5,7 +5,7 @@ import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
 import { EditorBreakpointInfo, EditorService } from './editor.service';
 import { FileService } from './file.service';
-import { debounceTime, filter, timeout } from 'rxjs/operators';
+import { debounceTime, filter, switchMap, timeout } from 'rxjs/operators';
 
 function descape(src: string) {
   let result = "";
@@ -68,8 +68,10 @@ export class DebugService {
 
   private requestResults: Subject<GdbResponse> = new Subject();
 
-  private localVariables: BehaviorSubject<GdbArray> = new BehaviorSubject([]);
-  private localVariables$: Observable<GdbArray> = this.localVariables.asObservable();
+  private localVariables: Subject<void> = new Subject();
+  localVariables$: Observable<GdbArray> = this.localVariables.pipe(
+    switchMap(() => this.getLocalVariables())
+  );
 
   constructor(
     private electronService: ElectronService,
@@ -112,6 +114,7 @@ export class DebugService {
             const stopLine = Number.parseInt(response.payload["frame"]["line"] as string);
             this.traceLine.next({ file: stopFile, line: stopLine });
             this.updateCallStack();
+            this.localVariables.next();
           }
         }
       } else {

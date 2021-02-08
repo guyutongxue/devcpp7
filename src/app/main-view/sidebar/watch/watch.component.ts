@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { GdbArray } from 'tsgdbmi';
+import { DebugService } from '../../../services/debug.service';
 
 @Component({
   selector: 'app-watch',
@@ -7,9 +10,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WatchComponent implements OnInit {
 
-  constructor() { }
+  localVariables$: Observable<GdbArray>;
+
+  constructor(private debugService: DebugService) { 
+  }
 
   ngOnInit(): void {
+    this.localVariables$ = this.debugService.localVariables$;
   }
 
 }

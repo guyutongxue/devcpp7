@@ -1,37 +1,37 @@
 <div id="debugPanel">
     <div id="leftPart">
         <div id="exprEval">
-            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !isDebugging" [(ngModel)]="expr"
+            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !(isDebugging$ | async)" [(ngModel)]="expr"
                 (keyup.enter)="evalExpr()">
                 <i nz-icon nzType="arrow-down"></i>
             <div id="exprResult">{{exprVal}}</div>
         </div>
         <div id="debugControl">
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行"
-                [disabled]="!enabled || !isDebugging" (click)="debugContinue()">
+                [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugContinue()">
                 <i class="codicon codicon-debug-continue"></i>
             </button>
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步执行"
-                [disabled]="!enabled || !isDebugging" (click)="debugStepover()">
+                [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugStepover()">
                 <i class="codicon codicon-debug-step-over"></i>
             </button>
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步进入"
-                [disabled]="!enabled || !isDebugging" (click)="debugStepinto()">
+                [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugStepinto()">
                 <i class="codicon codicon-debug-step-into"></i>
             </button>
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="跳出函数"
-                [disabled]="!enabled || !isDebugging" (click)="debugStepout()">
+                [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugStepout()">
                 <i class="codicon codicon-debug-step-out"></i>
             </button>
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="重新运行"
-                [disabled]="!enabled || !isDebugging" (click)="debugRestart()">
+                [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugRestart()">
                 <i class="codicon codicon-debug-restart"></i>
             </button>
-            <button *ngIf="!isDebugging" nz-button nzType="secondary" (click)="startDebug()" nz-tooltip
+            <button *ngIf="!(isDebugging$ | async)" nz-button nzType="secondary" (click)="startDebug()" nz-tooltip
                 nzTooltipPlacement="topRight" nzTooltipTitle="开始调试" [disabled]="!enabled">
                 <i class="codicon codicon-debug-start"></i>
             </button>
-            <button *ngIf="isDebugging" nz-button nzType="secondary" (click)="exitDebug()" nz-tooltip
+            <button *ngIf="(isDebugging$ | async)" nz-button nzType="secondary" (click)="exitDebug()" nz-tooltip
                 nzTooltipPlacement="topRight" nzTooltipTitle="退出调试" [disabled]="!enabled">
                 <i class="codicon codicon-debug-stop"></i>
             </button>
@@ -47,17 +47,17 @@
         </div>
         <div id="tabContentWrapper">
             <div *ngIf="selectedIndex === 0" id="console" class="tab-content" (click)="cInput.focus();">
-                <div id="consoleOutput" #cOutput>{{consoleOutput}}</div>
+                <div id="consoleOutput" #cOutput>{{consoleOutput$ | async}}</div>
                 <div id="consoleInput">
                     <i nz-icon nzType="right"
-                        [ngStyle]="{ color: (enabled && isDebugging ? promptColor : '#262626' ) }"></i>
+                        [ngStyle]="{ color: (enabled && (isDebugging$ | async) ? promptColor : '#262626' ) }"></i>
                     <input #cInput nz-input type="text" nzBorderless placeholder="发送命令给 GDB"
                         (keyup.enter)="sendCommand();" [(ngModel)]="consoleInput"
-                        [disabled]="!enabled || !isDebugging || !consoleInputEnabled">
+                        [disabled]="!enabled || !(isDebugging$ | async) || !consoleInputEnabled">
                 </div>
             </div>
             <div *ngIf="selectedIndex === 1">
-                <nz-table #sTable [nzData]="callStack" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false"
+                <nz-table #sTable [nzData]="callStack$ | async" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false"
                     nzNoResult=" ">
                     <thead>
                         <tr>
@@ -92,10 +92,10 @@
                                 <a (click)="locateLine(data.line)">{{ printPosition(data) }}</a>
                             </td>
                             <td>
-                                <div class="editable-cell" [hidden]="!isDebugging && currentEditBkptline === data.line" (click)="startEditBkpt(data)">
+                                <div class="editable-cell" [hidden]="!(isDebugging$ | async) && currentEditBkptline === data.line" (click)="startEditBkpt(data)">
                                     {{ data.expression === null ? "　" : data.expression }}
                                 </div>
-                              <input [hidden]="isDebugging || currentEditBkptline !== data.line" type="text" nz-input [(ngModel)]="currentEditValue" (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)" placeholder="仅表达式成立时程序中断……">
+                              <input [hidden]="(isDebugging$ | async) || currentEditBkptline !== data.line" type="text" nz-input [(ngModel)]="currentEditValue" (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)" placeholder="仅表达式成立时程序中断……">
                             </td>
                         </tr>
                     </tbody>

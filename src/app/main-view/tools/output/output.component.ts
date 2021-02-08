@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ProblemsService } from '../../../services/problems.service';
 
 @Component({
@@ -10,20 +12,16 @@ export class OutputComponent implements OnInit {
 
   constructor(private problemsService: ProblemsService) { }
 
-  compileMessage: string;
-  linkMessage: string;
-  otherMessage: string;
+  compileMessage$: Observable<string>;
+  linkMessage$: Observable<string>;
+  otherMessage$: Observable<string>;
 
   ngOnInit(): void {
-    this.problemsService.problems.subscribe(data => {
-      this.compileMessage = JSON.stringify(data).replace(/\n/g,'\\');
-    });
-    this.problemsService.linkerr.subscribe(data => {
-      this.linkMessage = data;
-    });
-    this.problemsService.unknownerr.subscribe(data => {
-      this.otherMessage = data;
-    })
+    this.compileMessage$ = this.problemsService.problems.pipe(
+      map(data => JSON.stringify(data).replace(/\n/g, '\\'))
+    );
+    this.linkMessage$ = this.problemsService.linkerr;
+    this.otherMessage$ = this.problemsService.unknownerr;
   }
 
 }

@@ -1,5 +1,7 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as path from 'path';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { DebugService, FrameInfo } from '../../../services/debug.service';
 import { EditorBreakpointInfo } from '../../../services/editor.service';
 import { FileService } from '../../../services/file.service';
@@ -19,18 +21,18 @@ export class DebugComponent implements OnInit, AfterViewChecked {
 
   selectedIndex: number = 0;
 
-  isDebugging: boolean = false;
+  isDebugging$: Observable<boolean>;
 
   expr: string = "";
   exprVal: string = "";
 
-  consoleOutput: string = "";
+  consoleOutput$: Observable<string>;
   promptColor: string = "#262626";
   consoleInput: string = "";
   consoleInputEnabled = true;
 
-  callStack: FrameInfo[] = [];
-  bkptList: FrameInfo[] = [];
+  callStack$: Observable<FrameInfo[]>;
+  // bkptList: FrameInfo[] = [];
 
   currentEditBkptline: number = null;
   currentEditValue: string = "";
@@ -44,18 +46,11 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
-    this.debugService.consoleOutput$.subscribe(value => {
-      this.consoleOutput = value;
-    });
-    this.debugService.isDebugging.subscribe(value => {
-      this.isDebugging = value;
-      if (value) {
-        this.promptColor = "#262626";
-      }
-    });
-    this.debugService.callStack$.subscribe(value => {
-      this.callStack = value;
-    })
+    this.consoleOutput$ = this.debugService.consoleOutput$;
+    this.isDebugging$ = this.debugService.isDebugging.pipe(tap(value => {
+      if (value) this.promptColor = "#262626";
+    }));
+    this.callStack$ = this.debugService.callStack$;
   }
 
   ngAfterViewChecked(): void {    
@@ -116,7 +111,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   }
 
   startEditBkpt(data: EditorBreakpointInfo) {
-    if (this.isDebugging) return;
+    if (this.debugService.isDebugging.value) return;
     this.currentEditValue = data.expression;
     this.currentEditBkptline = data.line;
   }
