@@ -62,11 +62,14 @@ export class DebugService {
   private callStack: Subject<FrameInfo[]> = new Subject();
   callStack$: Observable<FrameInfo[]> = this.callStack.asObservable();
 
-  private bkptList: Subject<BreakpointInfo[]> = new Subject();
-  bkptList$: Observable<BreakpointInfo[]> = this.bkptList.asObservable();
+  // private bkptList: Subject<BreakpointInfo[]> = new Subject();
+  // bkptList$: Observable<BreakpointInfo[]> = this.bkptList.asObservable();
   editorBkptList: EditorBreakpointInfo[] = [];
 
   private requestResults: Subject<GdbResponse> = new Subject();
+
+  private localVariables: BehaviorSubject<GdbArray> = new BehaviorSubject([]);
+  private localVariables$: Observable<GdbArray> = this.localVariables.asObservable();
 
   constructor(
     private electronService: ElectronService,
@@ -197,7 +200,7 @@ export class DebugService {
     if (result.message !== "error") {
       return result.payload["value"];
     } else {
-      return null;
+      return result.payload["msg"];
     }
   }
 
@@ -223,5 +226,14 @@ export class DebugService {
       lineNumber: line,
       column: 1
     });
+  }
+
+  async getLocalVariables(): Promise<GdbArray> {
+    const result = await this.sendMiRequest("-stack-list-variables --all-values");
+    if (result.message !== "error") {
+      return result.payload["variables"];
+    } else {
+      return null;
+    }
   }
 }

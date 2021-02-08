@@ -9,6 +9,7 @@ import { ElectronService } from '../core/services';
 import { classicTheme } from '../configs/editorTheme';
 import { defaultKeybindings } from '../configs/editorKeybindings'
 import { StartLanguageServerResult } from '../../background/handlers/typing';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // All standard C++ headers filename
 const stdCppHeaders = [
@@ -51,7 +52,17 @@ export class EditorService {
   private traceDecoration: string[];
   private lastTraceUri: monaco.Uri = null;
 
-  constructor(private electronService: ElectronService) { }
+  constructor(private electronService: ElectronService) { 
+    this.editorText.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(v => {
+      const model = this.editor?.getModel();
+      if (model) {
+        this.updateModelInfo(model);
+      }
+    })
+  }
 
   private getUri(tab: Tab): monaco.Uri {
     let uri = tab.type + "://";
@@ -160,7 +171,7 @@ export class EditorService {
           expression: null
         });
       }
-      this.nextCurrentBreakpoints();
+      this.updateModelInfo(currentModel);
     }
   }
 
@@ -177,11 +188,7 @@ export class EditorService {
     this.editor.onMouseDown(this.mouseDownListener);
     this.editor.onDidChangeModel(() => {
       this.editorText.next(this.editor.getValue());
-      this.nextCurrentBreakpoints();
     });
-    this.editor.onDidChangeModelDecorations(() => {
-      this.nextCurrentBreakpoints();
-    })
     this.isInit = true;
     this.editorMessage.next({ type: "initCompleted" });
   }
@@ -257,10 +264,11 @@ export class EditorService {
     target.dispose();
   }
 
-  private nextCurrentBreakpoints() {
-    const currentModel = this.editor.getModel();
-    this.breakpointInfos.next(this.breakpointDecInfos[currentModel.uri.toString()].map(dec => ({
-      line: currentModel.getDecorationRange(dec.id).startLineNumber,
+  private updateModelInfo(model: monaco.editor.ITextModel) {
+    const uri = model.uri.toString();
+    if (uri in this.breakpointDecInfos)
+    this.breakpointInfos.next(this.breakpointDecInfos[uri].map(dec => ({
+      line: model.getDecorationRange(dec.id).startLineNumber,
       ...dec
     })));
   }
@@ -268,7 +276,7 @@ export class EditorService {
   changeBkptCondition(id: string, expression: string) {
     const currentModel = this.editor.getModel();
     this.breakpointDecInfos[currentModel.uri.toString()].find(v => v.id === id).expression = expression;
-    this.nextCurrentBreakpoints();
+    this.updateModelInfo(currentModel);
   }
 
   showTrace(line: number) {

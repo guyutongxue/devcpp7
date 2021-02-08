@@ -3,7 +3,8 @@
         <div id="exprEval">
             <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !isDebugging" [(ngModel)]="expr"
                 (keyup.enter)="evalExpr()">
-            <div>{{exprVal}}</div>
+                <i nz-icon nzType="arrow-down"></i>
+            <div id="exprResult">{{exprVal}}</div>
         </div>
         <div id="debugControl">
             <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行"
