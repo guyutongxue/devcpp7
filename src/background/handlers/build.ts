@@ -1,10 +1,11 @@
 import { IpcMainEvent } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
 import { getWindow, extraResourcesPath } from '../basicUtil'
 import { GccDiagnostics, BuildResult } from './typing';
-
+import { ioEncoding } from './constants';
 
 function encode(src: string) {
   return encodeURIComponent(src);
@@ -57,7 +58,9 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
   return new Promise((resolve, reject) => {
     execFile(path.join(extraResourcesPath, 'mingw64/bin/g++.exe'), args, {
       cwd: cwd,
-    }, (error, stdout, stderr) => {
+      encoding: 'buffer'
+    }, (error, stdout, stderrBuf) => {
+      const stderr = iconv.decode(stderrBuf, ioEncoding);
       if (error) {
         resolve({
           success: false,
