@@ -1,29 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import { GdbArray, GdbResponse } from 'tsgdbmi';
+import * as iconv from 'iconv-lite';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
+import { ioEncoding } from '../../background/handlers/constants';
 import { EditorBreakpointInfo, EditorService } from './editor.service';
 import { FileService } from './file.service';
 import { debounceTime, filter, switchMap, timeout } from 'rxjs/operators';
-
-function descape(src: string) {
-  let result = "";
-  for (let i = 0; i < src.length; i++) {
-    if (src[i] === '\\') {
-      i++;
-      switch (src[i]) {
-        case '\\': result += '\\'; break;
-        case '"': result += '"'; break;
-        case 'n': result += '\n'; break;
-        case 't': result += '\t'; break;
-      }
-    } else {
-      result += src[i];
-    }
-  }
-  return result;
-}
 
 function escape(src: string) {
   return src.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\t/g, '\\t');
@@ -77,7 +61,7 @@ export class DebugService {
     private electronService: ElectronService,
     private fileService: FileService,
     private editorService: EditorService) {
-    
+
     this.electronService.ipcRenderer.on('ng:debug/debuggerStarted', async () => {
       this.consoleOutput.next("");
       for (const breakInfo of this.initBreakpoints) {
@@ -91,7 +75,7 @@ export class DebugService {
     });
 
     this.electronService.ipcRenderer.on('ng:debug/console', (_, response: GdbResponse) => {
-      const newstr = descape(response.payload as string);
+      const newstr = response.payload as string;
       this.consoleOutput.next(this.allOutput += newstr);
     });
 

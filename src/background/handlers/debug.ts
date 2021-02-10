@@ -5,9 +5,9 @@ import * as path from 'path';
 import { doCompile } from './build';
 import { extraResourcesPath, getWindow } from '../basicUtil';
 import { SendRequestOptions, SendRequestResult } from './typing';
+import { ioEncoding } from "./constants";
 
-
-const gdb = new GdbController();
+const gdb = new GdbController(ioEncoding);
 gdb.onResponse(response => {
     switch (response.type) {
         case "console":
@@ -55,15 +55,23 @@ export async function startDebugger(event: IpcMainEvent, arg: { srcPath: string 
     gdb.launch(gdbPath, [filename], {
         cwd: cwd
     });
-    for (const command of startupCommand) {
-        const response = await gdb.sendRequest(command);
-        if (response.message === "error") {
-            event.returnValue = {
-                success: false,
-                reason: `Startup command '${command}' execution failed`
-            };
-            return;
+    try {
+        for (const command of startupCommand) {
+            const response = await gdb.sendRequest(command);
+            if (response.message === "error") {
+                event.returnValue = {
+                    success: false,
+                    reason: `Startup command '${command}' execution failed`
+                };
+                return;
+            }
         }
+    } catch (e) {
+        event.returnValue = {
+            success: false,
+            error: e
+        } as SendRequestResult;
+        return;
     }
     getWindow().webContents.send('ng:debug/debuggerStarted');
     event.returnValue = {
