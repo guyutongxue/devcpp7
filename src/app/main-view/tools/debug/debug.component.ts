@@ -93,8 +93,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   }
 
   async evalExpr() {
-    const result = await this.debugService.evalExpr(this.expr);
-    if (result !== null) this.exprVal = result;
+    this.exprVal = await this.debugService.evalExpr(this.expr);
   }
 
   printPosition(data: FrameInfo | EditorBreakpointInfo) {

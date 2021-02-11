@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject } from 'rxjs';
 import { GdbArray, GdbResponse } from 'tsgdbmi';
-import * as iconv from 'iconv-lite';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
-import { ioEncoding } from '../../background/handlers/constants';
 import { EditorBreakpointInfo, EditorService } from './editor.service';
 import { FileService } from './file.service';
-import { debounceTime, filter, switchMap, timeout } from 'rxjs/operators';
+import { catchError, debounceTime, filter, switchMap, timeout } from 'rxjs/operators';
 
 function escape(src: string) {
   return src.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\t/g, '\\t');
@@ -43,8 +41,6 @@ export class DebugService {
 
   // use this subject to set rate limit of "running"/"stopped" event.
   private traceLine: Subject<TraceLine | null> = new Subject();
-  private callStack: Subject<FrameInfo[]> = new Subject();
-  callStack$: Observable<FrameInfo[]> = this.callStack.asObservable();
 
   // private bkptList: Subject<BreakpointInfo[]> = new Subject();
   // bkptList$: Observable<BreakpointInfo[]> = this.bkptList.asObservable();
@@ -52,9 +48,14 @@ export class DebugService {
 
   private requestResults: Subject<GdbResponse> = new Subject();
 
-  private localVariables: Subject<void> = new Subject();
-  localVariables$: Observable<GdbArray> = this.localVariables.pipe(
-    switchMap(() => this.getLocalVariables())
+  programStop: BehaviorSubject<void> = new BehaviorSubject(undefined);
+  localVariables$: Observable<GdbArray> = this.programStop.pipe(
+    switchMap(() => this.getLocalVariables()),
+    catchError(err => (alert(err), EMPTY))
+  );
+  callStack$: Observable<FrameInfo[]> = this.programStop.pipe(
+    switchMap(() => this.getCallStack()),
+    catchError(err => (alert(err), EMPTY))
   );
 
   constructor(
@@ -97,8 +98,7 @@ export class DebugService {
             const stopFile = response.payload["frame"]["file"] as string;
             const stopLine = Number.parseInt(response.payload["frame"]["line"] as string);
             this.traceLine.next({ file: stopFile, line: stopLine });
-            this.updateCallStack();
-            this.localVariables.next();
+            this.programStop.next();
           }
         }
       } else {
@@ -125,7 +125,7 @@ export class DebugService {
   private exitCleaning(): void {
     this.isDebugging.next(false);
     this.traceLine.next(null);
-    this.callStack.next([]);
+    this.programStop.next();
   }
 
   private bkptConditionCmd(info: EditorBreakpointInfo) {
@@ -191,19 +191,6 @@ export class DebugService {
     }
   }
 
-  private async updateCallStack(): Promise<void> {
-    const result = await this.sendMiRequest("-stack-list-frames");
-    if (result.message !== "error") {
-      const frames: FrameInfo[] = (result.payload["stack"] as GdbArray).map(value => ({
-        file: value["file"],
-        line: Number.parseInt(value["line"]),
-        func: value["func"],
-        level: Number.parseInt(value["level"])
-      }))
-      this.callStack.next(frames);
-    }
-  }
-
   changeBkptCondition(id: string, expression: string) {
     this.editorService.changeBkptCondition(id, expression);
   }
@@ -215,12 +202,28 @@ export class DebugService {
     });
   }
 
+  async getCallStack(): Promise<FrameInfo[]> {
+    if (!this.isDebugging.value) return [];
+    const result = await this.sendMiRequest("-stack-list-frames");
+    if (result.message !== "error") {
+      return (result.payload["stack"] as GdbArray).map(value => ({
+        file: value["file"],
+        line: Number.parseInt(value["line"]),
+        func: value["func"],
+        level: Number.parseInt(value["level"])
+      }) as FrameInfo);
+    } else {
+      return Promise.reject(result.payload["msg"]);
+    }
+  }
+
   async getLocalVariables(): Promise<GdbArray> {
+    if (!this.isDebugging.value) return [];
     const result = await this.sendMiRequest("-stack-list-variables --all-values");
     if (result.message !== "error") {
       return result.payload["variables"];
     } else {
-      return null;
+      return Promise.reject(result.payload["msg"]);
     }
   }
 }

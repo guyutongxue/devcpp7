@@ -15,6 +15,7 @@ gdb.onResponse(response => {
             break;
         case "notify":
             getWindow().webContents.send('ng:debug/notify', response);
+            getWindow().focus();
             break;
         case "result":
             getWindow().webContents.send('ng:debug/result', response);
