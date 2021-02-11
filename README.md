@@ -18,9 +18,11 @@ A project simulating legacy Dev-C++, a tiny C++ IDE, powered by Angular, Electro
 
 **Under construction, but may be in abeyance later**
 
-Due to the incompleteness of Monaco Editor API, I'm afraid that I won't be able to continue this project as ideally as I expected.
-
-Currently only contains basic new/open/save operations, and a small compile button.
+Current features:
+- Basic New/Open/Save
+- Features provided by LSP: suggestions, hover message, outline, squiggles, etc.
+- Basic single file Compile/Run
+- Basic step-by-step debug
 
 ## :warning: Warning
 
@@ -35,6 +37,14 @@ Currently only contains basic new/open/save operations, and a small compile butt
 ## Build instructions
 
 This repo is based on [angular-electron](https://github.com/maximegris/angular-electron) template. Following instructions are copied from there.
+
+### Install dependencies
+
+Install Node.js on Windows, then type
+```
+npm install
+```
+in the root directory of this project to install all the dependencies.
 
 ### Dealing with extraResousrce
 
