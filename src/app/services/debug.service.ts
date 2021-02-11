@@ -206,12 +206,12 @@ export class DebugService {
     if (!this.isDebugging.value) return [];
     const result = await this.sendMiRequest("-stack-list-frames");
     if (result.message !== "error") {
-      return (result.payload["stack"] as GdbArray).map(value => ({
+      return (result.payload["stack"] as GdbArray).map<FrameInfo>(value => ({
         file: value["file"],
         line: Number.parseInt(value["line"]),
         func: value["func"],
         level: Number.parseInt(value["level"])
-      }) as FrameInfo);
+      }));
     } else {
       return Promise.reject(result.payload["msg"]);
     }

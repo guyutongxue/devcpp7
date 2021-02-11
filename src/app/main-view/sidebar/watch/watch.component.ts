@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
 import { FlatTreeControl, TreeControl } from '@angular/cdk/tree';
+import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { BehaviorSubject, merge, Observable, of } from 'rxjs';
-import { delay, map, tap } from 'rxjs/operators';
+import { delay, map, take, tap } from 'rxjs/operators';
 import { GdbArray } from 'tsgdbmi';
 import { DebugService } from '../../../services/debug.service';
 
 interface FlatNode {
   expandable: boolean;
   id: number;
-  label: string;
+  expression: string;
+  value?: string;
   level: number;
   loading?: boolean;
 }
@@ -17,13 +19,13 @@ interface FlatNode {
 const TREE_DATA: FlatNode[] = [
   {
     id: 0,
-    label: 'Expand to load',
+    expression: 'Expand to load',
     level: 0,
     expandable: true
   },
   {
     id: 1,
-    label: 'Expand to load',
+    expression: 'Expand to load',
     level: 0,
     expandable: true
   }
@@ -33,19 +35,19 @@ function getChildren(node: FlatNode): Observable<FlatNode[]> {
   return of([
     {
       id: Date.now(),
-      label: `Child Node (level-${node.level + 1})`,
+      expression: `Child Node (level-${node.level + 1})`,
       level: node.level + 1,
       expandable: true
     },
     {
       id: Date.now(),
-      label: `Child Node (level-${node.level + 1})`,
+      expression: `Child Node (level-${node.level + 1})`,
       level: node.level + 1,
       expandable: true
     },
     {
       id: Date.now(),
-      label: `Leaf Node (level-${node.level + 1})`,
+      expression: `Leaf Node (level-${node.level + 1})`,
       level: node.level + 1,
       expandable: false
     }
@@ -54,12 +56,12 @@ function getChildren(node: FlatNode): Observable<FlatNode[]> {
 
 
 class DynamicDatasource implements DataSource<FlatNode> {
-  private flattenedData: BehaviorSubject<FlatNode[]>;
-  private childrenLoadedSet = new Set<FlatNode>();
 
-  constructor(private treeControl: TreeControl<FlatNode>, initData: FlatNode[]) {
-    this.flattenedData = new BehaviorSubject<FlatNode[]>(initData);
-    treeControl.dataNodes = initData;
+  constructor(private treeControl: TreeControl<FlatNode>,
+    private flattenedData: BehaviorSubject<FlatNode[]>,
+    private onExpand: (node: FlatNode) => void,
+    private onShrink: (node: FlatNode) => void) {
+    treeControl.dataNodes = this.flattenedData.value;
   }
 
   connect(collectionViewer: CollectionViewer): Observable<FlatNode[]> {
@@ -70,7 +72,7 @@ class DynamicDatasource implements DataSource<FlatNode> {
     ];
     return merge(changes).pipe(
       map(() => {
-        return this.expandFlattenedNodes(this.flattenedData.getValue());
+        return this.expandFlattenedNodes(this.flattenedData.value);
       })
     );
   }
@@ -98,18 +100,60 @@ class DynamicDatasource implements DataSource<FlatNode> {
 
   handleExpansionChange(change: SelectionChange<FlatNode>): void {
     if (change.added) {
-      change.added.forEach(node => this.loadChildren(node));
+      change.added.forEach(node => this.onExpand(node));
+    }
+    if (change.removed) {
+      change.removed.forEach(node => this.onShrink(node));
     }
   }
+
+  disconnect(): void { }
+}
+
+@Component({
+  selector: 'app-watch',
+  templateUrl: './watch.component.html',
+  styleUrls: ['./watch.component.scss'],
+  encapsulation: ViewEncapsulation.None
+})
+export class WatchComponent implements OnInit {
+
+  localVariables$: Observable<NzTreeNodeOptions[]>;
+  isDebugging$: Observable<boolean>;
+
+  flattenedData: BehaviorSubject<FlatNode[]> = new BehaviorSubject(TREE_DATA);
+  private childrenLoadedSet = new Set<FlatNode>();
+
+  constructor(private debugService: DebugService) { }
+
+  ngOnInit(): void {
+    this.localVariables$ = this.debugService.localVariables$.pipe(
+      map(value => value.map<NzTreeNodeOptions>(val => ({
+        key: val["name"],
+        title: `${val["name"]}:${val["value"]}`,
+        isLeaf: true
+      })))
+    );
+    this.isDebugging$ = this.debugService.isDebugging;
+  }
+  treeControl = new FlatTreeControl<FlatNode>(
+    node => node.level,
+    node => node.expandable
+  );
+  dataSource = new DynamicDatasource(this.treeControl, this.flattenedData, (a) => { this.loadChildren(a) }, ()=>{});
+
+  hasChild = (_: number, node: FlatNode) => node.expandable;
 
   loadChildren(node: FlatNode): void {
     if (this.childrenLoadedSet.has(node)) {
       return;
     }
     node.loading = true;
-    getChildren(node).subscribe(children => {
+    getChildren(node).pipe(
+      take(1)
+    ).subscribe(children => {
       node.loading = false;
-      const flattenedData = this.flattenedData.getValue();
+      const flattenedData = this.flattenedData.value;
       const index = flattenedData.indexOf(node);
       if (index !== -1) {
         flattenedData.splice(index + 1, 0, ...children);
@@ -118,33 +162,4 @@ class DynamicDatasource implements DataSource<FlatNode> {
       this.flattenedData.next(flattenedData);
     });
   }
-
-  disconnect(): void {
-    this.flattenedData.complete();
-  }
-}
-
-@Component({
-  selector: 'app-watch',
-  templateUrl: './watch.component.html',
-  styleUrls: ['./watch.component.scss']
-})
-export class WatchComponent implements OnInit {
-
-  localVariables$: Observable<GdbArray>;
-  isDebugging$: Observable<boolean>;
-
-  constructor(private debugService: DebugService) { }
-
-  ngOnInit(): void {
-    this.localVariables$ = this.debugService.localVariables$;
-    this.isDebugging$ = this.debugService.isDebugging;
-  }
-  treeControl = new FlatTreeControl<FlatNode>(
-    node => node.level,
-    node => node.expandable
-  );
-  dataSource = new DynamicDatasource(this.treeControl, TREE_DATA);
-
-  hasChild = (_: number, node: FlatNode) => node.expandable;
 }

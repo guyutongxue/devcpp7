@@ -1,6 +1,6 @@
 <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
     <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
-        {{ node.label }}
+        {{ node.expression }}
     </nz-tree-node>
 
     <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodePadding>
@@ -10,15 +10,13 @@
         <nz-tree-node-toggle *ngIf="node.loading" nzTreeNodeNoopToggle>
             <i nz-icon nzType="loading" nzTreeNodeToggleActiveIcon></i>
         </nz-tree-node-toggle>
-        {{ node.label }}
+        {{ node.expression }}
     </nz-tree-node>
 </nz-tree-view>
-<nz-list nzSize="small">
-    <ng-container *ngIf="isDebugging$ | async">
-        <nz-list-item *ngFor="let variable of localVariables$ | async">
-            <span>
-                <nz-tag nzColor="blue">局</nz-tag> {{ variable["name"] }} : {{ variable["value"] }}
-            </span>
-        </nz-list-item>
-    </ng-container>
-</nz-list>
+<nz-tree *ngIf="isDebugging$ | async" [nzData]="localVariables$ | async" id="localTree" nzBlockNode [nzTreeTemplate]="localNode">
+    <ng-template #localNode let-node>
+        <span>
+            <nz-tag nzColor="blue">局</nz-tag> {{node.title}}
+        </span>
+    </ng-template>
+</nz-tree>
