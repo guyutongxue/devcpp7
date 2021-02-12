@@ -5,27 +5,26 @@ import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { BehaviorSubject, merge, Observable, of } from 'rxjs';
 import { delay, map, take, tap } from 'rxjs/operators';
 import { GdbArray } from 'tsgdbmi';
-import { DebugService } from '../../../services/debug.service';
+import { DebugService, GdbVarInfo } from '../../../services/debug.service';
 
-interface FlatNode {
+interface FlatNode extends GdbVarInfo {
   expandable: boolean;
-  id: number;
-  expression: string;
-  value?: string;
   level: number;
   loading?: boolean;
 }
 
 const TREE_DATA: FlatNode[] = [
   {
-    id: 0,
-    expression: 'Expand to load',
+    id: "v0",
+    expression: 'a',
+    value: null,
     level: 0,
     expandable: true
   },
   {
-    id: 1,
-    expression: 'Expand to load',
+    id: "v1",
+    expression: 'b',
+    value: null,
     level: 0,
     expandable: true
   }
@@ -34,20 +33,23 @@ const TREE_DATA: FlatNode[] = [
 function getChildren(node: FlatNode): Observable<FlatNode[]> {
   return of([
     {
-      id: Date.now(),
+      id: Date.now().toString(10),
       expression: `Child Node (level-${node.level + 1})`,
+      value: null,
       level: node.level + 1,
       expandable: true
     },
     {
-      id: Date.now(),
+      id: Date.now().toString(10),
       expression: `Child Node (level-${node.level + 1})`,
+      value: null,
       level: node.level + 1,
       expandable: true
     },
     {
-      id: Date.now(),
+      id: Date.now().toString(10),
       expression: `Leaf Node (level-${node.level + 1})`,
+      value: null,
       level: node.level + 1,
       expandable: false
     }
@@ -122,32 +124,31 @@ export class WatchComponent implements OnInit {
   isDebugging$: Observable<boolean>;
 
   flattenedData: BehaviorSubject<FlatNode[]> = new BehaviorSubject(TREE_DATA);
-  private childrenLoadedSet = new Set<FlatNode>();
+  editingNodeId: string | null = null;
+  editingValue: string = "";
 
   constructor(private debugService: DebugService) { }
 
   ngOnInit(): void {
     this.localVariables$ = this.debugService.localVariables$.pipe(
-      map(value => value.map<NzTreeNodeOptions>(val => ({
+      map(arr => arr.map<NzTreeNodeOptions>(val => ({
         key: val["name"],
-        title: `${val["name"]}:${val["value"]}`,
+        title: `${val["name"]} : ${val["value"]}`,
         isLeaf: true
       })))
     );
     this.isDebugging$ = this.debugService.isDebugging;
+    console.log(this.debugService);
   }
   treeControl = new FlatTreeControl<FlatNode>(
     node => node.level,
     node => node.expandable
   );
-  dataSource = new DynamicDatasource(this.treeControl, this.flattenedData, (a) => { this.loadChildren(a) }, ()=>{});
+  dataSource = new DynamicDatasource(this.treeControl, this.flattenedData, (a) => { this.loadChildren(a) }, (a)=>{ this.deleteChildren(a) });
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
   loadChildren(node: FlatNode): void {
-    if (this.childrenLoadedSet.has(node)) {
-      return;
-    }
     node.loading = true;
     getChildren(node).pipe(
       take(1)
@@ -155,11 +156,30 @@ export class WatchComponent implements OnInit {
       node.loading = false;
       const flattenedData = this.flattenedData.value;
       const index = flattenedData.indexOf(node);
-      if (index !== -1) {
-        flattenedData.splice(index + 1, 0, ...children);
-        this.childrenLoadedSet.add(node);
-      }
+      flattenedData.splice(index + 1, 0, ...children);
       this.flattenedData.next(flattenedData);
     });
+  }
+
+  deleteChildren(node: FlatNode): void {
+    const flattenedData = this.flattenedData.value;
+    const fromIndex = flattenedData.indexOf(node) + 1;
+    const toIndex = flattenedData.findIndex((val, index) => index >= fromIndex && val.level === node.level);
+    if (toIndex === -1) flattenedData.splice(fromIndex);
+    else flattenedData.splice(fromIndex, toIndex - fromIndex);
+    this.flattenedData.next(flattenedData);
+  }
+
+  tryEdit(node: FlatNode) {
+    console.log(node);
+    if (node.level !== 0) return;
+    this.deleteChildren(node);
+    this.editingValue = node.expression;
+    this.editingNodeId = node.id;
+    this.treeControl.collapse(node);
+  }
+  saveEdit(node: FlatNode) {
+    node.expression = this.editingValue;
+    this.editingNodeId = null;
   }
 }

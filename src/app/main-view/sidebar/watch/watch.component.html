@@ -1,16 +1,26 @@
 <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
-    <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
-        {{ node.expression }}
+    <!-- <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
+        <span (dblclick)="tryEdit(node)">{{ node.expression }}</span>
     </nz-tree-node>
 
-    <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodePadding>
-        <nz-tree-node-toggle *ngIf="!node.loading">
-            <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
-        </nz-tree-node-toggle>
-        <nz-tree-node-toggle *ngIf="node.loading" nzTreeNodeNoopToggle>
-            <i nz-icon nzType="loading" nzTreeNodeToggleActiveIcon></i>
-        </nz-tree-node-toggle>
-        {{ node.expression }}
+    <nz-tree-node *nzTreeNodeDef="let node; when: isEditing" nzTreeNodePadding>
+        <input nz-input placeholder="Input node name" nzSize="small" #inputEle (keyup.enter)="saveEdit(node, inputEle.value)" >
+    </nz-tree-node> -->
+
+    <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
+        <ng-container *ngIf="node.expandable">
+            <nz-tree-node-toggle *ngIf="!node.loading">
+                <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
+            </nz-tree-node-toggle>
+            <nz-tree-node-toggle *ngIf="node.loading" nzTreeNodeNoopToggle>
+                <i nz-icon nzType="loading" nzTreeNodeToggleActiveIcon></i>
+            </nz-tree-node-toggle>
+        </ng-container>
+        <span *ngIf="editingNodeId !== node.id" (dblclick)="tryEdit(node)">{{ node.expression }}</span>
+        <input *ngIf="editingNodeId === node.id" 
+        nz-input 
+        [(ngModel)]="editingValue"
+        placeholder="要查看的表达式" nzSize="small" (keyup.enter)="saveEdit(node)" (blur)="saveEdit(node)">
     </nz-tree-node>
 </nz-tree-view>
 <nz-tree *ngIf="isDebugging$ | async" [nzData]="localVariables$ | async" id="localTree" nzBlockNode [nzTreeTemplate]="localNode">

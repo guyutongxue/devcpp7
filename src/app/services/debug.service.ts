@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject } from 'rxjs';
-import { GdbArray, GdbResponse } from 'tsgdbmi';
+import { GdbArray, GdbResponse, GdbVal } from 'tsgdbmi';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
 import { EditorBreakpointInfo, EditorService } from './editor.service';
@@ -23,6 +23,13 @@ export interface BreakpointInfo {
   file: string;
   line: number;
   func?: string;
+}
+
+export interface GdbVarInfo {
+  id: string;
+  expression: string;
+  value: string;
+  expandable: boolean;
 }
 
 @Injectable({
@@ -226,4 +233,46 @@ export class DebugService {
       return Promise.reject(result.payload["msg"]);
     }
   }
+
+  private isVariableExpandable(x: GdbVal) {
+    return (x["dynamic"] ? x["has_more"] : x["numchild"]) !== "0"
+  }
+  
+  async createVariables(origin: GdbVarInfo[]): Promise<GdbVarInfo[]> {
+    return Promise.all(origin.map(async o => {
+      const result = await this.sendMiRequest(`-var-create ${o.id} * (${o.expression})`);
+      if (result.message === "error") return null;
+      else return {
+        id: result.payload["name"],
+        value: result.payload["value"] ?? "",
+        expandable: this.isVariableExpandable(result.payload)
+      } as GdbVarInfo;
+    }))
+  }
+ 
+  async getVariableChildren(variableId: string): Promise<GdbVarInfo[]> {
+    const result = await this.sendMiRequest(`-var-list-children --all-values ${variableId}`);
+    if (result.message === "error") return Promise.reject();
+    const children = result.payload["children"] as GdbArray;
+    return children.map(val => ({
+      id: val["name"],
+      expression: val["name"],
+      value: val["value"] ?? "",
+      expandable: this.isVariableExpandable(val)
+    }));
+  }
+
+  async updateVariables(origin: GdbVarInfo[]) {
+    const result = await this.sendMiRequest('-var-update --all-values *');
+    if (result.message === "error") return;
+    const changeList = result.payload["changelist"] as GdbArray;
+    for (const change of changeList) {
+      const target = origin.find(o => o.id === change["name"]);
+      if (change["in_scope"] !== "true") {
+
+        continue;
+      }
+      target.value = change["value"];
+    }
+  } 
 }
