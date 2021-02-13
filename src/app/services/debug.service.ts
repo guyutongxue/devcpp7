@@ -235,15 +235,17 @@ export class DebugService {
   }
 
   private isVariableExpandable(x: GdbVal) {
-    return (x["dynamic"] ? x["has_more"] : x["numchild"]) !== "0"
+    return !!(x["dynamic"] ?? x["numchild"] !== "0")
   }
   
   async createVariables(origin: GdbVarInfo[]): Promise<GdbVarInfo[]> {
+    if (!this.isDebugging.value) return [];
     return Promise.all(origin.map(async o => {
       const result = await this.sendMiRequest(`-var-create ${o.id} * (${o.expression})`);
       if (result.message === "error") return null;
       else return {
         id: result.payload["name"],
+        expression: o.expression,
         value: result.payload["value"] ?? "",
         expandable: this.isVariableExpandable(result.payload)
       } as GdbVarInfo;
@@ -251,28 +253,40 @@ export class DebugService {
   }
  
   async getVariableChildren(variableId: string): Promise<GdbVarInfo[]> {
+    if (!this.isDebugging.value) return [];
     const result = await this.sendMiRequest(`-var-list-children --all-values ${variableId}`);
     if (result.message === "error") return Promise.reject();
     const children = result.payload["children"] as GdbArray;
     return children.map(val => ({
       id: val["name"],
-      expression: val["name"],
+      expression: val["exp"],
       value: val["value"] ?? "",
       expandable: this.isVariableExpandable(val)
     }));
   }
 
   async updateVariables(origin: GdbVarInfo[]) {
+    const deleteList: string[] = [];
+    const collapseList: string[] = [];
+    if (!this.isDebugging.value) return { deleteList: origin.map(v => v.id), collapseList };
     const result = await this.sendMiRequest('-var-update --all-values *');
     if (result.message === "error") return;
     const changeList = result.payload["changelist"] as GdbArray;
     for (const change of changeList) {
-      const target = origin.find(o => o.id === change["name"]);
       if (change["in_scope"] !== "true") {
-
+        deleteList.push(change["name"])
         continue;
       }
+      if (change["new_num_children"]) {
+        collapseList.push(change["name"]);
+      }
+      const target = origin.find(o => o.id === change["name"]);
       target.value = change["value"];
     }
+    return { deleteList, collapseList };
   } 
+
+  async deleteVariable(variableId: string, childrenOnly = false) {
+    if (this.isDebugging.value) this.sendMiRequest(`-var-delete ${childrenOnly ? '-c' : ''} ${variableId}`);
+  }
 }

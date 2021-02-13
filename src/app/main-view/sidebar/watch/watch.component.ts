@@ -1,14 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
 import { FlatTreeControl, TreeControl } from '@angular/cdk/tree';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
-import { BehaviorSubject, merge, Observable, of } from 'rxjs';
+import { BehaviorSubject, merge, Observable, of, Subscription } from 'rxjs';
 import { delay, map, take, tap } from 'rxjs/operators';
 import { GdbArray } from 'tsgdbmi';
 import { DebugService, GdbVarInfo } from '../../../services/debug.service';
 
 interface FlatNode extends GdbVarInfo {
-  expandable: boolean;
   level: number;
   loading?: boolean;
 }
@@ -118,10 +117,11 @@ class DynamicDatasource implements DataSource<FlatNode> {
   styleUrls: ['./watch.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class WatchComponent implements OnInit {
+export class WatchComponent implements OnInit, OnDestroy {
 
   localVariables$: Observable<NzTreeNodeOptions[]>;
   isDebugging$: Observable<boolean>;
+  private programStopSubscription: Subscription;
 
   flattenedData: BehaviorSubject<FlatNode[]> = new BehaviorSubject(TREE_DATA);
   editingNodeId: string | null = null;
@@ -138,42 +138,88 @@ export class WatchComponent implements OnInit {
       })))
     );
     this.isDebugging$ = this.debugService.isDebugging;
+    this.programStopSubscription = this.debugService.programStop.subscribe(async _ => {
+      await this.tryCreateVar(this.flattenedData.value);
+      this.updateVar(this.flattenedData.value);
+    })
     console.log(this.debugService);
   }
-  treeControl = new FlatTreeControl<FlatNode>(
-    node => node.level,
-    node => node.expandable
-  );
-  dataSource = new DynamicDatasource(this.treeControl, this.flattenedData, (a) => { this.loadChildren(a) }, (a)=>{ this.deleteChildren(a) });
 
-  hasChild = (_: number, node: FlatNode) => node.expandable;
-
-  loadChildren(node: FlatNode): void {
-    node.loading = true;
-    getChildren(node).pipe(
-      take(1)
-    ).subscribe(children => {
-      node.loading = false;
-      const flattenedData = this.flattenedData.value;
-      const index = flattenedData.indexOf(node);
-      flattenedData.splice(index + 1, 0, ...children);
-      this.flattenedData.next(flattenedData);
-    });
+  ngOnDestroy(): void {
+    this.programStopSubscription.unsubscribe();
   }
 
-  deleteChildren(node: FlatNode): void {
+  treeControl = new FlatTreeControl<FlatNode>(
+    node => node.level,
+    node => node.value !== null && node.expandable
+  );
+  dataSource = new DynamicDatasource(
+    this.treeControl,
+    this.flattenedData,
+    (a) => { this.loadChildren(a) },
+    (a) => { this.deleteNode(a, true) }
+  );
+
+  private async tryCreateVar(data: FlatNode[]) {
+    const needCreateVar: FlatNode[] = [];
+    data.forEach(v => {
+      if (v.value === null) {
+        v.loading = true;
+        needCreateVar.push(v);
+      }
+    });
+    this.flattenedData.next(data);
+    const result = await this.debugService.createVariables(needCreateVar);
+    console.log(result);
+    this.flattenedData.next(data.map(v => ({
+      ...(result.find(o => o?.id === v.id) ?? v),
+      level: v.level,
+      loading: false
+    })));
+  }
+
+  private async updateVar(data: FlatNode[]) {
+    const needUpdateVar = data.filter(v => v.value !== null);
+    const { deleteList, collapseList } = await this.debugService.updateVariables(needUpdateVar);
+    for (const id of collapseList) {
+      const target = data.find(v => v.id === id);
+      this.deleteNode(target, true);
+    }
+    for (const id of deleteList) {
+      const target = data.find(v => v.id === id);
+      target.value = null;
+    }
+    this.flattenedData.next(data);
+  }
+
+  async loadChildren(node: FlatNode) {
+    node.loading = true;
+    const children = await this.debugService.getVariableChildren(node.id);
+    node.loading = false;
     const flattenedData = this.flattenedData.value;
-    const fromIndex = flattenedData.indexOf(node) + 1;
+    const index = flattenedData.indexOf(node);
+    flattenedData.splice(index + 1, 0, ...(children.map(c => ({
+      ...c,
+      level: node.level + 1
+    }))));
+    this.flattenedData.next(flattenedData);
+  }
+
+  deleteNode(node: FlatNode, childrenOnly = false): void {
+    const flattenedData = this.flattenedData.value;
+    const fromIndex = flattenedData.findIndex(v => v.id === node.id) + 1;
     const toIndex = flattenedData.findIndex((val, index) => index >= fromIndex && val.level === node.level);
     if (toIndex === -1) flattenedData.splice(fromIndex);
     else flattenedData.splice(fromIndex, toIndex - fromIndex);
+    if (!childrenOnly) flattenedData.splice(fromIndex - 1, 1);
     this.flattenedData.next(flattenedData);
+    this.debugService.deleteVariable(node.id, childrenOnly);
   }
 
   tryEdit(node: FlatNode) {
     console.log(node);
     if (node.level !== 0) return;
-    this.deleteChildren(node);
+    this.deleteNode(node, true);
     this.editingValue = node.expression;
     this.editingNodeId = node.id;
     this.treeControl.collapse(node);

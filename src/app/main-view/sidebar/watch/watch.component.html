@@ -8,7 +8,7 @@
     </nz-tree-node> -->
 
     <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
-        <ng-container *ngIf="node.expandable">
+        <ng-container *ngIf="node.value !== null && node.expandable">
             <nz-tree-node-toggle *ngIf="!node.loading">
                 <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
             </nz-tree-node-toggle>
@@ -16,7 +16,7 @@
                 <i nz-icon nzType="loading" nzTreeNodeToggleActiveIcon></i>
             </nz-tree-node-toggle>
         </ng-container>
-        <span *ngIf="editingNodeId !== node.id" (dblclick)="tryEdit(node)">{{ node.expression }}</span>
+        <span *ngIf="editingNodeId !== node.id" (dblclick)="tryEdit(node)">{{ node.expression }} : {{ node.value === null ? '未知' : node.value }}</span>
         <input *ngIf="editingNodeId === node.id" 
         nz-input 
         [(ngModel)]="editingValue"
