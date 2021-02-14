@@ -1,32 +1,30 @@
-<nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
-    <!-- <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
-        <span (dblclick)="tryEdit(node)">{{ node.expression }}</span>
-    </nz-tree-node>
-
-    <nz-tree-node *nzTreeNodeDef="let node; when: isEditing" nzTreeNodePadding>
-        <input nz-input placeholder="Input node name" nzSize="small" #inputEle (keyup.enter)="saveEdit(node, inputEle.value)" >
-    </nz-tree-node> -->
-
-    <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
-        <ng-container *ngIf="node.value !== null && node.expandable">
-            <nz-tree-node-toggle *ngIf="!node.loading">
-                <i nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></i>
-            </nz-tree-node-toggle>
-            <nz-tree-node-toggle *ngIf="node.loading" nzTreeNodeNoopToggle>
-                <i nz-icon nzType="loading" nzTreeNodeToggleActiveIcon></i>
-            </nz-tree-node-toggle>
-        </ng-container>
-        <span *ngIf="editingNodeId !== node.id" (dblclick)="tryEdit(node)">{{ node.expression }} : {{ node.value === null ? '未知' : node.value }}</span>
-        <input *ngIf="editingNodeId === node.id" 
-        nz-input 
-        [(ngModel)]="editingValue"
-        placeholder="要查看的表达式" nzSize="small" (keyup.enter)="saveEdit(node)" (blur)="saveEdit(node)">
-    </nz-tree-node>
-</nz-tree-view>
-<nz-tree *ngIf="isDebugging$ | async" [nzData]="localVariables$ | async" id="localTree" nzBlockNode [nzTreeTemplate]="localNode">
-    <ng-template #localNode let-node>
-        <span>
-            <nz-tag nzColor="blue">局</nz-tag> {{node.title}}
-        </span>
-    </ng-template>
-</nz-tree>
+<div id="watchVarTreeWrapper">
+    <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
+        <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
+            <ng-container *ngIf="node.value !== null && node.expandable; else noopToggle">
+                <nz-tree-node-toggle *ngIf="!node.loading">
+                    <i nz-icon nzType="caret-right" [ngStyle]="{ transform: node.expanded ? 'rotate(90deg)' : '' }"></i>
+                </nz-tree-node-toggle>
+                <nz-tree-node-toggle *ngIf="node.loading" nzTreeNodeNoopToggle>
+                    <i nz-icon nzType="loading" nzTreeNodeToggleActiveIcon></i>
+                </nz-tree-node-toggle>
+            </ng-container>
+            <ng-template #noopToggle>
+                <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
+            </ng-template>
+            <span *ngIf="editingNodeId !== node.id" (dblclick)="tryEdit(node)" class="node-label">
+                {{ node.expression }} : {{ node.value === null ? '未知' : node.value }}
+            </span>
+            <input *ngIf="editingNodeId === node.id" nz-input [(ngModel)]="editingValue" placeholder="要查看的表达式"
+                nzSize="small" (keyup.enter)="saveEdit(node)" (blur)="saveEdit(node)">
+        </nz-tree-node>
+    </nz-tree-view>
+    <nz-tree *ngIf="isDebugging$ | async" [nzData]="localVariables$ | async" id="localTree" nzBlockNode
+        [nzTreeTemplate]="localNode">
+        <ng-template #localNode let-node>
+            <span>
+                <nz-tag nzColor="blue">局</nz-tag> {{node.title}}
+            </span>
+        </ng-template>
+    </nz-tree>
+</div>

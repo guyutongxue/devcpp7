@@ -1,10 +1,16 @@
-#localTree {
-    .ant-tree-node-selected,.ant-tree-node-content-wrapper:hover {
-        background: inherit !important;
+#watchVarTreeWrapper {
+    .node-label {
+        user-select: none;
     }
 
-    .ant-tree-node-content-wrapper {
-        cursor: initial !important;
-    }
+    #localTree {
+        .ant-tree-node-selected,.ant-tree-node-content-wrapper:hover {
+            background: inherit !important;
+        }
 
+        .ant-tree-node-content-wrapper {
+            cursor: initial !important;
+        }
+
+    }
 }

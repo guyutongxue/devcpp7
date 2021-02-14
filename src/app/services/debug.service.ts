@@ -241,7 +241,7 @@ export class DebugService {
   async createVariables(origin: GdbVarInfo[]): Promise<GdbVarInfo[]> {
     if (!this.isDebugging.value) return [];
     return Promise.all(origin.map(async o => {
-      const result = await this.sendMiRequest(`-var-create ${o.id} * (${o.expression})`);
+      const result = await this.sendMiRequest(`-var-create ${o.id} @ (${o.expression})`);
       if (result.message === "error") return null;
       else return {
         id: result.payload["name"],
@@ -270,7 +270,7 @@ export class DebugService {
     const collapseList: string[] = [];
     if (!this.isDebugging.value) return { deleteList: origin.map(v => v.id), collapseList };
     const result = await this.sendMiRequest('-var-update --all-values *');
-    if (result.message === "error") return;
+    if (result.message === "error") return{ deleteList, collapseList };
     const changeList = result.payload["changelist"] as GdbArray;
     for (const change of changeList) {
       if (change["in_scope"] !== "true") {
