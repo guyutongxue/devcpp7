@@ -257,6 +257,7 @@ export class DebugService {
     const result = await this.sendMiRequest(`-var-list-children --all-values ${variableId}`);
     if (result.message === "error") return Promise.reject();
     const children = result.payload["children"] as GdbArray;
+    if (typeof children === "undefined") return [];
     return children.map(val => ({
       id: val["name"],
       expression: val["exp"],

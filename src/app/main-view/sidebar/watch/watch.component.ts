@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TreeControl } from '@angular/cdk/tree';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import {  Observable } from 'rxjs';
@@ -49,5 +49,11 @@ export class WatchComponent implements OnInit {
     if (this.editingValue.trim() !== "")
       this.watchService.saveNode(node, this.editingValue);
     this.editingNodeId = null;
+  }
+
+  newVariable() {
+    const newId = this.watchService.newNode();
+    this.editingValue = '';
+    this.editingNodeId = newId;
   }
 }

@@ -52,7 +52,6 @@ export class DynamicDatasource implements DataSource<GdbVarInfoNode> {
       if (treeControl.isExpandable(node)) {
         currentExpand[treeControl.getLevel(node) + 1] = node.expanded;
       }
-      console.log(node, treeControl.isExpanded(node));
     });
     return results;
   }
@@ -188,5 +187,18 @@ export class WatchService {
     this.flattenedData.next(flattenedData);
     this.tryCreateVar(this.flattenedData.value);
   }
-
+  newNode(): string {
+    const flattenedData = this.flattenedData.value;
+    const newId = `v${this.nextId++}`;
+    flattenedData.push({
+      id: newId,
+      expression: '',
+      expandable: false,
+      value: null,
+      expanded: false,
+      level: 0
+    });
+    this.flattenedData.next(flattenedData);
+    return newId
+  }
 }

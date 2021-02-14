@@ -280,6 +280,7 @@ export class EditorService {
   }
 
   showTrace(line: number) {
+    this.hideTrace();
     const currentModel = this.editor.getModel();
     this.traceDecoration = currentModel.deltaDecorations(this.traceDecoration, [{
       range: { startLineNumber: line, startColumn: 1, endLineNumber: line, endColumn: 1 },

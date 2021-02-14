@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
-import { NzInputModule } from 'ng-zorro-antd/input'
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+
+import { CoreModule } from '../../core/core.module';
 
 import { OutlineComponent } from './outline/outline.component';
 import { WatchComponent } from './watch/watch.component';
@@ -18,8 +21,10 @@ import { WatchComponent } from './watch/watch.component';
     NzTreeModule,
     NzTreeViewModule,
     NzInputModule,
+    NzButtonModule,
     NzTagModule,
-    NzIconModule
+    NzIconModule,
+    CoreModule
   ],
   exports: [ OutlineComponent, WatchComponent ]
 })
