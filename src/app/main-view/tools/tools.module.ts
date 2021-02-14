@@ -10,6 +10,8 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 
+import { CoreModule } from '../../core/core.module';
+
 import { ProblemsComponent } from './problems/problems.component';
 import { OutputComponent } from './output/output.component';
 import { DebugComponent } from './debug/debug.component';
@@ -26,7 +28,8 @@ import { DebugComponent } from './debug/debug.component';
     NzInputModule,
     NzTableModule,
     NzTabsModule,
-    NzCollapseModule
+    NzCollapseModule,
+    CoreModule
   ]
 })
 export class ToolsModule { }

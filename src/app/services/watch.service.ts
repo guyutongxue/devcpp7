@@ -163,17 +163,18 @@ export class WatchService {
    * @param reason 'gdb' This variable is no longer valid
    * @param reason 'collapse' Delete child nodes because of collapsion
    */
-  private deleteNode(node: GdbVarInfoNode, reason: "user" | "invalid" | "collapse"): void {
+  deleteNode(node: GdbVarInfoNode, reason: "user" | "invalid" | "collapse"): void {
     const flattenedData = this.flattenedData.value;
     const fromIndex = flattenedData.findIndex(v => v.id === node.id) + 1;
     const toIndex = flattenedData.findIndex((val, index) => index >= fromIndex && val.level === node.level);
+    flattenedData[fromIndex - 1].expanded = false;
     if (toIndex === -1) flattenedData.splice(fromIndex);
     else flattenedData.splice(fromIndex, toIndex - fromIndex);
     if (reason === 'user') flattenedData.splice(fromIndex - 1, 1);
     if (reason === 'invalid') flattenedData[fromIndex - 1].value = null;
-    flattenedData[fromIndex - 1].expanded = false;
     this.flattenedData.next(flattenedData);
-    this.debugService.deleteVariable(node.id, reason === 'collapse');
+    if (node.value !== null)
+      this.debugService.deleteVariable(node.id, reason === 'collapse');
   }
 
   editNode(node: GdbVarInfoNode) {
@@ -199,6 +200,13 @@ export class WatchService {
       level: 0
     });
     this.flattenedData.next(flattenedData);
-    return newId
+    return newId;
+  }
+
+  clearAllNode() {
+    const flattenedData = this.flattenedData.value;
+    for (const i of flattenedData.filter(v => v.level === 0)) {
+      this.deleteNode(i, 'user');
+    }
   }
 }

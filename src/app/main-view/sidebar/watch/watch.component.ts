@@ -48,6 +48,8 @@ export class WatchComponent implements OnInit {
   saveEdit(node: GdbVarInfoNode) {
     if (this.editingValue.trim() !== "")
       this.watchService.saveNode(node, this.editingValue);
+    else
+      this.watchService.deleteNode(node, 'user');
     this.editingNodeId = null;
   }
 
@@ -55,5 +57,9 @@ export class WatchComponent implements OnInit {
     const newId = this.watchService.newNode();
     this.editingValue = '';
     this.editingNodeId = newId;
+  }
+
+  clearAll() {
+    this.watchService.clearAllNode();
   }
 }

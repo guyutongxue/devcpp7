@@ -117,6 +117,8 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   stopEditBkpt(data: EditorBreakpointInfo) {
     if (this.currentEditValue.trim() !== "") {
       this.debugService.changeBkptCondition(data.id, this.currentEditValue);
+    } else {
+      this.debugService.changeBkptCondition(data.id, null);
     }
     this.currentEditBkptline = null;
   }

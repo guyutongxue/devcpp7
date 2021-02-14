@@ -1,9 +1,9 @@
 <div id="debugPanel">
     <div id="leftPart">
         <div id="exprEval">
-            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !(isDebugging$ | async)" [(ngModel)]="expr"
-                (keyup.enter)="evalExpr()">
-                <i nz-icon nzType="arrow-down"></i>
+            <input nz-input type="text" placeholder="表达式求值" [disabled]="!enabled || !(isDebugging$ | async)"
+                [(ngModel)]="expr" (keyup.enter)="evalExpr()">
+            <i nz-icon nzType="arrow-down"></i>
             <div id="exprResult">{{exprVal}}</div>
         </div>
         <div id="debugControl">
@@ -57,8 +57,8 @@
                 </div>
             </div>
             <div *ngIf="selectedIndex === 1">
-                <nz-table #sTable [nzData]="callStack$ | async" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false"
-                    nzNoResult=" ">
+                <nz-table #sTable [nzData]="callStack$ | async" nzTableLayout="fixed" nzSize="small"
+                    [nzFrontPagination]="false" nzNoResult=" ">
                     <thead>
                         <tr>
                             <th nzWidth="50px">层</th>
@@ -78,8 +78,8 @@
                 </nz-table>
             </div>
             <div *ngIf="selectedIndex === 2">
-                <nz-table #bTable [nzData]="getEditorBreakpoints()" nzTableLayout="fixed" nzSize="small" [nzFrontPagination]="false"
-                    nzNoResult=" ">
+                <nz-table #bTable [nzData]="getEditorBreakpoints()" nzTableLayout="fixed" nzSize="small"
+                    [nzFrontPagination]="false" nzNoResult=" ">
                     <thead>
                         <tr>
                             <th nzWidth="150px" nzRight>位置</th>
@@ -87,15 +87,20 @@
                         </tr>
                     </thead>
                     <tbody id="breakpointTableBody">
-                        <tr *ngFor="let data of bTable.data"  class="editable-row">
+                        <tr *ngFor="let data of bTable.data" class="editable-row">
                             <td [nzEllipsis]="true" nzRight>
                                 <a (click)="locateLine(data.line)">{{ printPosition(data) }}</a>
                             </td>
                             <td>
-                                <div class="editable-cell" [hidden]="!(isDebugging$ | async) && currentEditBkptline === data.line" (click)="startEditBkpt(data)">
+                                <div class="editable-cell"
+                                    *ngIf="(isDebugging$ | async) || currentEditBkptline !== data.line"
+                                    (click)="startEditBkpt(data)">
                                     {{ data.expression === null ? "　" : data.expression }}
                                 </div>
-                              <input [hidden]="(isDebugging$ | async) || currentEditBkptline !== data.line" type="text" nz-input [(ngModel)]="currentEditValue" (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)" placeholder="仅表达式成立时程序中断……">
+                                <input *ngIf="!(isDebugging$ | async) && currentEditBkptline === data.line"
+                                    type="text" nz-input [(ngModel)]="currentEditValue" appAutofocus
+                                    (blur)="stopEditBkpt(data)" (keyup.enter)="stopEditBkpt(data)"
+                                    placeholder="仅表达式成立时程序中断……">
                             </td>
                         </tr>
                     </tbody>

@@ -1,4 +1,7 @@
-<button nz-button nzType="secondary" (click)="newVariable()"><i nz-icon nzType="plus"></i></button>
+<nz-button-group>
+    <button nz-button nzType="secondary" (click)="newVariable()"><i nz-icon nzType="plus" title="添加观察"></i></button>
+    <button nz-button nzType="secondary" (click)="clearAll()"><i nz-icon nzType="delete" title="删除全部"></i></button>
+</nz-button-group>
 <div id="watchVarTreeWrapper">
     <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">
         <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
@@ -16,10 +19,8 @@
             <span *ngIf="editingNodeId !== node.id" (dblclick)="tryEdit(node)" class="node-label">
                 {{ node.expression }} : {{ node.value === null ? '未知' : node.value }}
             </span>
-            <input *ngIf="editingNodeId === node.id" nz-input appAutofocus
-                [(ngModel)]="editingValue" placeholder="要查看的表达式"
-                nzSize="small" (keyup.enter)="saveEdit(node)" (blur)="saveEdit(node)"
-            >
+            <input *ngIf="editingNodeId === node.id" nz-input appAutofocus [(ngModel)]="editingValue"
+                placeholder="要查看的表达式" nzSize="small" (keyup.enter)="saveEdit(node)" (blur)="saveEdit(node)">
         </nz-tree-node>
     </nz-tree-view>
     <nz-tree *ngIf="isDebugging$ | async" [nzData]="localVariables$ | async" id="localTree" nzBlockNode
