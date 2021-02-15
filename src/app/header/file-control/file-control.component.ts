@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { FileService } from '../../services/file.service';
+import { StatusService } from '../../services/status.service';
 
 @Component({
   selector: 'app-file-control',
@@ -10,10 +11,14 @@ import { FileService } from '../../services/file.service';
 export class FileControlComponent implements OnInit {
 
   constructor(
-    private fileService: FileService) { }
+    private fileService: FileService,
+    private statusService: StatusService
+  ) { }
 
   get isSaveEnable() {
-    return this.fileService.currentFileType() !== "none";
+    return this.fileService.currentFileType() !== "none"
+      && !this.statusService.isBuilding
+      && !this.statusService.isDebugging;
   }
 
   ngOnInit(): void { }

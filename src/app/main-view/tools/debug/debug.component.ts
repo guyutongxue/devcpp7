@@ -47,7 +47,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.consoleOutput$ = this.debugService.consoleOutput$;
-    this.isDebugging$ = this.debugService.isDebugging.pipe(tap(value => {
+    this.isDebugging$ = this.debugService.isDebugging$.pipe(tap(value => {
       if (value) this.promptColor = "#262626";
     }));
     this.callStack$ = this.debugService.callStack$;
@@ -110,7 +110,7 @@ export class DebugComponent implements OnInit, AfterViewChecked {
   }
 
   startEditBkpt(data: EditorBreakpointInfo) {
-    if (this.debugService.isDebugging.value) return;
+    if (this.debugService.isDebugging$.value) return;
     this.currentEditValue = data.expression;
     this.currentEditBkptline = data.line;
   }

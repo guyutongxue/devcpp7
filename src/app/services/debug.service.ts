@@ -37,7 +37,7 @@ export interface GdbVarInfo {
 })
 export class DebugService {
 
-  isDebugging: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  isDebugging$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private allOutput: string = "";
   private consoleOutput: BehaviorSubject<string> = new BehaviorSubject("");
@@ -90,7 +90,7 @@ export class DebugService {
     this.electronService.ipcRenderer.on('ng:debug/notify', (_, response: GdbResponse) => {
       if (response.message === "running") {
         // Program is running (continue or init start or restart)
-        this.isDebugging.next(true);
+        this.isDebugging$.next(true);
         this.traceLine.next(null);
       } else if (response.message === "stopped") {
         const reason = response.payload["reason"] as string;
@@ -130,7 +130,7 @@ export class DebugService {
   }
 
   private exitCleaning(): void {
-    this.isDebugging.next(false);
+    this.isDebugging$.next(false);
     this.traceLine.next(null);
     this.programStop.next();
   }
@@ -210,7 +210,7 @@ export class DebugService {
   }
 
   async getCallStack(): Promise<FrameInfo[]> {
-    if (!this.isDebugging.value) return [];
+    if (!this.isDebugging$.value) return [];
     const result = await this.sendMiRequest("-stack-list-frames");
     if (result.message !== "error") {
       return (result.payload["stack"] as GdbArray).map<FrameInfo>(value => ({
@@ -225,7 +225,7 @@ export class DebugService {
   }
 
   async getLocalVariables(): Promise<GdbArray> {
-    if (!this.isDebugging.value) return [];
+    if (!this.isDebugging$.value) return [];
     const result = await this.sendMiRequest("-stack-list-variables --all-values");
     if (result.message !== "error") {
       return result.payload["variables"];
@@ -239,7 +239,7 @@ export class DebugService {
   }
   
   async createVariables(origin: GdbVarInfo[]): Promise<GdbVarInfo[]> {
-    if (!this.isDebugging.value) return [];
+    if (!this.isDebugging$.value) return [];
     return Promise.all(origin.map(async o => {
       const result = await this.sendMiRequest(`-var-create ${o.id} @ (${o.expression})`);
       if (result.message === "error") return null;
@@ -253,7 +253,7 @@ export class DebugService {
   }
  
   async getVariableChildren(variableId: string): Promise<GdbVarInfo[]> {
-    if (!this.isDebugging.value) return [];
+    if (!this.isDebugging$.value) return [];
     const result = await this.sendMiRequest(`-var-list-children --all-values ${variableId}`);
     if (result.message === "error") return Promise.reject();
     const children = result.payload["children"] as GdbArray;
@@ -269,7 +269,7 @@ export class DebugService {
   async updateVariables(origin: GdbVarInfo[]) {
     const deleteList: string[] = [];
     const collapseList: string[] = [];
-    if (!this.isDebugging.value) return { deleteList: origin.map(v => v.id), collapseList };
+    if (!this.isDebugging$.value) return { deleteList: origin.map(v => v.id), collapseList };
     const result = await this.sendMiRequest('-var-update --all-values *');
     if (result.message === "error") return{ deleteList, collapseList };
     const changeList = result.payload["changelist"] as GdbArray;
@@ -288,6 +288,6 @@ export class DebugService {
   } 
 
   async deleteVariable(variableId: string, childrenOnly = false) {
-    if (this.isDebugging.value) this.sendMiRequest(`-var-delete ${childrenOnly ? '-c' : ''} ${variableId}`);
+    if (this.isDebugging$.value) this.sendMiRequest(`-var-delete ${childrenOnly ? '-c' : ''} ${variableId}`);
   }
 }

@@ -5,13 +5,14 @@ import { ElectronService } from '../core/services/electron/electron.service';
 import { BuildResult, GccDiagnostics } from '../../background/handlers/typing';
 import { FileService } from './file.service';
 import { ProblemsService } from './problems.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BuildService {
 
-  isCompiling: boolean = false;
+  isBuilding$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private notifyOption: NzNotificationDataOptions = {
     nzDuration: 3000
   }
@@ -24,10 +25,10 @@ export class BuildService {
     private problemsService: ProblemsService
   ) {
     this.electronService.ipcRenderer.on("ng:build-control/buildStarted", (_) => {
-      this.isCompiling = true;
+      this.isBuilding$.next(true);
     })
     this.electronService.ipcRenderer.on("ng:build-control/buildComplete", (_, result: BuildResult) => {
-      this.isCompiling = false;
+      this.isBuilding$.next(false);
       console.log("Compile result: ", result);
       if (result.success) {
         if (result.diagnostics.length === 0) {

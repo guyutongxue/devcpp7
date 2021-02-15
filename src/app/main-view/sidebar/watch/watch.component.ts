@@ -1,11 +1,10 @@
-import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { TreeControl } from '@angular/cdk/tree';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
-import {  Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { DebugService } from '../../../services/debug.service';
 import { WatchService, DynamicDatasource, GdbVarInfoNode } from '../../../services/watch.service';
-import { trimTrailingNulls } from '@angular/compiler/src/render3/view/util';
 
 @Component({
   selector: 'app-watch',
@@ -32,7 +31,7 @@ export class WatchComponent implements OnInit {
         isLeaf: true
       })))
     );
-    this.isDebugging$ = this.debugService.isDebugging.pipe(
+    this.isDebugging$ = this.debugService.isDebugging$.pipe(
       distinctUntilChanged()
     );
     this.dataSource = this.watchService.dataSource;
