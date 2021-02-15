@@ -32,6 +32,12 @@ export interface EditorBreakpointInfo extends EditorBreakpointDecInfo {
   line: number;
 }
 
+interface ModelInfo {
+  cursor: monaco.IPosition;
+  scrollTop: number;
+  bkptDecs: EditorBreakpointDecInfo[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,18 +51,18 @@ export class EditorService {
   private editorText = new BehaviorSubject<string>("");
   editorText$ = this.editorText.asObservable();
 
-  private breakpointDecInfos: { [uri: string]: EditorBreakpointDecInfo[] } = {};
+  private modelInfos: { [uri: string]: ModelInfo } = {};
   private breakpointInfos = new BehaviorSubject<EditorBreakpointInfo[]>([]);
   breakpointInfos$ = this.breakpointInfos.asObservable();
 
   private traceDecoration: string[];
   private lastTraceUri: monaco.Uri = null;
 
-  constructor(private electronService: ElectronService) { 
+  constructor(private electronService: ElectronService) {
     this.editorText.pipe(
       debounceTime(300),
       distinctUntilChanged()
-    ).subscribe(v => {
+    ).subscribe(_ => {
       const model = this.editor?.getModel();
       if (model) {
         this.updateModelInfo(model);
@@ -158,14 +164,15 @@ export class EditorService {
       const lineNumber = e.target.range.startLineNumber;
       const currentModel = this.editor.getModel();
       const uri = currentModel.uri.toString();
-      const index = this.breakpointDecInfos[uri].findIndex(v =>
+      const index = this.modelInfos[uri].bkptDecs.findIndex(v =>
         currentModel.getDecorationRange(v.id).startLineNumber === lineNumber
       );
+      console.log(index);
       if (index !== -1) {
-        currentModel.deltaDecorations([this.breakpointDecInfos[uri][index].id], []);
-        this.breakpointDecInfos[uri].splice(index, 1);
+        currentModel.deltaDecorations([this.modelInfos[uri].bkptDecs[index].id], []);
+        this.modelInfos[uri].bkptDecs.splice(index, 1);
       } else {
-        this.breakpointDecInfos[uri].push({
+        this.modelInfos[uri].bkptDecs.push({
           id: currentModel.deltaDecorations([], [this.bkptInfoToDecoration(lineNumber)])[0],
           hitCount: null,
           expression: null
@@ -199,32 +206,44 @@ export class EditorService {
     const newUri = uri.toString();
     let newModel = monaco.editor.getModel(uri);
     const oldModel = this.editor.getModel();
+    const oldUri = oldModel?.uri.toString();
+    if (oldUri in this.modelInfos) {
+      this.modelInfos[oldUri].cursor = this.editor.getPosition();
+      this.modelInfos[oldUri].scrollTop = this.editor.getScrollTop();
+    }
     if (newModel === null) {
       newModel = monaco.editor.createModel(tab.code, isCpp(tab.title) ? 'cpp' : 'text', uri);
       newModel.onDidChangeContent(_ => {
         tab.saved = false;
         this.editorText.next(newModel.getValue());
       });
-      this.breakpointDecInfos[newUri] = [];
-      if (replace) {
+      this.modelInfos[newUri] = {
+        cursor: { column: 1, lineNumber: 1 },
+        scrollTop: 0,
+        bkptDecs: [],
+      };
+      if (replace && oldModel !== null) {
         // "Inherit" old decorations to new model
-        const oldUri = oldModel.uri.toString();
-        for (const info of this.breakpointDecInfos[oldUri]) {
-          const line = oldModel.getDecorationRange(info.id).startLineNumber;
-          this.breakpointDecInfos[newUri].push({
+        for (const bkptInfo of this.modelInfos[oldUri].bkptDecs) {
+          const line = oldModel.getDecorationRange(bkptInfo.id).startLineNumber;
+          this.modelInfos[newUri].bkptDecs.push({
             id: newModel.deltaDecorations([], [this.bkptInfoToDecoration(line)])[0],
-            expression: info.expression,
-            hitCount: info.hitCount
+            expression: bkptInfo.expression,
+            hitCount: bkptInfo.hitCount
           });
         }
-        delete this.breakpointDecInfos[oldUri];
+        this.modelInfos[newUri].cursor = this.modelInfos[oldUri].cursor;
+        this.modelInfos[newUri].scrollTop = this.modelInfos[oldUri].scrollTop;
+        delete this.modelInfos[oldUri];
       }
     }
     this.editor.setModel(newModel);
-    console.log('switch to ', newUri);
+    console.log('switch to ', newUri, tab);
     if (replace) {
       oldModel.dispose();
     }
+    this.editor.setPosition(this.modelInfos[newUri].cursor);
+    this.editor.setScrollTop(this.modelInfos[newUri].scrollTop);
     this.editor.focus();
   }
 
@@ -258,7 +277,7 @@ export class EditorService {
     const uri = this.getUri(tab);
     console.log('destroy ', uri.toString());
     const target = monaco.editor.getModel(uri);
-    delete this.breakpointDecInfos[uri.toString()];
+    delete this.modelInfos[uri.toString()];
     if (this.lastTraceUri === uri) this.lastTraceUri = null;
     target.setValue("");
     target.dispose();
@@ -266,16 +285,16 @@ export class EditorService {
 
   private updateModelInfo(model: monaco.editor.ITextModel) {
     const uri = model.uri.toString();
-    if (uri in this.breakpointDecInfos)
-    this.breakpointInfos.next(this.breakpointDecInfos[uri].map(dec => ({
-      line: model.getDecorationRange(dec.id).startLineNumber,
-      ...dec
-    })));
+    if (uri in this.modelInfos)
+      this.breakpointInfos.next(this.modelInfos[uri].bkptDecs.map(dec => ({
+        line: model.getDecorationRange(dec.id).startLineNumber,
+        ...dec
+      })));
   }
 
   changeBkptCondition(id: string, expression: string) {
     const currentModel = this.editor.getModel();
-    this.breakpointDecInfos[currentModel.uri.toString()].find(v => v.id === id).expression = expression;
+    this.modelInfos[currentModel.uri.toString()].bkptDecs.find(v => v.id === id).expression = expression;
     this.updateModelInfo(currentModel);
   }
 

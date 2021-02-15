@@ -12,7 +12,7 @@
                 <as-split-area *ngIf="currentOutletUrl('sidebar') !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
                     <router-outlet name="sidebar"></router-outlet>
                 </as-split-area>
-                <as-split-area [order]="1" size="*">
+                <as-split-area [order]="1" size="*" [ngStyle]="{ overflow: 'hidden' }">
                     <app-tabs></app-tabs>
                 </as-split-area>
             </as-split>

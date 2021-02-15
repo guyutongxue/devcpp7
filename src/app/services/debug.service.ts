@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject, throwError, TimeoutError } from 'rxjs';
 import { GdbArray, GdbResponse, GdbVal } from 'tsgdbmi';
 import { ElectronService } from '../core/services/electron/electron.service';
 import { SendRequestOptions } from '../../background/handlers/typing';
@@ -153,7 +153,16 @@ export class DebugService {
     })
     return firstValueFrom(this.requestResults.pipe(
       filter(result => result.token === token),
-      timeout(1000)
+      timeout(2000),
+      catchError(err => {
+        if (err instanceof TimeoutError) {
+          window.alert("GDB 未响应。调试将退出。");
+          this.exitDebug();
+          return EMPTY;
+        } else {
+          return throwError(() => err);
+        }
+      })
     ));
   }
 

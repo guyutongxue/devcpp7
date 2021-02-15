@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
 import { FlatTreeControl, TreeControl } from '@angular/cdk/tree';
 import { BehaviorSubject, merge, Observable } from 'rxjs';
-import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { DebugService, GdbVarInfo } from './debug.service';
 import { map, tap } from 'rxjs/operators';
 
@@ -72,24 +71,7 @@ export class DynamicDatasource implements DataSource<GdbVarInfoNode> {
 })
 export class WatchService {
 
-  private flattenedData = new BehaviorSubject<GdbVarInfoNode[]>([
-    {
-      id: "v00",
-      expression: 'a',
-      value: null,
-      level: 0,
-      expandable: true,
-      expanded: false
-    },
-    {
-      id: "v01",
-      expression: 'b',
-      value: null,
-      level: 0,
-      expandable: true,
-      expanded: false
-    }
-  ]);
+  private flattenedData = new BehaviorSubject<GdbVarInfoNode[]>([]);
   treeControl = new FlatTreeControl<GdbVarInfoNode>(
     node => node.level,
     node => node.value !== null && node.expandable,
