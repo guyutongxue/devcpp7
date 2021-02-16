@@ -1,0 +1,33 @@
+<div id="menuBar">
+    <ul nz-menu nzMode="horizontal" [nzSelectable]="false">
+        <li nz-submenu nzTitle="文件">
+            <ul class="mySubmenu">
+                <li nz-menu-item nzDisabled>未完成</li>
+            </ul>
+        </li>
+        <li nz-submenu nzTitle="编辑">
+            <ul class="mySubmenu">
+                <li nz-menu-item nzDisabled>未完成</li>
+            </ul>
+        </li>
+        <li nz-submenu nzTitle="视图">
+            <ul class="mySubmenu">
+                <li nz-menu-item nzDisabled>未完成</li>
+            </ul>
+        </li>
+        <li nz-submenu nzTitle="帮助">
+            <ul class="mySubmenu">
+                <li nz-menu-item nzIcon="question-circle" (click)="toggleDevTools()">切换 WebTools</li>
+                <li nz-menu-item>Option 4</li>
+                <li nz-submenu nzTitle="Sub Menu">
+                    <ul class="mySubmenu">
+                        <li nz-menu-item nzDisabled>Option 5</li>
+                        <li nz-menu-item>Option 6</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<app-file-control></app-file-control>
+<app-build-control></app-build-control>

@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { ViewEncapsulation } from '@angular/core'
 import { Router } from '@angular/router';
-import { SplitAreaDirective } from 'angular-split';
 import { ProblemsService } from '../services/problems.service';
 
 @Component({

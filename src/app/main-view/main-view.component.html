@@ -1,23 +1,25 @@
 <div id="asContainer">
-    <as-split unit="pixel" direction="vertical" (dragEnd)="toolsSizeOnChange($event)">
-        <as-split-area id="upperPart" [order]="0">
-            <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
-                <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
-                    [nzTooltipTitle]="i.title" (click)="showSidebar(i.url)" [nzDisabled]="i.disabled"
-                    [nzSelected]="currentOutletUrl('sidebar') === i.url">
-                    <i nz-icon [nzType]="i.icon"></i>
-                </li>
-            </ul>
-            <as-split unit="pixel" direction="horizontal">
-                <as-split-area *ngIf="currentOutletUrl('sidebar') !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
-                    <router-outlet name="sidebar"></router-outlet>
-                </as-split-area>
-                <as-split-area [order]="1" size="*" [ngStyle]="{ overflow: 'hidden' }">
-                    <app-tabs></app-tabs>
-                </as-split-area>
-            </as-split>
+    <as-split unit="pixel" direction="vertical" (dragEnd)="toolsSizeOnChange($event)" id="outerSplit">
+        <as-split-area [order]="0" size="*">
+            <div id="upperPart">
+                <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
+                    <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
+                        [nzTooltipTitle]="i.title" (click)="showSidebar(i.url)" [nzDisabled]="i.disabled"
+                        [nzSelected]="currentOutletUrl('sidebar') === i.url">
+                        <i nz-icon [nzType]="i.icon"></i>
+                    </li>
+                </ul>
+                <as-split unit="pixel" direction="horizontal">
+                    <as-split-area *ngIf="currentOutletUrl('sidebar') !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
+                        <router-outlet name="sidebar"></router-outlet>
+                    </as-split-area>
+                    <as-split-area [order]="1" size="*" [ngStyle]="{ overflow: 'hidden' }">
+                        <app-tabs></app-tabs>
+                    </as-split-area>
+                </as-split>
+            </div>
         </as-split-area>
-        <as-split-area *ngIf="currentOutletUrl('tools') !== null" [order]="1" [size]="200" minSize="150" id="toolsArea">
+        <as-split-area *ngIf="currentOutletUrl('tools') !== null" [order]="1" [size]="200" [minSize]="200" id="toolsArea">
             <router-outlet name="tools"></router-outlet>
         </as-split-area>
     </as-split>

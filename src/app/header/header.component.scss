@@ -1,0 +1,21 @@
+#menuBar {
+    .ant-menu-horizontal {
+        line-height: 25px;
+        >.ant-menu-submenu {
+            margin: -1px 8px 0;
+        }
+    }
+}
+
+.ant-menu-vertical.ant-menu-sub {
+    min-width: 200px;
+
+    .mySubmenu {
+        .ant-menu-item,.ant-menu-submenu-title {
+            $h: 26px;
+            height: $h;
+            line-height: $h;
+        }
+        
+    }
+}

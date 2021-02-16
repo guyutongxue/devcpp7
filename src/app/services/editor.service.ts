@@ -167,7 +167,6 @@ export class EditorService {
       const index = this.modelInfos[uri].bkptDecs.findIndex(v =>
         currentModel.getDecorationRange(v.id).startLineNumber === lineNumber
       );
-      console.log(index);
       if (index !== -1) {
         currentModel.deltaDecorations([this.modelInfos[uri].bkptDecs[index].id], []);
         this.modelInfos[uri].bkptDecs.splice(index, 1);

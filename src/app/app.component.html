@@ -1,8 +1,7 @@
 <div id="header">
-    <app-file-control></app-file-control>
-    <app-build-control></app-build-control>
+    <app-header></app-header>
 </div>
-<div id="mainView">
+<div id="mainView" [ngStyle]="{ 'height.px': mainViewHeight }">
     <app-main-view></app-main-view>
 </div>
-<div id="footer">Footer</div>
+<div id="footer">就绪</div>

@@ -26,6 +26,18 @@ export class AppComponent implements OnInit {
     }
   }
 
+  get headerHeight() {
+    return 26.8 + 1 * 32;
+  }
+
+  get footerHeight() {
+    return 20;
+  }
+
+  get mainViewHeight() {
+    return window.innerHeight - this.headerHeight - this.footerHeight;
+  }
+
   ngOnInit() : void {
 
   }
