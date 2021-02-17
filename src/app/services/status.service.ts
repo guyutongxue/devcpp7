@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { DebugService } from './debug.service';
 import { BuildService } from './build.service';
 import { BehaviorSubject } from 'rxjs';
+import { FileService } from './file.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +15,15 @@ export class StatusService {
   isBuilding: boolean = false;
 
   constructor(
-    debugService: DebugService,
-    buildService: BuildService
+    private fileService: FileService,
+    private debugService: DebugService,
+    private buildService: BuildService
   ) { 
-    debugService.isDebugging$.subscribe(v => this.isDebugging = v);
-    buildService.isBuilding$.subscribe(v => this.isBuilding = v);
+    this.debugService.isDebugging$.subscribe(v => this.isDebugging = v);
+    this.buildService.isBuilding$.subscribe(v => this.isBuilding = v);
+  }
+
+  get saveEnabled() {
+    return this.fileService.currentFileType() !== "none" && !this.isDebugging && !this.isBuilding;
   }
 }

@@ -55,7 +55,8 @@ export class FileService {
   }
 
   saveAs(tab?: Tab) : string | null {
-    if (typeof tab === "undefined") this.tabsService.getActive().value;
+    this.tabsService.syncActiveCode();
+    if (typeof tab === "undefined") tab = this.tabsService.getActive().value;
     let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
       content: tab.code,
       defaultFilename:

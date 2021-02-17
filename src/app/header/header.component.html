@@ -1,33 +1,64 @@
 <div id="menuBar">
-    <ul nz-menu nzMode="horizontal" [nzSelectable]="false">
-        <li nz-submenu nzTitle="文件">
+    <nz-button-group>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="fileMenu">
+            文件
+        </button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="editMenu">
+            编辑
+        </button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="runMenu">
+            运行
+        </button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="helpMenu">
+            帮助
+        </button>
+    </nz-button-group>
+</div>
+<nz-dropdown-menu nzNoAnimation #fileMenu>
+    <ul nz-menu>
+        <li nz-menu-item (click)="fileNew()">新建源文件</li>
+        <li nz-menu-item (click)="fileOpen()">打开源文件...</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="fileSave()">保存</li>
+        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="fileSaveAs()">另存为...</li>
+    </ul>
+</nz-dropdown-menu>
+<nz-dropdown-menu nzNoAnimation #editMenu>
+    <ul nz-menu>
+        <li nz-menu-item nzDisabled>撤销</li>
+        <li nz-menu-item nzDisabled>恢复</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item nzDisabled>剪切</li>
+        <li nz-menu-item nzDisabled>复制</li>
+        <li nz-menu-item nzDisabled>粘贴</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item nzDisabled>查找</li>
+        <li nz-menu-item nzDisabled>替换</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item nzDisabled>切换单行注释</li>
+    </ul>
+</nz-dropdown-menu>
+<nz-dropdown-menu nzNoAnimation #runMenu>
+    <ul nz-menu>
+        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="buildBuild()">编译</li>
+        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="buildRunExe()">编译并运行</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item [nzDisabled]="!debugEnabled || isDebugging" (click)="debugStart()">开始调试</li>
+        <li nz-menu-item [nzDisabled]="!debugEnabled || !isDebugging" (click)="debugExit()">停止调试</li>
+    </ul>
+</nz-dropdown-menu>
+<nz-dropdown-menu nzNoAnimation #helpMenu>
+    <ul nz-menu>
+        <li nz-menu-item nzIcon="question-circle" (click)="toggleDevTools()">切换 WebTools</li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item>Option 4</li>
+        <li nz-submenu nzTitle="Sub Menu">
             <ul class="mySubmenu">
-                <li nz-menu-item nzDisabled>未完成</li>
-            </ul>
-        </li>
-        <li nz-submenu nzTitle="编辑">
-            <ul class="mySubmenu">
-                <li nz-menu-item nzDisabled>未完成</li>
-            </ul>
-        </li>
-        <li nz-submenu nzTitle="视图">
-            <ul class="mySubmenu">
-                <li nz-menu-item nzDisabled>未完成</li>
-            </ul>
-        </li>
-        <li nz-submenu nzTitle="帮助">
-            <ul class="mySubmenu">
-                <li nz-menu-item nzIcon="question-circle" (click)="toggleDevTools()">切换 WebTools</li>
-                <li nz-menu-item>Option 4</li>
-                <li nz-submenu nzTitle="Sub Menu">
-                    <ul class="mySubmenu">
-                        <li nz-menu-item nzDisabled>Option 5</li>
-                        <li nz-menu-item>Option 6</li>
-                    </ul>
-                </li>
+                <li nz-menu-item nzDisabled>Option 5</li>
+                <li nz-menu-item>Option 6</li>
             </ul>
         </li>
     </ul>
-</div>
+</nz-dropdown-menu>
 <app-file-control></app-file-control>
 <app-build-control></app-build-control>

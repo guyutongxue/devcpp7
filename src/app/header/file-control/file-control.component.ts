@@ -16,9 +16,7 @@ export class FileControlComponent implements OnInit {
   ) { }
 
   get isSaveEnable() {
-    return this.fileService.currentFileType() !== "none"
-      && !this.statusService.isBuilding
-      && !this.statusService.isDebugging;
+    return this.statusService.saveEnabled;
   }
 
   ngOnInit(): void { }

@@ -7,15 +7,17 @@
     }
 }
 
-.ant-menu-vertical.ant-menu-sub {
-    min-width: 200px;
+// .ant-menu-vertical.ant-menu-sub {
+//     min-width: 200px;
 
-    .mySubmenu {
-        .ant-menu-item,.ant-menu-submenu-title {
-            $h: 26px;
-            height: $h;
-            line-height: $h;
-        }
-        
-    }
-}
+//     .mySubmenu {
+//         .ant-menu-item,.ant-menu-submenu-title {
+//             $h: 26px;
+//             height: $h;
+//             line-height: $h;
+//         }
+//         .ant-dropdown-menu-item-divider {
+//             margin-top: -4px;
+//         }
+//     }
+// }
