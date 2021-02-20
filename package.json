@@ -31,7 +31,6 @@
     "express": "4.17.1",
     "get-port": "5.1.1",
     "iconv-lite": "0.6.2",
-    "monaco-editor": "0.21.1",
     "monaco-editor-core": "0.21.1",
     "monaco-languageclient": "0.13.1-next.4",
     "ng-zorro-antd": "11.0.1",

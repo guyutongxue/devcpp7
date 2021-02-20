@@ -17,7 +17,7 @@
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
             "assets": [
-              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "assets/monaco-editor/" },
+              { "glob": "**/*", "input": "node_modules/monaco-editor-core", "output": "assets/monaco-editor/" },
               "src/assets"
             ],
             "styles": [

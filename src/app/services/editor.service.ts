@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
 import { DocumentSymbol } from 'vscode-languageserver-protocol';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, take } from 'rxjs/operators';
+
 import { Tab } from './tabs.service'
 import { ElectronService } from '../core/services';
 import { classicTheme } from '../configs/editorTheme';
+import { cppLang, cppLangConf } from '../configs/cppLanguageConfig'
 import { defaultKeybindings } from '../configs/editorKeybindings'
 import { StartLanguageServerResult } from '../../background/handlers/typing';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // All standard C++ headers filename
 const stdCppHeaders = [
@@ -58,7 +61,7 @@ export class EditorService {
   private traceDecoration: string[];
   private lastTraceUri: monaco.Uri = null;
 
-  constructor(private electronService: ElectronService) {
+  constructor(private monacoEditorLoaderService: MonacoEditorLoaderService, private electronService: ElectronService) {
     this.editorText.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -67,6 +70,21 @@ export class EditorService {
       if (model) {
         this.updateModelInfo(model);
       }
+    })
+    this.monacoEditorLoaderService.isMonacoLoaded$.pipe(
+      filter(isLoaded => isLoaded),
+      take(1)
+    ).subscribe(() => {
+      monaco.languages.register({
+        id: 'cpp',
+        extensions: [
+          '.cc', '.cxx', '.cpp', '.h'
+        ],
+        aliases: ['C++', 'Cpp', 'cpp']
+      });
+      monaco.languages.setMonarchTokensProvider('cpp', cppLang);
+      monaco.languages.setLanguageConfiguration('cpp', cppLangConf);
+      monaco.editor.defineTheme('devcpp-classic', classicTheme);
     })
   }
 
@@ -182,7 +200,6 @@ export class EditorService {
   }
 
   monacoInit(editor: monaco.editor.IStandaloneCodeEditor) {
-    monaco.editor.defineTheme('devcpp-classic', classicTheme);
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     for (let i of defaultKeybindings) {
