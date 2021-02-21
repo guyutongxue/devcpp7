@@ -14,7 +14,8 @@ export class EditorComponent implements OnInit {
 
   editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
     glyphMargin: true,
-    lineNumbersMinChars: 2
+    lineNumbersMinChars: 2,
+    'semanticHighlighting.enabled': true
   };
   key: string;
   get code(){
@@ -39,12 +40,12 @@ export class EditorComponent implements OnInit {
   }
 
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
+    if (!this.editorService.isLanguageClientStarted) this.editorService.startLanguageClient();
     this.editorService.monacoInit(editor);
     if (this.key) {
       let activeTab = this.tabsService.getByKey(this.key).value;
       this.editorService.switchToModel(activeTab);
     }
-    if (!this.editorService.isLanguageClientStarted) this.editorService.startLanguageClient();
   }
 
 }

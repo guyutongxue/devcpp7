@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
   }
 
   get headerHeight() {
-    return 26.8 + 1 * 32;
+    return 32 + 1 * 32;
   }
 
   get footerHeight() {

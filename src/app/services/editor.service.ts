@@ -3,7 +3,7 @@ import { listen, MessageConnection } from 'vscode-ws-jsonrpc';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { MonacoEditorLoaderService } from '@materia-ui/ngx-monaco-editor';
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, createConnection } from 'monaco-languageclient';
-import { DocumentSymbol } from 'vscode-languageserver-protocol';
+import { DocumentSymbol, SemanticTokens } from 'vscode-languageserver-protocol';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, take } from 'rxjs/operators';
 
@@ -68,7 +68,7 @@ export class EditorService {
     ).subscribe(_ => {
       const model = this.editor?.getModel();
       if (model) {
-        this.updateModelInfo(model);
+        this.updateBkptInfo(model);
       }
     })
     this.monacoEditorLoaderService.isMonacoLoaded$.pipe(
@@ -84,7 +84,22 @@ export class EditorService {
       });
       monaco.languages.setMonarchTokensProvider('cpp', cppLang);
       monaco.languages.setLanguageConfiguration('cpp', cppLangConf);
+      monaco.languages.registerDocumentSemanticTokensProvider('cpp', {
+        getLegend() {
+          return {
+            tokenModifiers: [],
+            tokenTypes: ["variable", "variable", "parameter", "function", "member", "function", "member", "variable", "class", "enum", "enumConstant", "type", "dependent", "dependent", "namespace", "typeParameter", "concept", "type", "macro", "comment"]
+          } as monaco.languages.SemanticTokensLegend;
+        },
+        provideDocumentSemanticTokens: async (model: monaco.editor.ITextModel) => {
+          return {
+            data: new Uint32Array(await this.getSemanticTokens(model))
+          }
+        },
+        releaseDocumentSemanticTokens() { }
+      })
       monaco.editor.defineTheme('devcpp-classic', classicTheme);
+      this.startLanguageClient();
     })
   }
 
@@ -110,7 +125,6 @@ export class EditorService {
 
   startLanguageClient() {
     const result: StartLanguageServerResult = this.electronService.ipcRenderer.sendSync('langServer/start');
-    if (!this.isInit) return;
     MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
     // create the web socket
     const socketUrl = `ws://localhost:${result.port}/langServer`;
@@ -195,7 +209,7 @@ export class EditorService {
           expression: null
         });
       }
-      this.updateModelInfo(currentModel);
+      this.updateBkptInfo(currentModel);
     }
   }
 
@@ -274,6 +288,18 @@ export class EditorService {
     });
   }
 
+  private async getSemanticTokens(model?: monaco.editor.ITextModel): Promise<number[]> {
+    if (!this.isInit) return Promise.resolve(null);
+    if (!this.isLanguageClientStarted) return Promise.resolve(null);
+    if (typeof model === 'undefined') model = this.editor.getModel();
+    if (model === null) return Promise.resolve(null);
+    return (await this.languageClient.sendRequest<SemanticTokens>("textDocument/semanticTokens/full", {
+      textDocument: {
+        uri: model.uri.toString()
+      }
+    })).data;
+  }
+
   getCode() {
     if (!this.isInit) return "";
     return this.editor.getValue();
@@ -299,7 +325,7 @@ export class EditorService {
     target.dispose();
   }
 
-  private updateModelInfo(model: monaco.editor.ITextModel) {
+  private updateBkptInfo(model: monaco.editor.ITextModel) {
     const uri = model.uri.toString();
     if (uri in this.modelInfos)
       this.breakpointInfos.next(this.modelInfos[uri].bkptDecs.map(dec => ({
@@ -311,7 +337,7 @@ export class EditorService {
   changeBkptCondition(id: string, expression: string) {
     const currentModel = this.editor.getModel();
     this.modelInfos[currentModel.uri.toString()].bkptDecs.find(v => v.id === id).expression = expression;
-    this.updateModelInfo(currentModel);
+    this.updateBkptInfo(currentModel);
   }
 
   showTrace(line: number) {
