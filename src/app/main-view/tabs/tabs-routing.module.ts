@@ -10,8 +10,12 @@ const routes: Routes = [
     component: EditorComponent
   },
   {
-    path: '',
+    path: 'empty',
     component: EmptyPageComponent
+  },
+  {
+    path: '**',
+    redirectTo: 'empty'
   }
 ];
 

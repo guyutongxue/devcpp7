@@ -42,7 +42,7 @@ export class TabsComponent implements OnInit {
   private doRemoveTab(tab: Tab) {
     this.tabsService.remove(tab.key);
     if (this.tabList.length === 0) {
-      this.router.navigate(['']);
+      this.router.navigate(['empty']);
     }
   }
 
