@@ -25,6 +25,33 @@ function isCpp(filename: string) {
   return ['cc', 'cxx', 'cpp', 'h'].includes(ext);
 }
 
+const clangdSemanticTokensLegend: monaco.languages.SemanticTokensLegend = {
+  tokenModifiers: [], // No token modifier supported now (12.0.0-rc1)
+  // See https://github.com/llvm/llvm-project/blob/4dc8365/clang-tools-extra/clangd/SemanticHighlighting.h#L30
+  tokenTypes: [
+    "variable",  // Global var
+    "variable",  // Local var
+    "variable",  // Param
+    "function",  // Function (global)
+    "function",  // Member function
+    "function",  // Static member function
+    "variable",  // Member data
+    "variable",  // Static member data
+    "type",      // Class type
+    "type",      // Enum type
+    "number",    // Enum member
+    "type",      // Type-alias (rely on template)
+    "type",      // Other type
+    "",          // Unknown
+    "type",      // Namespace
+    "type",      // Template param
+    "type",      // Concept
+    "type",      // Primitive type (type-alias)
+    "macro",     // Macro
+    "comment"    // Inactive Code
+  ]
+}
+
 interface EditorBreakpointDecInfo {
   id: string;
   hitCount: number | null;
@@ -86,10 +113,7 @@ export class EditorService {
       monaco.languages.setLanguageConfiguration('cpp', cppLangConf);
       monaco.languages.registerDocumentSemanticTokensProvider('cpp', {
         getLegend() {
-          return {
-            tokenModifiers: [],
-            tokenTypes: ["variable", "variable", "parameter", "function", "member", "function", "member", "variable", "class", "enum", "enumConstant", "type", "dependent", "dependent", "namespace", "typeParameter", "concept", "type", "macro", "comment"]
-          } as monaco.languages.SemanticTokensLegend;
+          return clangdSemanticTokensLegend;
         },
         provideDocumentSemanticTokens: async (model: monaco.editor.ITextModel) => {
           return {

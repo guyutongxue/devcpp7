@@ -1,7 +1,7 @@
 import { } from 'monaco-languageclient';
 export const classicTheme: monaco.editor.IStandaloneThemeData = {
   base: "vs",
-  inherit: true,
+  inherit: false,
   colors: {
     'editor.background': '#ffffff',
     "editor.lineHighlightBackground": "#ccffff",
@@ -43,13 +43,25 @@ export const classicTheme: monaco.editor.IStandaloneThemeData = {
       foreground: '#800080',
     },
     {
-      token: "comments",
+      token: "comment",
       foreground: '#0078d7',
       fontStyle: 'italic'
     },
     {
+      token: 'macro',
+      foreground: '#008000'
+    },
+    {
+      token: 'type',
+      foreground: '#267f99'
+    },
+    {
+      token: 'variable',
+      foreground: '#001080'
+    },
+    {
       token: 'function',
-      fontStyle: 'italic'
+      foreground: '#795e26'
     }
   ]
 }
