@@ -18,10 +18,8 @@
     ]
   },
   "files": [
-    "main.ts"
-  ],
-  "include": [
-    "src/background/**/*.ts"
+    "main.ts",
+    "src/background/server/server.ts"
   ],
   "exclude": [
     "node_modules",

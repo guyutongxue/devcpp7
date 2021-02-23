@@ -1,7 +1,7 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) 2018 TypeFox GmbH (http://www.typefox.io). All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
+/**
+ * Copyright (c) 2018 TypeFox GmbH (http://www.typefox.io)
+ * Original file licensed under the MIT License.
+ */
 
 import * as http from "http";
 import * as url from "url";

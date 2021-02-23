@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject, throwError, TimeoutError } from 'rxjs';
 import { GdbArray, GdbResponse, GdbVal } from 'tsgdbmi';
-import { ElectronService } from '../core/services/electron/electron.service';
+import { ElectronService } from '../core/services';
 import { SendRequestOptions } from '../../background/handlers/typing';
 import { EditorBreakpointInfo, EditorService } from './editor.service';
 import { FileService } from './file.service';

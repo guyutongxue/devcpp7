@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router'
 import { NzNotificationDataOptions, NzNotificationService } from 'ng-zorro-antd/notification';
-import { ElectronService } from '../core/services/electron/electron.service';
+import { ElectronService } from '../core/services';
 import { BuildResult, GccDiagnostics } from '../../background/handlers/typing';
 import { FileService } from './file.service';
 import { ProblemsService } from './problems.service';

@@ -85,4 +85,4 @@ try {
   // throw e;
 }
 
-import './src/background/background';
+import './src/background';

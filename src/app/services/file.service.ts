@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ElectronService } from '../core/services/electron/electron.service'
+import { ElectronService } from '../core/services'
 import { EditorService } from './editor.service';
 import { Tab, TabsService } from './tabs.service';
 import { OpenFileOptions, SaveFileOptions, SaveAsFileOptions } from '../../background/handlers/typing'
