@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ElectronService } from './core/services';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
@@ -24,6 +24,14 @@ export class AppComponent implements OnInit {
     } else {
       console.log('Run in browser');
     }
+    this.windowHeight = window.innerHeight;
+  }
+
+  private windowHeight: number;
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.windowHeight = window.innerHeight;
   }
 
   get headerHeight() {
@@ -35,7 +43,7 @@ export class AppComponent implements OnInit {
   }
 
   get mainViewHeight() {
-    return window.innerHeight - this.headerHeight - this.footerHeight;
+    return this.windowHeight - this.headerHeight - this.footerHeight;
   }
 
   ngOnInit() : void {
