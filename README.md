@@ -14,6 +14,8 @@ A project simulating legacy Dev-C++, a tiny C++ IDE, powered by Angular, Electro
 
 **This repository has no relationship to Bloodshed's Dev-C++.**
 
+![Snapshot](https://s3.ax1x.com/2021/02/22/yHDron.png)
+
 ## Current Status
 
 **Under construction, but may be in abeyance later**
