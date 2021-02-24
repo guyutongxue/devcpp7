@@ -1,6 +1,5 @@
-import { IpcMainEvent } from "electron/main";
-import { getWindow } from "../basicUtil";
+import { getWebContents, typedIpcMain } from "../basicUtil";
 
-export function toggleDevTools(_: IpcMainEvent) {
-    getWindow().webContents.toggleDevTools();
-}
+typedIpcMain.handle('window/toggleDevTools', (_) => {
+    getWebContents().toggleDevTools();
+})

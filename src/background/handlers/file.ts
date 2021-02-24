@@ -1,36 +1,25 @@
 import * as electron from 'electron';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { getWindow } from '../basicUtil';
-import { SaveFileOptions, SaveAsFileOptions, OpenFileOptions } from './typing'
+import { getWindow, typedIpcMain } from '../basicUtil';
 
 // interface Result { success: boolean, [key: string]: any };
 
-/**
- * Save file
- * @param event 
- * @param arg 
- */
-export function saveFile(event: electron.IpcMainEvent, arg: SaveFileOptions) {
+typedIpcMain.handle('file/save', (_, arg) => {
   try {
     fs.writeFileSync(arg.path, arg.content, "utf-8");
-    event.returnValue = {
+    return {
       success: true
     };
   } catch (e) {
-    event.returnValue = {
+    return {
       success: false,
       error: e
     }
   }
-}
+});
 
-/**
- * Open a save dialog and choose path for it. 
- * @param event 
- * @param arg 
- */
-export async function saveAsFile(event: electron.IpcMainEvent, arg: SaveAsFileOptions) {
+typedIpcMain.handle('file/saveAs', async (_, arg) => {
   try {
     let options: electron.SaveDialogOptions = {
       defaultPath: arg.defaultFilename,
@@ -40,41 +29,30 @@ export async function saveAsFile(event: electron.IpcMainEvent, arg: SaveAsFileOp
         { name: "所有文件", extensions: ["*"] },
       ],
     };
-    await electron.dialog.showSaveDialog(getWindow(), options).then(r => {
-      try {
-        if (!r.canceled) {
-          fs.writeFileSync(r.filePath as string, arg.content, "utf-8");
-          event.returnValue = {
-            success: true,
-            path: r.filePath as string
-          }
-        } else {
-          event.returnValue = {
-            success: false,
-            reason: "User cancelled operation."
-          };
-        }
-      } catch (e) {
-        event.returnValue = {
-          success: false,
-          error: e
-        };
+    const r = await electron.dialog.showSaveDialog(getWindow(), options);
+    if (!r.canceled) {
+      fs.writeFileSync(r.filePath, arg.content, "utf-8");
+      return {
+        success: true,
+        path: r.filePath
       }
-    });
-  } catch (e) {
-    event.returnValue = {
-      success: false,
-      error: e
+    } else {
+      return {
+        success: false,
+        cancelled: true
+      };
     }
+  } catch (e) {
+    return {
+      success: false,
+      cancelled: false,
+      error: e
+    };
   }
-}
+});
 
-/**
- * Open an open dialog and choose which file to open.
- * @param event 
- * @param arg 
- */
-export async function openFile(event: electron.IpcMainEvent, arg: OpenFileOptions) {
+
+typedIpcMain.handle('file/open', async (_, arg) => {
   interface FileInfo {
     path: string;
     content: string;
@@ -115,14 +93,14 @@ export async function openFile(event: electron.IpcMainEvent, arg: OpenFileOption
         });
       }
     }
-    event.returnValue = {
+    return {
       success: true,
       files: files
     };
   } catch (e) {
-    event.returnValue = {
+    return {
       success: false,
       error: e
     };
   }
-}
+});

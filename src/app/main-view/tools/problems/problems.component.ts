@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
-import { GccDiagnostic, GccDiagnosticPosition } from '../../../../background/handlers/typing';
+import { GccDiagnostic, GccDiagnosticPosition } from '../../../core/ipcTyping';
 import { ProblemsService } from '../../../services/problems.service';
 import * as path from 'path'
 import { FileService } from '../../../services/file.service';

@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { ElectronService } from '../core/services'
 import { EditorService } from './editor.service';
 import { Tab, TabsService } from './tabs.service';
-import { OpenFileOptions, SaveFileOptions, SaveAsFileOptions } from '../../background/handlers/typing'
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +15,6 @@ export class FileService {
     private editorService: EditorService,
     private tabsService: TabsService,
     private electronService: ElectronService) {
-    this.electronService.ipcRenderer.on('ng:file-control/save', (_) => {
-      this.save();
-    });
     this.editorService.editorMessage.subscribe(({ type, arg }) => {
       switch (type) {
         case "requestSave":
@@ -54,42 +50,41 @@ export class FileService {
     return this.tabsService.getActive().value?.title ?? null;
   }
 
-  saveAs(tab?: Tab) : string | null {
+  async saveAs(tab?: Tab) : Promise<string | null> {
     this.tabsService.syncActiveCode();
     if (typeof tab === "undefined") tab = this.tabsService.getActive().value;
-    let result = this.electronService.ipcRenderer.sendSync("file/saveAs", {
+    const result = await this.electronService.ipcRenderer.invoke("file/saveAs", {
       content: tab.code,
       defaultFilename:
         tab.path === null
           ? tab.title
           : tab.path,
-    } as SaveAsFileOptions);
-    if (!result.success) {
-      if ("error" in result) {
+    });
+    if (result.success === false) {
+      if (result.cancelled === false) {
         alert(result.error);
       }
       return null;
+    } else {
+      this.tabsService.saveCode(tab.key, result.path);
+      return result.path;
     }
-    this.tabsService.saveCode(tab.key, result.path);
-    return result.path;
   }
 
   /** @return saved file path, null if not successful */
-  save(tab?: Tab): string | null {
+  async save(tab?: Tab): Promise<string | null> {
     this.tabsService.syncActiveCode();
     if (typeof tab === "undefined") tab = this.tabsService.getActive().value;
     // new file, not stored yet
     if (tab.path === null) {
       return this.saveAs(tab);
     } else {
-      let result = this.electronService.ipcRenderer.sendSync("file/save", {
+      const result = await this.electronService.ipcRenderer.invoke("file/save", {
         content: tab.code,
         path: tab.path,
-      } as SaveFileOptions);
-      if (!result.success) {
-        if ("error" in result) {
-          alert(result.error);
-        }
+      });
+      if (result.success === false) {
+        alert(result.error);
         return null;
       }
       this.tabsService.saveCode(tab.key, tab.path);
@@ -98,25 +93,23 @@ export class FileService {
   }
 
   /** Save active file when it's not saved */
-  saveOnNeed(): string | null {
+  async saveOnNeed(): Promise<string | null> {
     const target = this.tabsService.getActive().value;
     if (!target.saved) return this.save(target);
     else return target.path;
   }
 
-  open() {
-    const result = this.electronService.ipcRenderer.sendSync("file/open", {
+  async open() {
+    const result = await this.electronService.ipcRenderer.invoke("file/open", {
       showDialog: true,
       paths: []
-    } as OpenFileOptions);
-    if (!result.success) {
-      if ("error" in result) {
-        alert(result.error);
-      }
+    });
+    if (result.success === false) {
+      alert(result.error);
       return false;
     }
-    let tabList = this.tabsService.tabList.map(tab => tab.path);
-    for (let file of result.files) {
+    const tabList = this.tabsService.tabList.map(tab => tab.path);
+    for (const file of result.files) {
       if (tabList.includes(file.path)) {
         continue;
       }
@@ -150,15 +143,15 @@ export class FileService {
    * @param col position
    * @param type "cursor" means set cursor to that position, "debug" means set trace line 
    */
-  locate(filepath: string, row: number, col: number, type: "cursor" | "debug" = "cursor") {
+  async locate(filepath: string, row: number, col: number, type: "cursor" | "debug" = "cursor") {
     const target = this.tabsService.tabList.find(t => t.path === filepath);
     if (typeof target === "undefined") {
-      const result = this.electronService.ipcRenderer.sendSync("file/open", {
+      const result = await this.electronService.ipcRenderer.invoke("file/open", {
         showDialog: false,
         paths: [
           filepath
         ]
-      } as OpenFileOptions);
+      });
       if (!result.success || result.files.length < 1) {
         if ("error" in result) {
           alert(result.error);

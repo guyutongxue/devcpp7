@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router'
 import { NzNotificationDataOptions, NzNotificationService } from 'ng-zorro-antd/notification';
 import { ElectronService } from '../core/services';
-import { BuildResult, GccDiagnostics } from '../../background/handlers/typing';
+import { BuildResult, GccDiagnostics } from '../core/ipcTyping';
 import { FileService } from './file.service';
 import { ProblemsService } from './problems.service';
 import { BehaviorSubject } from 'rxjs';
@@ -24,10 +24,10 @@ export class BuildService {
     private fileService: FileService,
     private problemsService: ProblemsService
   ) {
-    this.electronService.ipcRenderer.on("ng:build-control/buildStarted", (_) => {
+    this.electronService.ipcRenderer.on("ng:build/buildStarted", (_) => {
       this.isBuilding$.next(true);
     })
-    this.electronService.ipcRenderer.on("ng:build-control/buildComplete", (_, result: BuildResult) => {
+    this.electronService.ipcRenderer.on("ng:build/buildComplete", (_, result) => {
       this.isBuilding$.next(false);
       console.log("Compile result: ", result);
       if (result.success) {
@@ -82,25 +82,25 @@ export class BuildService {
 
   private sendBuildRequest(srcPath: string) {
     console.log("sending request");
-    this.electronService.ipcRenderer.send("build/build", {
+    this.electronService.ipcRenderer.invoke("build/build", {
       path: srcPath
     });
   }
 
   private sendRunExeRequest(srcPath: string) {
-    this.electronService.ipcRenderer.send("build/runExe", {
+    this.electronService.ipcRenderer.invoke("build/runExe", {
       path: srcPath
     });
   }
 
-  compile(): void {
-    const srcPath = this.fileService.saveOnNeed();
+  async compile() {
+    const srcPath = await this.fileService.saveOnNeed();
     if (srcPath !== null)
       this.sendBuildRequest(srcPath);
   }
 
-  runExe(): void {
-    const srcPath = this.fileService.saveOnNeed();
+  async runExe() {
+    const srcPath = await this.fileService.saveOnNeed();
     if (srcPath !== null)
       this.sendRunExeRequest(srcPath);
   }

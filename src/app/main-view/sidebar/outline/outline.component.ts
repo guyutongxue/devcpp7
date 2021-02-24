@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators'
 import { Observable, Subscription } from 'rxjs';
 
 import { NzTreeFlatDataSource, NzTreeFlattener } from 'ng-zorro-antd/tree-view';
@@ -66,7 +66,7 @@ export class OutlineComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.symbols$ = this.editorService.editorText$.pipe(
-      debounceTime(500),
+      debounceTime(300),
       distinctUntilChanged(),
       switchMap(_ => this.editorService.getSymbols())
     );

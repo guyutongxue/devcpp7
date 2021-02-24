@@ -146,6 +146,7 @@ export class WatchService {
    * @param reason 'collapse' Delete child nodes because of collapsion
    */
   deleteNode(node: GdbVarInfoNode, reason: "user" | "invalid" | "collapse"): void {
+    node = { ...node }; // Make a copy first
     const flattenedData = this.flattenedData.value;
     const fromIndex = flattenedData.findIndex(v => v.id === node.id) + 1;
     const toIndex = flattenedData.findIndex((val, index) => index >= fromIndex && val.level === node.level);

@@ -61,7 +61,6 @@ export class HeaderComponent implements OnInit {
   }
 
   toggleDevTools() {
-    debugger;
-    this.electronService.ipcRenderer.send("window/toggleDevTools");
+    this.electronService.ipcRenderer.invoke("window/toggleDevTools");
   }
 }

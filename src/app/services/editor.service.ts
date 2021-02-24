@@ -7,12 +7,11 @@ import { DocumentSymbol, SemanticTokens } from 'vscode-languageserver-protocol';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, take } from 'rxjs/operators';
 
-import { Tab } from './tabs.service'
+import { Tab } from './tabs.service';
 import { ElectronService } from '../core/services';
 import { classicTheme } from '../configs/editorTheme';
-import { cppLang, cppLangConf } from '../configs/cppLanguageConfig'
-import { defaultKeybindings } from '../configs/editorKeybindings'
-import { StartLanguageServerResult } from '../../background/handlers/typing';
+import { cppLang, cppLangConf } from '../configs/cppLanguageConfig';
+import { defaultKeybindings } from '../configs/editorKeybindings';
 
 // All standard C++ headers filename
 const stdCppHeaders = [
@@ -147,8 +146,8 @@ export class EditorService {
     };
   }
 
-  startLanguageClient() {
-    const result: StartLanguageServerResult = this.electronService.ipcRenderer.sendSync('langServer/start');
+  async startLanguageClient() {
+    const result = await this.electronService.ipcRenderer.invoke('langServer/start');
     MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
     // create the web socket
     const socketUrl = `ws://localhost:${result.port}/langServer`;
@@ -237,7 +236,7 @@ export class EditorService {
     }
   }
 
-  monacoInit(editor: monaco.editor.IStandaloneCodeEditor) {
+  editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     for (let i of defaultKeybindings) {
@@ -247,11 +246,17 @@ export class EditorService {
     }
     this.interceptOpenEditor();
     this.editor.onMouseDown(this.mouseDownListener);
-    this.editor.onDidChangeModel(() => {
-      this.editorText.next(this.editor.getValue());
+    this.editor.onDidChangeModel((e) => {
+      this.editorText.next(monaco.editor.getModel(e.newModelUrl).getValue());
     });
     this.isInit = true;
     this.editorMessage.next({ type: "initCompleted" });
+  }
+
+  editorDestroy() {
+    this.editorText.next("");
+    this.editor = null;
+    this.isInit = false;
   }
 
 
@@ -345,7 +350,6 @@ export class EditorService {
     const target = monaco.editor.getModel(uri);
     delete this.modelInfos[uri.toString()];
     if (this.lastTraceUri === uri) this.lastTraceUri = null;
-    target.setValue("");
     target.dispose();
   }
 

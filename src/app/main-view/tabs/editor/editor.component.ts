@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router'
 
 import { EditorService } from '../../../services/editor.service'
@@ -10,7 +10,7 @@ import { TabsService } from '../../../services/tabs.service'
   styleUrls: ['./editor.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent implements OnInit, OnDestroy {
 
   editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
     glyphMargin: true,
@@ -39,9 +39,13 @@ export class EditorComponent implements OnInit {
     console.log(this.editorService);
   }
 
+  ngOnDestroy() {
+    this.editorService.editorDestroy();
+  }
+
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
     if (!this.editorService.isLanguageClientStarted) this.editorService.startLanguageClient();
-    this.editorService.monacoInit(editor);
+    this.editorService.editorInit(editor);
     if (this.key) {
       let activeTab = this.tabsService.getByKey(this.key).value;
       this.editorService.switchToModel(activeTab);

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject, throwError, TimeoutError } from 'rxjs';
 import { GdbArray, GdbResponse, GdbVal } from 'tsgdbmi';
 import { ElectronService } from '../core/services';
-import { SendRequestOptions } from '../../background/handlers/typing';
 import { EditorBreakpointInfo, EditorService } from './editor.service';
 import { FileService } from './file.service';
 import { catchError, debounceTime, filter, switchMap, timeout } from 'rxjs/operators';
@@ -78,7 +77,7 @@ export class DebugService {
       await this.sendMiRequest("-exec-run");
     });
 
-    this.electronService.ipcRenderer.on('ng:debug/debuggerClosed', () => {
+    this.electronService.ipcRenderer.on('ng:debug/debuggerStopped', () => {
       this.exitCleaning();
     });
 
@@ -148,9 +147,9 @@ export class DebugService {
 
   private sendMiRequest(command: string): Promise<GdbResponse> {
     const token = Math.floor(Math.random() * 1000000);
-    this.electronService.ipcRenderer.send("debug/sendRequest", <SendRequestOptions>{
+    this.electronService.ipcRenderer.invoke("debug/sendRequest", {
       command: `${token}${command}`
-    })
+    });
     return firstValueFrom(this.requestResults.pipe(
       filter(result => result.token === token),
       timeout(2000),
@@ -166,16 +165,19 @@ export class DebugService {
     ));
   }
 
-  startDebug() {
-    this.sourcePath = this.fileService.saveOnNeed();
+  async startDebug() {
+    this.sourcePath = await this.fileService.saveOnNeed();
     if (this.sourcePath === null) return;
     this.initBreakpoints = this.editorBkptList;
-    this.electronService.ipcRenderer.send('debug/start', {
+    this.electronService.ipcRenderer.invoke('debug/start', {
       srcPath: this.sourcePath
+    }).then(r => {
+      if (r.success === false)
+        alert(r.error);
     });
   }
   exitDebug() {
-    this.electronService.ipcRenderer.send('debug/exit');
+    this.electronService.ipcRenderer.invoke('debug/exit');
   }
 
   sendCommand(command: string) {

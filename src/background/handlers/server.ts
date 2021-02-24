@@ -1,10 +1,8 @@
 import * as child_process from 'child_process';
 import * as path from 'path';
 import * as getPort from 'get-port';
-import * as electron from 'electron';
 
-import { extraResourcesPath } from '../basicUtil';
-import { StartLanguageServerResult } from './typing'
+import { extraResourcesPath, typedIpcMain } from '../basicUtil';
 
 async function doStart() {
     const port = await getPort({ port: 3000 });
@@ -23,19 +21,19 @@ async function doStart() {
     return { port, process };
 }
 
-export async function startLanguageServer(event: electron.IpcMainEvent, arg: any) {
+typedIpcMain.handle('langServer/start', async (_) => {
     console.log("Starting language server...")
     const result = await doStart();
     global['langServerProcess'] = result.process;
     console.log("done");
-    event.returnValue = {
+    return {
         port: result.port
-    } as StartLanguageServerResult;
-}
+    };
+});
 
-export async function stopLanguageServer(event: electron.IpcMainEvent, arg: any) {
+typedIpcMain.handle('langServer/stop', (_) => {
     if (global['langServerProcess'] !== null) {
         const pid: child_process.ChildProcess = global['langServerProcess'];
         pid.kill();
     }
-} 
+});

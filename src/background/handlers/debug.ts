@@ -1,31 +1,29 @@
 import { GdbController } from "tsgdbmi";
-import { IpcMainEvent } from 'electron';
 import * as path from 'path';
 
 import { doCompile } from './build';
-import { extraResourcesPath, getWindow } from '../basicUtil';
-import { SendRequestOptions, SendRequestResult } from './typing';
+import { extraResourcesPath, getWebContents, getWindow, typedIpcMain } from '../basicUtil';
 import { ioEncoding } from "./constants";
 
 const gdb = new GdbController(ioEncoding);
 gdb.onResponse(response => {
     switch (response.type) {
         case "console":
-            getWindow().webContents.send('ng:debug/console', response);
+            getWebContents().send('ng:debug/console', response);
             break;
         case "notify":
-            getWindow().webContents.send('ng:debug/notify', response);
+            getWebContents().send('ng:debug/notify', response);
             getWindow().focus();
             break;
         case "result":
-            getWindow().webContents.send('ng:debug/result', response);
+            getWebContents().send('ng:debug/result', response);
             break;
         default:
             break;
     }
 });
 gdb.onClose(() => {
-    getWindow().webContents.send('ng:debug/debuggerClosed');
+    getWebContents().send('ng:debug/debuggerStopped');
 });
 const gdbPath = path.join(extraResourcesPath, 'mingw64/bin/gdb.exe');
 const startupCommand = [
@@ -33,23 +31,20 @@ const startupCommand = [
     '-enable-pretty-printing'
 ];
 
-export async function startDebugger(event: IpcMainEvent, arg: { srcPath: string }) {
-    
+typedIpcMain.handle('debug/start', async (_, arg) => {
     const result = await doCompile(arg.srcPath);
-    getWindow().webContents.send('ng:build-control/buildComplete', result);
+    getWebContents().send('ng:build/buildComplete', result);
     if (!result.success) {
-        event.returnValue = {
+        return {
             success: false,
-            reason: "Compilation failed."
+            error: "Compilation failed."
         }
-        return;
     }
     if (gdb.isRunning) {
-        event.returnValue = {
+        return {
             success: false,
-            reason: "GDB is already running."
+            error: "GDB is already running."
         }
-        return;
     };
     const cwd = path.dirname(result.output);
     const filename = path.basename(result.output);
@@ -60,58 +55,48 @@ export async function startDebugger(event: IpcMainEvent, arg: { srcPath: string 
         for (const command of startupCommand) {
             const response = await gdb.sendRequest(command);
             if (response.message === "error") {
-                event.returnValue = {
+                return {
                     success: false,
-                    reason: `Startup command '${command}' execution failed`
+                    error: `Startup command '${command}' execution failed`
                 };
-                return;
             }
         }
     } catch (e) {
-        event.returnValue = {
+        return {
             success: false,
             error: e
-        } as SendRequestResult;
-        return;
-    }
-    getWindow().webContents.send('ng:debug/debuggerStarted');
-    event.returnValue = {
-        success: true
-    }
-}
-
-export async function exitDebugger(event: IpcMainEvent) {
-    if (!gdb.isRunning) {
-        event.returnValue = {
-            success: false,
-            reason: "GDB not started."
         }
     }
-    gdb.exit();
-    event.returnValue = {
+    getWebContents().send('ng:debug/debuggerStarted');
+    return {
         success: true
     }
-}
+});
 
-export function sendRequest(event: IpcMainEvent, arg: SendRequestOptions): void {
+typedIpcMain.handle('debug/exit', (_) => {
     if (!gdb.isRunning) {
-        event.returnValue = {
-            success: false,
-            message: "GDB not started"
-        } as SendRequestResult;
         return;
+    }
+    gdb.exit();
+});
+
+typedIpcMain.handle('debug/sendRequest', (_, arg) => {
+    if (!gdb.isRunning) {
+        return {
+            success: false,
+            error: "GDB not started"
+        };
     }
     try {
         console.log("request: " + arg.command);
         gdb.sendRequest(arg.command, false);
-        // console.log("result: ", result);
-        event.returnValue = { success: true } as SendRequestResult;
-        return;
+        return {
+            success: true
+        };
     } catch (e) {
-        event.returnValue = {
+        return {
             success: false,
             error: e
-        } as SendRequestResult;
-        return;
+        };
     }
-}
+});

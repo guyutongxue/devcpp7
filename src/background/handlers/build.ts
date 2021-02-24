@@ -1,10 +1,9 @@
-import { IpcMainEvent } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
-import { getWindow, extraResourcesPath } from '../basicUtil'
-import { GccDiagnostics, BuildResult } from './typing';
+import { getWindow, extraResourcesPath, typedIpcMain } from '../basicUtil'
+import { GccDiagnostics, BuildResult } from '../../app/core/ipcTyping';
 import { ioEncoding } from './constants';
 
 function encode(src: string) {
@@ -55,11 +54,11 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
       outputFileName,
     ]
   }
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _) => {
     execFile(path.join(extraResourcesPath, 'mingw64/bin/g++.exe'), args, {
       cwd: cwd,
       encoding: 'buffer'
-    }, (error, stdout, stderrBuf) => {
+    }, (error, _, stderrBuf) => {
       const stderr = iconv.decode(stderrBuf, ioEncoding);
       if (error) {
         resolve({
@@ -125,14 +124,14 @@ export async function doCompile(srcPath: string): Promise<BuildResult> {
   }
 }
 
-export async function build(_: IpcMainEvent, arg: { path: string }) {
+typedIpcMain.handle('build/build', async (_, arg) => {
   console.log("Receive build request. Compiling");
   const result = await doCompile(arg.path);
   console.log("Compilation finish. Returning value");
   getWindow().webContents.send('ng:build-control/buildComplete', result);
-}
+});
 
-export async function runExe(_: IpcMainEvent, arg: { path: string }) {
+typedIpcMain.handle('build/runExe', async (_, arg) => {
   console.log(arg.path);
   if (!isCompiled(arg.path)) {
     const result = await doCompile(arg.path);
@@ -146,4 +145,4 @@ export async function runExe(_: IpcMainEvent, arg: { path: string }) {
     shell: true,
     cwd: path.dirname(arg.path)
   });
-}
+});

@@ -124,7 +124,7 @@ export class TabsService {
   remove(key: string) {
     // Clone it, for we will remove it's src later
     const index = this.getByKey(key).index;
-    const target = Object.assign({}, this.tabList[index]);
+    const target: Tab = { ...this.tabList[index] };
     this.tabList.splice(index, 1);
     // closing current tab
     if (this.activeTabKey === key) {
