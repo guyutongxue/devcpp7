@@ -1,0 +1,8 @@
+<span class="app-icon">
+    <ng-container *ngIf="type?.startsWith('codicon'); else: nzIcon">
+        <i [ngClass]="['codicon', type]"></i>
+    </ng-container>
+    <ng-template #nzIcon>
+        <i nz-icon [nzType]="type"></i>
+    </ng-template>
+</span>
