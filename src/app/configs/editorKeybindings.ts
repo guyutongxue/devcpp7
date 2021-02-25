@@ -124,9 +124,4 @@ enum KeyMod {
 export const defaultKeybindings: {
     keybinding: number,
     message: string
-}[] = [
-        {
-            keybinding: KeyMod.CtrlCmd | KeyCode.KEY_S,
-            message: 'requestSave'
-        }
-    ];
+}[] = [];

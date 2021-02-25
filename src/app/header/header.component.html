@@ -15,52 +15,16 @@
     </nz-button-group>
 </div>
 <nz-dropdown-menu nzNoAnimation #fileMenu>
-    <ul nz-menu>
-        <li nz-menu-item (click)="fileNew()">新建源文件</li>
-        <li nz-menu-item (click)="fileOpen()">打开源文件...</li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="fileSave()">保存</li>
-        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="fileSaveAs()">另存为...</li>
-    </ul>
+    <app-header-dropdown [data]="fileMenuId"></app-header-dropdown>  
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #editMenu>
-    <ul nz-menu>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editUndo()">撤销</li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editRedo()">恢复</li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editCut()" style="display: flex; flex-direction: row">
-            <span style="flex-grow: 1">剪切</span><span>Ctrl+C</span>
-        </li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editCopy()">复制</li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editPaste()">粘贴</li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editFind()">查找</li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editReplace()">替换</li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editComment()">切换单行注释</li>
-    </ul>
+    <app-header-dropdown [data]="editMenuId"></app-header-dropdown>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #runMenu>
-    <ul nz-menu>
-        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="buildBuild()">编译</li>
-        <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="buildRunExe()">编译并运行</li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item [nzDisabled]="!hasFile || isDebugging" (click)="debugStart()">开始调试</li>
-        <li nz-menu-item [nzDisabled]="!hasFile || !isDebugging" (click)="debugExit()">停止调试</li>
-    </ul>
+    <app-header-dropdown [data]="runMenuId"></app-header-dropdown>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #helpMenu>
-    <ul nz-menu>
-        <li nz-menu-item nzIcon="question-circle" (click)="toggleDevTools()">切换 WebTools</li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item>Option 4</li>
-        <li nz-submenu nzTitle="Sub Menu">
-            <ul class="mySubmenu">
-                <li nz-menu-item nzDisabled>Option 5</li>
-                <li nz-menu-item>Option 6</li>
-            </ul>
-        </li>
-    </ul>
+    <app-header-dropdown [data]="helpMenuId"></app-header-dropdown>
 </nz-dropdown-menu>
 <app-file-control></app-file-control>
 <app-build-control></app-build-control>

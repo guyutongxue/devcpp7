@@ -1,10 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ElectronService } from '../core/services';
-import { BuildService } from '../services/build.service';
-import { DebugService } from '../services/debug.service';
-import { FileService } from '../services/file.service';
-import { EditorService } from '../services/editor.service';
-import { StatusService } from '../services/status.service';
+
+import { Command } from '../services/status.service';
+import { DropdownList } from './header-dropdown/header-dropdown.component';
+
 
 @Component({
   selector: 'app-header',
@@ -14,80 +12,46 @@ import { StatusService } from '../services/status.service';
 })
 export class HeaderComponent implements OnInit {
 
-  constructor(
-    private electronService: ElectronService,
-    private statusService: StatusService,
-    private fileService: FileService,
-    private editorService: EditorService,
-    private buildService: BuildService,
-    private debugService: DebugService
-  ) { }
+  readonly commandList: {
+    [key: string]: Command
+  }
+
+  fileMenuId: DropdownList = [
+    "file.new",
+    "file.open",
+    "#divider",
+    "file.save",
+    "file.saveAs"
+  ];
+  editMenuId: DropdownList = [
+    "edit.undo",
+    "edit.redo",
+    "#divider",
+    "edit.cut",
+    "edit.copy",
+    "edit.paste",
+    "#divider",
+    "edit.find",
+    "edit.replace",
+    "#divider",
+    "edit.commentLine"
+  ];
+  runMenuId: DropdownList = [
+    "build.build",
+    "build.run",
+    "build.buildRun",
+    "#divider",
+    "debug.start",
+    "debug.exit"
+  ];
+
+  helpMenuId: DropdownList = [
+    "window.toggleDevtools"
+  ]
+
+  constructor() {
+  }
 
   ngOnInit(): void {
-  }
-  
-  fileNew(): void {
-    this.fileService.new();
-  }
-  fileOpen(): void {
-    this.fileService.open();
-  }
-  fileSave(): void {
-    this.fileService.save();
-  }
-  fileSaveAs(): void {
-    this.fileService.saveAs();
-  }
-  get fileSaveEnabled() {
-    return this.statusService.saveEnabled;
-  }
-
-  editUndo() {
-    this.editorService.runAction('undo');
-  }
-  editRedo() {
-    this.editorService.runAction('redo');
-  }
-  editCut() {
-    this.editorService.runAction('editor.action.clipboardCutAction');
-  }
-  editCopy() {
-    this.editorService.runAction('editor.action.clipboardCopyAction');
-  }
-  editPaste() {
-    this.editorService.runAction('editor.action.clipboardPasteAction');
-  }
-  editFind() {
-    this.editorService.runAction('editor.find');
-  }
-  editReplace() {
-    this.editorService.runAction('editor.action.startFindReplaceAction');
-  }
-  editComment() {
-    this.editorService.runAction('editor.action.commentLine');
-  }
-
-  buildBuild() {
-    this.buildService.compile();
-  }
-  buildRunExe() {
-    this.buildService.runExe();
-  }
-
-  debugStart() {
-    this.debugService.startDebug();
-  }
-  debugExit() {
-    this.debugService.exitDebug();
-  }
-  get hasFile() {
-    return this.fileService.currentFileType() !== "none";
-  }
-  get isDebugging() {
-    return this.statusService.isDebugging;
-  }
-
-  toggleDevTools() {
-    this.electronService.ipcRenderer.invoke("window/toggleDevTools");
   }
 }

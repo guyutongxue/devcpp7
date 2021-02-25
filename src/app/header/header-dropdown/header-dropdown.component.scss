@@ -1,0 +1,13 @@
+li span.item {
+    display: flex;
+    flex-direction: row;
+
+    .item-name {
+        flex-grow: 1;
+        flex-shrink: 0;
+    }
+    .item-shortcut {
+        flex-shrink: 0;
+        padding-left: 1em;
+    }
+}

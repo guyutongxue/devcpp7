@@ -11,9 +11,18 @@ import { NzNoAnimationModule } from 'ng-zorro-antd/core/no-animation'
 import { FileControlComponent } from './file-control/file-control.component';
 import { BuildControlComponent } from './build-control/build-control.component';
 import { HeaderComponent } from './header.component';
+import { HeaderDropdownComponent, ShortcutTranslatePipe, TypeofPipe } from './header-dropdown/header-dropdown.component';
+import { CoreModule } from '../core/core.module';
 
 @NgModule({
-  declarations: [FileControlComponent, BuildControlComponent, HeaderComponent],
+  declarations: [
+    FileControlComponent,
+    BuildControlComponent,
+    HeaderComponent,
+    HeaderDropdownComponent,
+    TypeofPipe, 
+    ShortcutTranslatePipe
+  ],
   imports: [
     CommonModule,
     NzDropDownModule,
@@ -21,7 +30,8 @@ import { HeaderComponent } from './header.component';
     NzModalModule,
     NzNotificationModule,
     NzIconModule,
-    NzNoAnimationModule
+    NzNoAnimationModule,
+    CoreModule
   ],
   exports: [HeaderComponent]
 })

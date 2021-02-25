@@ -11,7 +11,6 @@ import { Tab } from './tabs.service';
 import { ElectronService } from '../core/services';
 import { classicTheme } from '../configs/editorTheme';
 import { cppLang, cppLangConf } from '../configs/cppLanguageConfig';
-import { defaultKeybindings } from '../configs/editorKeybindings';
 
 // All standard C++ headers filename
 const stdCppHeaders = [
@@ -294,11 +293,6 @@ export class EditorService {
   editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
-    for (let i of defaultKeybindings) {
-      this.editor.addCommand(i.keybinding, () => {
-        this.editorMessage.next({ type: i.message });
-      })
-    }
     this.interceptOpenEditor();
     this.addMissingActions();
     this.editor.onMouseDown(this.mouseDownListener);
@@ -401,6 +395,7 @@ export class EditorService {
   }
 
   runAction(id: string) {
+    console.log(id);
     if (!this.isInit) return;
     this.editor.getAction(id).run();
   }

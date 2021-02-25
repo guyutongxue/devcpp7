@@ -17,9 +17,6 @@ export class FileService {
     private electronService: ElectronService) {
     this.editorService.editorMessage.subscribe(({ type, arg }) => {
       switch (type) {
-        case "requestSave":
-          this.save();
-          break;
         case "requestOpen":
           // Do not locate if we are in a temporary file
           if (this.tabsService.getActive().value.path === null) break;

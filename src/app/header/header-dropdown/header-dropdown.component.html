@@ -1,0 +1,40 @@
+<ul nz-menu>
+    <ng-container *ngFor="let id of list">
+        <ng-container *ngIf="(id | typeof) === 'string'; else: submenu" >
+            <li *ngIf="id !== '#divider'; else: divider" 
+                nz-menu-item 
+                (click)="commandList[id].run()" 
+                [nzDisabled]="!commandList[id].enabled()">
+                <span class="item">
+                    <app-icon [type]="commandList[id].icon"></app-icon>
+                    <span class="item-name">{{ commandList[id].name }}</span>
+                    <span class="item-shortcut">{{ commandList[id].shortcut | shortcutTranslate }}</span>
+                </span>
+            </li>
+        </ng-container>
+        <ng-template #submenu>
+            <li nz-submenu [nzTitle]="$any(id).title">
+                <ul>
+                    <ng-container *ngFor="let subId of $any(id).children">
+                        <li *ngIf="id !== '#divider'; else: divider"
+                            nz-menu-item 
+                            (click)="commandList[subId].run()" 
+                            [nzDisabled]="!commandList[subId].enabled()">
+                            <i></i>
+                            <span class="item">
+                                <span class="item-name">{{ commandList[subId].name }}</span>
+                                <span class="item-shortcut">{{ commandList[subId].shortcut | shortcutTranslate }}</span>
+                            </span>
+                        </li>
+                    </ng-container>
+                </ul>
+            </li>
+        </ng-template>
+        <ng-template #divider>
+            <li nz-menu-divider ></li>
+        </ng-template>
+        <ng-template #noopIcon>
+            <i nz-icon></i>
+        </ng-template>
+    </ng-container>
+</ul>
