@@ -3,6 +3,8 @@ import { ElectronService } from './core/services';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
 
+import { HotkeysService } from './services/hotkeys.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,7 +13,8 @@ import { AppConfig } from '../environments/environment';
 export class AppComponent implements OnInit {
   constructor(
     private electronService: ElectronService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private hotkeysService: HotkeysService,
   ) {
     this.translate.setDefaultLang('en');
     console.log('AppConfig', AppConfig);

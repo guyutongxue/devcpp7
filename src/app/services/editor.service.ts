@@ -146,6 +146,61 @@ export class EditorService {
     };
   }
 
+  // https://github.com/microsoft/monaco-editor/issues/2195#issuecomment-711471692
+  private addMissingActions() {
+    this.editor.addAction({
+      id: 'undo',
+      label: 'Undo',
+      run: () => {
+        this.editor?.focus();
+        (this.editor.getModel() as any).undo();
+      },
+    })
+    this.editor.addAction({
+      id: 'redo',
+      label: 'Redo',
+      run: () => {
+        this.editor?.focus();
+        (this.editor.getModel() as any).redo();
+      },
+    })
+
+    this.editor.addAction({
+      id: 'editor.action.clipboardCutAction',
+      label: 'Cut',
+      run: () => {
+        this.editor?.focus();
+        document.execCommand('cut');
+      },
+    })
+    this.editor.addAction({
+      id: 'editor.action.clipboardCopyAction',
+      label: 'Copy',
+      run: () => {
+        this.editor?.focus();
+        document.execCommand('copy');
+      },
+    })
+    this.editor.addAction({
+      id: 'editor.action.clipboardPasteAction',
+      label: 'Paste',
+      run: () => {
+        this.editor?.focus();
+        document.execCommand('paste');
+      },
+    })
+    // https://github.com/microsoft/monaco-editor/issues/2010
+    this.editor.addAction({
+      id: 'editor.action.selectAll',
+      label: 'Select All',
+      run: () => {
+        this.editor?.focus();
+        const range = this.editor.getModel().getFullModelRange();
+        this.editor.setSelection(range);
+      }
+    })
+  }
+
   async startLanguageClient() {
     const result = await this.electronService.ipcRenderer.invoke('langServer/start');
     MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
@@ -245,6 +300,7 @@ export class EditorService {
       })
     }
     this.interceptOpenEditor();
+    this.addMissingActions();
     this.editor.onMouseDown(this.mouseDownListener);
     this.editor.onDidChangeModel((e) => {
       this.editorText.next(monaco.editor.getModel(e.newModelUrl).getValue());
@@ -342,6 +398,11 @@ export class EditorService {
     this.editor.setPosition(position);
     this.editor.revealLine(position.lineNumber);
     this.editor.focus();
+  }
+
+  runAction(id: string) {
+    if (!this.isInit) return;
+    this.editor.getAction(id).run();
   }
 
   destroy(tab: Tab) {

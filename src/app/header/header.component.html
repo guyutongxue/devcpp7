@@ -25,17 +25,19 @@
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #editMenu>
     <ul nz-menu>
-        <li nz-menu-item nzDisabled>撤销</li>
-        <li nz-menu-item nzDisabled>恢复</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editUndo()">撤销</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editRedo()">恢复</li>
         <li nz-menu-divider></li>
-        <li nz-menu-item nzDisabled>剪切</li>
-        <li nz-menu-item nzDisabled>复制</li>
-        <li nz-menu-item nzDisabled>粘贴</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editCut()" style="display: flex; flex-direction: row">
+            <span style="flex-grow: 1">剪切</span><span>Ctrl+C</span>
+        </li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editCopy()">复制</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editPaste()">粘贴</li>
         <li nz-menu-divider></li>
-        <li nz-menu-item nzDisabled>查找</li>
-        <li nz-menu-item nzDisabled>替换</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editFind()">查找</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editReplace()">替换</li>
         <li nz-menu-divider></li>
-        <li nz-menu-item nzDisabled>切换单行注释</li>
+        <li nz-menu-item [nzDisabled]="!hasFile" (click)="editComment()">切换单行注释</li>
     </ul>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #runMenu>
@@ -43,8 +45,8 @@
         <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="buildBuild()">编译</li>
         <li nz-menu-item [nzDisabled]="!fileSaveEnabled" (click)="buildRunExe()">编译并运行</li>
         <li nz-menu-divider></li>
-        <li nz-menu-item [nzDisabled]="!debugEnabled || isDebugging" (click)="debugStart()">开始调试</li>
-        <li nz-menu-item [nzDisabled]="!debugEnabled || !isDebugging" (click)="debugExit()">停止调试</li>
+        <li nz-menu-item [nzDisabled]="!hasFile || isDebugging" (click)="debugStart()">开始调试</li>
+        <li nz-menu-item [nzDisabled]="!hasFile || !isDebugging" (click)="debugExit()">停止调试</li>
     </ul>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #helpMenu>

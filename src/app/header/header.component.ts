@@ -3,6 +3,7 @@ import { ElectronService } from '../core/services';
 import { BuildService } from '../services/build.service';
 import { DebugService } from '../services/debug.service';
 import { FileService } from '../services/file.service';
+import { EditorService } from '../services/editor.service';
 import { StatusService } from '../services/status.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class HeaderComponent implements OnInit {
     private electronService: ElectronService,
     private statusService: StatusService,
     private fileService: FileService,
+    private editorService: EditorService,
     private buildService: BuildService,
     private debugService: DebugService
   ) { }
@@ -40,6 +42,31 @@ export class HeaderComponent implements OnInit {
     return this.statusService.saveEnabled;
   }
 
+  editUndo() {
+    this.editorService.runAction('undo');
+  }
+  editRedo() {
+    this.editorService.runAction('redo');
+  }
+  editCut() {
+    this.editorService.runAction('editor.action.clipboardCutAction');
+  }
+  editCopy() {
+    this.editorService.runAction('editor.action.clipboardCopyAction');
+  }
+  editPaste() {
+    this.editorService.runAction('editor.action.clipboardPasteAction');
+  }
+  editFind() {
+    this.editorService.runAction('editor.find');
+  }
+  editReplace() {
+    this.editorService.runAction('editor.action.startFindReplaceAction');
+  }
+  editComment() {
+    this.editorService.runAction('editor.action.commentLine');
+  }
+
   buildBuild() {
     this.buildService.compile();
   }
@@ -53,7 +80,7 @@ export class HeaderComponent implements OnInit {
   debugExit() {
     this.debugService.exitDebug();
   }
-  get debugEnabled() {
+  get hasFile() {
     return this.fileService.currentFileType() !== "none";
   }
   get isDebugging() {
