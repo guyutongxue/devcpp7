@@ -143,6 +143,7 @@ export type IpcCommands = {
     'debug/sendRequest': (options: DebugSendRequestOptions) => DebugSendRequestResult;
 
     'window/toggleDevTools': () => void;
+    'window/setTitle': (title: string) => void;
 }
 
 // Sync IPC

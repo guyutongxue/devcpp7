@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as path from 'path';
+import { ElectronService } from '../core/services';
 import { EditorService } from './editor.service';
 
 export interface Tab {
@@ -51,7 +52,7 @@ export class TabsService {
   tabList: Tab[] = [];
   private activeTabKey: string = null;
 
-  constructor(private editorService: EditorService) {
+  constructor(private electronService: ElectronService, private editorService: EditorService) {
     // TabsService controls how EditorService works.
     // When EditorService is not initialized, TabsService should do noting.
     // So I add `if (!this.editorService.isInit) return;` in each function
@@ -101,7 +102,9 @@ export class TabsService {
     else if (typeof arg === "number") {
       this.activeTabKey = this.tabList[arg].key;
     }
-    if (this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
+    const newActive = this.getActive().value;
+    if (this.editorService.isInit) this.editorService.switchToModel(newActive);
+    this.electronService.ipcRenderer.invoke('window/setTitle', newActive.path ?? newActive.title);
   }
 
   get hasActiveFile() {
@@ -131,6 +134,7 @@ export class TabsService {
       this.activeTabKey = null;
       if (this.tabList.length === 0) {
         // The only tab in MainView
+        this.electronService.ipcRenderer.invoke('window/setTitle', '');
       } else if (index === this.tabList.length) {
         // The last tab, move to front
         this.changeActive(index - 1);
