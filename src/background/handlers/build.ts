@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
-import { getWindow, extraResourcesPath, typedIpcMain } from '../basicUtil'
+import { getWindow, extraResourcesPath, typedIpcMain, getWebContents } from '../basicUtil'
 import { GccDiagnostics, BuildResult } from '../../app/core/ipcTyping';
 import { ioEncoding } from './constants';
 
@@ -78,7 +78,7 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
 
 
 export async function doCompile(srcPath: string): Promise<BuildResult> {
-  getWindow().webContents.send('ng:build-control/buildStarted');
+  getWebContents().send('ng:build/buildStarted');
   // 
   // generate .o
   const compileResult = await execCompiler(srcPath);
@@ -128,14 +128,14 @@ typedIpcMain.handle('build/build', async (_, arg) => {
   console.log("Receive build request. Compiling");
   const result = await doCompile(arg.path);
   console.log("Compilation finish. Returning value");
-  getWindow().webContents.send('ng:build-control/buildComplete', result);
+  getWebContents().send('ng:build/buildComplete', result);
 });
 
 typedIpcMain.handle('build/runExe', async (_, arg) => {
   console.log(arg.path);
-  if (!isCompiled(arg.path)) {
+  if (arg.forceCompile || !isCompiled(arg.path)) {
     const result = await doCompile(arg.path);
-    getWindow().webContents.send('ng:build-control/buildComplete', result);
+    getWebContents().send('ng:build/buildComplete', result);
     if (!result.success) return;
   }
   spawn(path.join(extraResourcesPath, 'bin/ConsolePauser.exe'), [

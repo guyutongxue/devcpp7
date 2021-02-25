@@ -87,9 +87,10 @@ export class BuildService {
     });
   }
 
-  private sendRunExeRequest(srcPath: string) {
+  private sendRunExeRequest(srcPath: string, forceCompile: boolean) {
     this.electronService.ipcRenderer.invoke("build/runExe", {
-      path: srcPath
+      path: srcPath,
+      forceCompile
     });
   }
 
@@ -99,9 +100,9 @@ export class BuildService {
       this.sendBuildRequest(srcPath);
   }
 
-  async runExe() {
+  async runExe(forceCompile = false) {
     const srcPath = await this.fileService.saveOnNeed();
     if (srcPath !== null)
-      this.sendRunExeRequest(srcPath);
+      this.sendRunExeRequest(srcPath, forceCompile);
   }
 }

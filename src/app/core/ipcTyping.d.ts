@@ -53,6 +53,10 @@ type FileOpenResult = {
 interface BuildOptions {
     path: string;
 }
+interface RunExeOptions {
+    path: string;
+    forceCompile: boolean;
+}
 interface GccDiagnosticPosition {
     file: string;
     line: number;
@@ -133,7 +137,7 @@ export type IpcCommands = {
     'file/open': (options: FileOpenOptions) => FileOpenResult;
 
     'build/build': (options: BuildOptions) => void;
-    'build/runExe': (options: BuildOptions) => void;
+    'build/runExe': (options: RunExeOptions) => void;
 
     'langServer/start': () => LanguageServerStartResult;
     'langServer/stop': () => void;
