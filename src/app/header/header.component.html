@@ -1,17 +1,10 @@
 <div id="menuBar">
     <nz-button-group>
-        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="fileMenu">
-            文件
-        </button>
-        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="editMenu">
-            编辑
-        </button>
-        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="runMenu">
-            运行
-        </button>
-        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="helpMenu">
-            帮助
-        </button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="fileMenu">文件</button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="editMenu">编辑</button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="runMenu">运行</button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="helpMenu">帮助</button>
+        <button nz-button nz-dropdown nzType="text"></button>
     </nz-button-group>
 </div>
 <nz-dropdown-menu nzNoAnimation #fileMenu>
