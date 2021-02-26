@@ -62,14 +62,3 @@ Follow [here](src/extraResources/README.md).
 | `npm run build:prod`     | Build the app with Angular aot. Your built files are in the /dist folder. |
 | `npm run electron:local` | Builds your application and start electron                                |
 | `npm run electron:build` | Builds your application and creates an app by electron-builder            |
-
-### E2E Testing (I don't work for it now)
-
-E2E Test scripts can be found in `e2e` folder.
-
-| Command       | Description              |
-| ------------- | ------------------------ |
-| `npm run e2e` | Execute end to end tests |
-
-Note: To make it work behind a proxy, you can add this proxy exception in your terminal  
-`export {no_proxy,NO_PROXY}="127.0.0.1,localhost"`
