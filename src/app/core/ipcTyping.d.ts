@@ -146,6 +146,11 @@ type DebugSendRequestResult = {
   error: any;
 }
 
+export interface Configurations {
+  'build.compileArgs': string[],
+  'advanced.ioEncoding': 'utf8' | 'win1252' | 'GBK';
+}
+
 // Async IPC
 // Command invoked from ipcRenderer, handled by ipcMain
 export type IpcCommands = {
@@ -165,6 +170,9 @@ export type IpcCommands = {
 
   'window/toggleDevTools': () => void;
   'window/setTitle': (title: string) => void;
+
+  'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
+  'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];
 }
 
 // Sync IPC

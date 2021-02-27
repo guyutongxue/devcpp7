@@ -15,13 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
-import './file';
-import './build';
-import './server';
-import './debug';
-import './window';
+// This file re-export ipcTyping declarations.
 
-
-/** @todo FIXME: electron-store doesn't support ES5 target. */
-// https://github.com/sindresorhus/electron-store/issues/146
-// import './store';
+export * from "../app/core/ipcTyping";
