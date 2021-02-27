@@ -25,7 +25,7 @@ import { IpcEvents, IpcCommands } from './ipcTyping'
 // very stupid to import a package, but useful.
 export const extraResourcesPath =
   !isAsar()
-    ? path.join(__dirname, '../extraResources')
+    ? path.join(__dirname, '../src/extraResources')
     : path.join((process as any).resourcesPath, 'extraResources');
 
 export function getWindow(): BrowserWindow {

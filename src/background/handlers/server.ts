@@ -21,10 +21,11 @@ import * as getPort from 'get-port';
 
 import { extraResourcesPath, typedIpcMain } from '../basicUtil';
 
+
 async function doStart() {
   const port = await getPort({ port: 3000 });
   const process = child_process.fork(
-    path.resolve(__dirname, '../server/server.js'),
+    path.join(__dirname, 'server/server.js'),
     [
       port.toString(),
       path.join(extraResourcesPath, 'mingw64/bin/clangd.exe'),
