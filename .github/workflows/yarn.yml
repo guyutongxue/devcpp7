@@ -1,6 +1,6 @@
 # Install dependencies and try build this project with electron-builder
 
-name: Node.js CI
+name: Yarn CI
 
 on:
   push:
@@ -16,5 +16,5 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '14'
-    - run: npm ci
-    - run: npm run electron:build
+    - run: npx yarn install
+    - run: npx yarn build

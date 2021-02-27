@@ -42,9 +42,9 @@ This repo is based on [angular-electron](https://github.com/maximegris/angular-e
 
 ### Install dependencies
 
-Install Node.js on Windows, then type
+Install Node.js and Yarn on Windows, then type
 ```
-npm install
+yarn install
 ```
 in the root directory of this project to install all the dependencies.
 
@@ -54,11 +54,8 @@ Follow [here](src/extraResources/README.md).
 
 ### Included Commands
 
-| Command                  | Description                                                               |
-| ------------------------ | ------------------------------------------------------------------------- |
-| `npm start`              | Hot reload both in electron & browser                                     |
-| `npm run ng:serve`       | Execute the app in the browser                                            |
-| `npm run build`          | Build the app. Your built files are in the /dist folder.                  |
-| `npm run build:prod`     | Build the app with Angular aot. Your built files are in the /dist folder. |
-| `npm run electron:local` | Builds your application and start electron                                |
-| `npm run electron:build` | Builds your application and creates an app by electron-builder            |
+| Command             | Description                                   |
+| ------------------- | --------------------------------------------- |
+| `yarn start`        | Hot reload in browser, for debugging UI stuff |
+| `yarn electron:dev` | Run developer env in Electron                 |
+| `yarn build`        | Build executable with electron-builder        |
