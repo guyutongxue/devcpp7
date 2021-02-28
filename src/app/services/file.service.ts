@@ -113,10 +113,10 @@ export class FileService {
     else return target.path;
   }
 
-  async open() {
+  async open(showDialog = true, paths: string[] = []) {
     const result = await this.electronService.ipcRenderer.invoke("file/open", {
-      showDialog: true,
-      paths: []
+      showDialog,
+      paths
     });
     if (result.success === false) {
       alert(result.error);
@@ -172,27 +172,9 @@ export class FileService {
   async locate(filepath: string, row: number, col: number, type: "cursor" | "debug" = "cursor") {
     const target = this.tabsService.tabList.find(t => t.path === filepath);
     if (typeof target === "undefined") {
-      const result = await this.electronService.ipcRenderer.invoke("file/open", {
-        showDialog: false,
-        paths: [
-          filepath
-        ]
-      });
-      if (!result.success || result.files.length < 1) {
-        if ("error" in result) {
-          alert(result.error);
-        }
+      const result = await this.open(false, [filepath]);
+      if (!result)
         return false;
-      }
-      const file = result.files[0];
-      this.tabsService.add({
-        key: file.key,
-        type: "file",
-        title: path.basename(file.path),
-        code: file.content,
-        path: file.path,
-      });
-      this.tabsService.changeActive(file.key);
     } else {
       this.tabsService.changeActive(target.key);
     }

@@ -21,6 +21,8 @@ import { Tab, TabsService } from '../../../services/tabs.service'
 import { Router } from '@angular/router';
 import { FileService } from '../../../services/file.service';
 import { StatusService } from '../../../services/status.service';
+import { ElectronService } from '../../../core/services';
+import { AppConfig } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-tabs',
@@ -29,13 +31,21 @@ import { StatusService } from '../../../services/status.service';
 })
 export class TabsComponent implements OnInit {
 
-  constructor(private router: Router,
+  constructor(
+    private router: Router,
+    private electronService: ElectronService,
     private tabsService: TabsService,
     private fileService: FileService,
-    private statusService: StatusService
+    // private statusService: StatusService
   ) { }
 
   ngOnInit(): void {
+    if (AppConfig.production) {
+      this.electronService.ipcRenderer.invoke('window/getArgv').then(argv => {
+        argv.shift();
+        this.fileService.open(false, argv);
+      })
+    }
     if (this.tabsService.getActive().index !== null)
       this.activeIndex = this.activeIndex;
   }
@@ -65,9 +75,6 @@ export class TabsComponent implements OnInit {
   }
 
   closeTab(e: { index: number }) {
-    if (this.statusService.isBuilding || this.statusService.isDebugging) {
-      return;
-    }
     const target = this.tabList[e.index];
     if (target.saved === false) {
       this.notSaveModalShow(target);

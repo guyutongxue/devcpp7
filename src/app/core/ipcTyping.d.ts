@@ -170,6 +170,7 @@ export type IpcCommands = {
 
   'window/toggleDevTools': () => void;
   'window/setTitle': (title: string) => void;
+  'window/getArgv': () => string[];
 
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
   'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];

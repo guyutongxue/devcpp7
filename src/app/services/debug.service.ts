@@ -1,21 +1,22 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router'
 import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject, throwError, TimeoutError } from 'rxjs';
 import { GdbArray, GdbResponse, GdbVal } from 'tsgdbmi';
 import { ElectronService } from '../core/services';
@@ -82,6 +83,7 @@ export class DebugService {
   );
 
   constructor(
+    private router: Router,
     private electronService: ElectronService,
     private fileService: FileService,
     private editorService: EditorService) {
@@ -91,6 +93,11 @@ export class DebugService {
       for (const breakInfo of this.initBreakpoints) {
         await this.sendMiRequest(`-break-insert ${this.bkptConditionCmd(breakInfo)} "${escape(this.sourcePath)}:${breakInfo.line}"`);
       }
+      this.router.navigate([{
+        outlets: {
+          tools: 'debug'
+        }
+      }]);
       await this.sendMiRequest("-exec-run");
     });
 
@@ -265,7 +272,7 @@ export class DebugService {
   private isVariableExpandable(x: GdbVal) {
     return !!(x["dynamic"] ?? x["numchild"] !== "0")
   }
-  
+
   async createVariables(origin: GdbVarInfo[]): Promise<GdbVarInfo[]> {
     if (!this.isDebugging$.value) return [];
     return Promise.all(origin.map(async o => {
@@ -279,7 +286,7 @@ export class DebugService {
       } as GdbVarInfo;
     }))
   }
- 
+
   async getVariableChildren(variableId: string): Promise<GdbVarInfo[]> {
     if (!this.isDebugging$.value) return [];
     const result = await this.sendMiRequest(`-var-list-children --all-values ${variableId}`);
@@ -313,7 +320,7 @@ export class DebugService {
       target.value = change["value"];
     }
     return { deleteList, collapseList };
-  } 
+  }
 
   async deleteVariable(variableId: string, childrenOnly = false) {
     if (this.isDebugging$.value) this.sendMiRequest(`-var-delete ${childrenOnly ? '-c' : ''} ${variableId}`);

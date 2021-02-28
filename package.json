@@ -1,6 +1,6 @@
 {
   "name": "devcpp7",
-  "version": "7.0.0-alpha2",
+  "version": "7.2102.0",
   "description": "A project which use modern framework to simulate legacy Dev-C++",
   "author": "Guyutongxue <guyutongxue@163.com>",
   "main": "dist/background-bundle.js",

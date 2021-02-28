@@ -1,17 +1,17 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -21,6 +21,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
 
 import { HotkeysService } from './services/hotkeys.service';
+import { StatusService } from './services/status.service';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +32,7 @@ export class AppComponent implements OnInit {
   constructor(
     private electronService: ElectronService,
     private translate: TranslateService,
-    private hotkeysService: HotkeysService,
+    private statusService: StatusService
   ) {
     this.translate.setDefaultLang('en');
     console.log('AppConfig', AppConfig);
@@ -68,5 +69,11 @@ export class AppComponent implements OnInit {
 
   ngOnInit() : void {
 
+  }
+
+  get currentStatus() {
+    if (this.statusService.isBuilding) return "正在编译中";
+    if (this.statusService.isDebugging) return "正在调试中";
+    return "就绪";
   }
 }

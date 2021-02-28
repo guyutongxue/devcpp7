@@ -14,20 +14,7 @@
     }
   ],
   "files": [
-    "**/*",
-    "!**/*.ts",
-    "!*.code-workspace",
-    "!LICENSE.md",
-    "!package.json",
-    "!package-lock.json",
-    "!src/",
-    "src/background/**/*",
-    "!hooks/",
-    "!angular.json",
-    "!_config.yml",
-    "!karma.conf.js",
-    "!tsconfig.json",
-    "!tslint.json"
+    "dist/**/*"
   ],
   "nsis": {
     "oneClick": false,
@@ -37,8 +24,13 @@
   },
   "win": {
     "icon": "dist/assets/icons/favicon.ico",
+    "fileAssociations": {
+      "ext": ["cc", "cxx", "cpp", "h"],
+      "description": "C++ source file",
+      "icon": "dist/assets/icons/cpp.ico"
+    },
     "target": [
-      "7z"
+      "7z", "nsis"
     ]
   }
 }
