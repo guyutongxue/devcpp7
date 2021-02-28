@@ -17,7 +17,7 @@
     "ngwithpack:prod": "npm-run-all -p ng:build:prod electron:pack",
     "electron:dev": "npm run ngwithpack:dev && npx electron .",
     "electron:prod": "npm run ngwithpack:prod && npx electron .",
-    "electron:build": "npm run ngwithpack:prod && electron-builder build",
+    "electron:build": "npm run ngwithpack:prod && electron-builder build --publish=never",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
