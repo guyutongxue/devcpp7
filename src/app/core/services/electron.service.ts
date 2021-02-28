@@ -9,8 +9,6 @@ import { TypedIpcRenderer } from 'electron-typed-ipc';
 
 import { IpcEvents, IpcCommands, Configurations } from '../ipcTyping'
 
-type Getter<K> = K extends keyof Configurations ? (key: K) => Promise<Configurations[K]> : never;
-type Setter<K> = K extends keyof Configurations ? (key: K, value: Configurations[K]) => Promise<void> : never;
 
 @Injectable({
   providedIn: 'root'
@@ -42,13 +40,14 @@ export class ElectronService {
         invoke() { }
       } as any;
     }
+    this.getConfig('build.compileArgs');
   }
 
-  getConfig: Getter<keyof Configurations> = async (key: keyof Configurations): Promise<any> => {
-    return this.ipcRenderer.invoke('store/get', key);
+  async getConfig<K extends keyof Configurations> (key: K): Promise<Configurations[K]> {
+    return this.ipcRenderer.invoke('store/get', key) as Promise<Configurations[K]>;
   }
 
-  setConfig: Setter<keyof Configurations> = async (key: keyof Configurations, value: any): Promise<void> => {
-    return this.ipcRenderer.invoke('store/set', key, value);
+  setConfig<K extends keyof Configurations> (key: K, value: Configurations[K]): void {
+    this.ipcRenderer.invoke('store/set', key, value);
   }
 }

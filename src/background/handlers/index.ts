@@ -20,8 +20,4 @@ import './build';
 import './server';
 import './debug';
 import './window';
-
-
-/** @todo FIXME: electron-store doesn't support ES5 target. */
-// https://github.com/sindresorhus/electron-store/issues/146
-// import './store';
+import './store';

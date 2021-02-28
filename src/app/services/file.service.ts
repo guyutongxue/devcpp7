@@ -1,17 +1,17 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -150,12 +150,24 @@ export class FileService {
     this.succUntitledNumber();
   }
 
+  newSettings(type: string, title: string) {
+    const key = "~" + type;
+    if (this.tabsService.getByKey(key).index === null) {
+      this.tabsService.add({
+        key,
+        type: "setting",
+        title
+      })
+    }
+    this.tabsService.changeActive(key);
+  }
+
   /**
    * Locate to a specify position of a file
-   * @param filepath 
+   * @param filepath
    * @param row position
    * @param col position
-   * @param type "cursor" means set cursor to that position, "debug" means set trace line 
+   * @param type "cursor" means set cursor to that position, "debug" means set trace line
    */
   async locate(filepath: string, row: number, col: number, type: "cursor" | "debug" = "cursor") {
     const target = this.tabsService.tabList.find(t => t.path === filepath);

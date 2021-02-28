@@ -23,7 +23,7 @@ module.exports = {
   node: {
     __dirname: false
   },
-  mode: 'development',
+  mode: 'none',
   module: {
     rules: [
       {

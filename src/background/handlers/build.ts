@@ -19,7 +19,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
-import { extraResourcesPath, typedIpcMain, getWebContents } from '../basicUtil'
+import { extraResourcesPath, typedIpcMain, getWebContents, store } from '../basicUtil'
 import { GccDiagnostics, BuildResult } from '../ipcTyping';
 import { ioEncoding } from './constants';
 
@@ -48,14 +48,15 @@ interface ExecCompilerResult {
   stderr: string
 }
 
-async function execCompiler(srcPath: string, noLink: boolean = true): Promise<ExecCompilerResult> {
+async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean): Promise<ExecCompilerResult> {
   let outputFileName: string;
   const cwd = path.dirname(srcPath);
   let args: string[];
   if (noLink) {
     outputFileName = path.basename(changeExt(srcPath, '.o'));
     args = [
-      '-g',
+      ...store.get('build.compileArgs'),
+      ...(debugInfo ? ['-g']: []),
       '-c',
       srcPath,
       '-o',
@@ -65,7 +66,7 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
   } else {
     outputFileName = path.basename(getExecutablePath(srcPath));
     args = [
-      '-g',
+      ...store.get('build.compileArgs'),
       srcPath,
       '-o',
       outputFileName,
@@ -94,11 +95,11 @@ async function execCompiler(srcPath: string, noLink: boolean = true): Promise<Ex
 
 
 
-export async function doCompile(srcPath: string): Promise<BuildResult> {
+export async function doCompile(srcPath: string, debugInfo = false): Promise<BuildResult> {
   getWebContents().send('ng:build/buildStarted');
   //
   // generate .o
-  const compileResult = await execCompiler(srcPath);
+  const compileResult = await execCompiler(srcPath, true, debugInfo);
   let diagnostics: GccDiagnostics = [];
   try {
     diagnostics = JSON.parse(compileResult.stderr);
@@ -121,7 +122,7 @@ export async function doCompile(srcPath: string): Promise<BuildResult> {
     };
   }
   // generate .exe
-  const linkResult = await execCompiler(changeExt(srcPath, '.o'), false);
+  const linkResult = await execCompiler(changeExt(srcPath, '.o'), false, debugInfo);
   if (!linkResult.success) {
     return {
       success: false,

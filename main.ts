@@ -33,7 +33,8 @@ function createWindow(): BrowserWindow {
     minHeight: 300,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: false
+      allowRunningInsecureContent: false,
+      contextIsolation: false
     },
   });
   global["win"] = win;

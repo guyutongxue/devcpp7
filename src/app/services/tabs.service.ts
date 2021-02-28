@@ -1,17 +1,17 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -22,7 +22,7 @@ import { EditorService } from './editor.service';
 
 export interface Tab {
   key: string, // An unique udid for each tab
-  type: "file" | "devcpp",
+  type: "file" | "setting",
   title: string,
   code: string,
   path: string,
@@ -40,7 +40,7 @@ const nullEnum: Enumerate<any> = {
 
 interface TabOptions {
   key: string,
-  type: "file" | "devcpp",
+  type: "file" | "setting",
   title: string,
   code?: string,
   path?: string
@@ -96,7 +96,7 @@ export class TabsService {
 
   getByKey(key: string): Enumerate<Tab> {
     const index = this.tabList.findIndex((x: Tab) => x.key === key);
-    if (typeof index === "undefined") return nullEnum;
+    if (index === -1) return nullEnum;
     return {
       index,
       value: this.tabList[index]
@@ -120,7 +120,8 @@ export class TabsService {
       this.activeTabKey = this.tabList[arg].key;
     }
     const newActive = this.getActive().value;
-    if (this.editorService.isInit) this.editorService.switchToModel(newActive);
+    if (newActive.type === "file" && this.editorService.isInit)
+      this.editorService.switchToModel(newActive);
     this.electronService.ipcRenderer.invoke('window/setTitle', newActive.path ?? newActive.title);
   }
 
@@ -135,7 +136,7 @@ export class TabsService {
       type: options.type,
       title: options.title,
       code: options.code ?? "",
-      saved: typeof options.path !== "undefined",
+      saved: !(options.type === "file" && typeof options.path === "undefined"),
       path: options.path ?? null
     };
     this.tabList.push(newTab);
@@ -160,7 +161,8 @@ export class TabsService {
         this.changeActive(index);
       }
     }
-    this.editorService.destroy(target);
+    if (target.type === "file")
+      this.editorService.destroy(target);
   }
 
   saveCode(key: string, savePath: string) {

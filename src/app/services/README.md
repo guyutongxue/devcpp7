@@ -7,14 +7,14 @@ The most part of code is in these services.
 Below chart shows all services' dependency relation. `A --> B` means that A is depend on B.
 
 ```
-                Components
+      Components        StatusService
 ===================||=====================
-                   vv   (DI)
+                   vv
 
-                StatusService      WatchService     HotkeysService
-                    |                     |
-    +---------------+------------------+  |
-    v                                  v  v
+               HotkeysService      WatchService     
+                                          |
+                                          |
+                                          v
 BuildService                       DebugService
     +---------------+                  |
     |               v                  |

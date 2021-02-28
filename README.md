@@ -1,4 +1,7 @@
 # Dev-C++ 7
+
+<img src="https://github.com/Guyutongxue/devcpp7/actions/workflows/yarn.yml/badge.svg">
+
 <p align="center">
 <img src="./src/assets/icons/favicon.png" height="70" alt="Dev C++ 7"> =
 <img src="https://s3.ax1x.com/2021/01/22/sombEd.png" height="70" alt="Angular">+

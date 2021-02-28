@@ -49,7 +49,7 @@ const startupCommand = [
 ];
 
 typedIpcMain.handle('debug/start', async (_, arg) => {
-  const result = await doCompile(arg.srcPath);
+  const result = await doCompile(arg.srcPath, true);
   getWebContents().send('ng:build/buildComplete', result);
   if (!result.success) {
     return {

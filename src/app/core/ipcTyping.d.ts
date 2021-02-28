@@ -173,6 +173,7 @@ export type IpcCommands = {
 
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
   'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];
+  'store/reset': (key?: keyof Configurations) => void;
 }
 
 // Sync IPC

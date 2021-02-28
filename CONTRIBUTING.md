@@ -41,7 +41,7 @@ The Editor communicates with Language Server by LSP through Electron's IPC. It w
 
 When opening/saving/compiling/running, foreground process will send a request to the background, and background deal with these request, and return an optional response.
 
-Angular will translate all TypeScript-written-things to runtime JavaScript. When building, TypeScript compiler compiles all things into JS, then WebPack packs all JS (including `node_modules`) into a single JS file. The corresponding `tsconfig.json` is located at `src`.
+Angular will translate all TypeScript-written-things to runtime JavaScript. When building, TypeScript compiler compiles all things into JS, then WebPack packs all JS (including `node_modules`) into a single JS file located in `dist` folder. The corresponding `tsconfig.json` is located at `src`.
 
 ## Background detail
 
@@ -53,5 +53,5 @@ When it received a start-language-server request, it will start an Express Serve
 
 When it received a compile (or run) request, it will execute the compiler in the `extraResource` folder.
 
-Background codes are written in TypeScript, and they will be compiled into JavaScript when building (or serving). The corresponding `tsconfig.json` is located at the root folder.
+Background codes are written in TypeScript, and they will be packed by WebPack when building. The corresponding `tsconfig.json` is located at the root folder, called `tsconfig.serve.json`, and WebPack's configuration is `main.webpack.js`. Packed bundle is located in `dist` folder which is same as renderer process.
 

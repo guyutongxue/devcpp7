@@ -18,9 +18,20 @@
 import * as path from 'path';
 import { BrowserWindow, ipcMain } from 'electron';
 import * as isAsar from 'electron-is-running-in-asar';
+import * as Store from 'electron-store';
 import { TypedIpcMain, TypedWebContents } from 'electron-typed-ipc';
 
-import { IpcEvents, IpcCommands } from './ipcTyping'
+import { IpcEvents, IpcCommands, Configurations } from './ipcTyping'
+
+export const store = new Store<Configurations>({
+  defaults: {
+    'build.compileArgs': [
+      '-g', '-std=c++2a'
+    ],
+    'advanced.ioEncoding': 'GBK'
+  },
+  accessPropertiesByDotNotation: false
+});
 
 // very stupid to import a package, but useful.
 export const extraResourcesPath =

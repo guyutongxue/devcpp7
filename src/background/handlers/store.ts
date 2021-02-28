@@ -15,21 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
-import * as Store from 'electron-store';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { Configurations } from "../ipcTyping";
-import { typedIpcMain, extraResourcesPath } from "../basicUtil";
+import { store, typedIpcMain, extraResourcesPath } from "../basicUtil";
 
-const store = new Store<Configurations>({
-  defaults: {
-    'build.compileArgs': [
-      '-g', '-std=c++2a'
-    ],
-    'advanced.ioEncoding': 'GBK'
-  }
-});
 
 
 function updateClangdCompileArgs(value: string[]) {
@@ -42,7 +32,7 @@ function updateClangdCompileArgs(value: string[]) {
 
 typedIpcMain.handle('store/get', (_, key) => {
   return store.get(key);
-})
+});
 typedIpcMain.handle('store/set', (_, key, value) => {
   store.set(key, value);
   switch (key) {
@@ -50,4 +40,11 @@ typedIpcMain.handle('store/set', (_, key, value) => {
       updateClangdCompileArgs(value as string[]);
       break;
   }
-})
+});
+typedIpcMain.handle('store/reset', (_, key) => {
+  if (typeof key === "undefined") {
+    store.clear();
+  } else {
+    store.reset(key);
+  }
+});

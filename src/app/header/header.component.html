@@ -3,18 +3,22 @@
         <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="fileMenu">文件</button>
         <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="editMenu">编辑</button>
         <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="runMenu">运行</button>
+        <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="toolMenu">工具</button>
         <button nz-button nz-dropdown nzType="text" [nzDropdownMenu]="helpMenu">帮助</button>
         <button nz-button nz-dropdown nzType="text"></button>
     </nz-button-group>
 </div>
 <nz-dropdown-menu nzNoAnimation #fileMenu>
-    <app-header-dropdown [data]="fileMenuId"></app-header-dropdown>  
+    <app-header-dropdown [data]="fileMenuId"></app-header-dropdown>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #editMenu>
     <app-header-dropdown [data]="editMenuId"></app-header-dropdown>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #runMenu>
     <app-header-dropdown [data]="runMenuId"></app-header-dropdown>
+</nz-dropdown-menu>
+<nz-dropdown-menu nzNoAnimation #toolMenu>
+    <app-header-dropdown [data]="toolMenuId"></app-header-dropdown>
 </nz-dropdown-menu>
 <nz-dropdown-menu nzNoAnimation #helpMenu>
     <app-header-dropdown [data]="helpMenuId"></app-header-dropdown>

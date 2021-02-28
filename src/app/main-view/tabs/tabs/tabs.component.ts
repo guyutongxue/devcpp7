@@ -1,17 +1,17 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -44,14 +44,15 @@ export class TabsComponent implements OnInit {
     return this.tabsService.tabList;
   }
 
-  
+
 
   get activeIndex(): number {
     return this.tabsService.getActive().index;
   }
   set activeIndex(index: number) {
     if (index >= 0) {
-      this.router.navigate(['file/' + this.tabList[index].key]);
+      const tab = this.tabList[index];
+      this.router.navigate([tab.type + '/' + tab.key]);
       this.tabsService.changeActive(index);
     }
   }

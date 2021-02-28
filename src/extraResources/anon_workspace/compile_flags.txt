@@ -1,4 +1,4 @@
 -xc++
 --target=x86_64-pc-windows-gnu
--g
 -std=c++2a
+-g

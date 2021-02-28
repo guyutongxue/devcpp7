@@ -1,17 +1,19 @@
 #tabContainer {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+  height        : 100%;
+  width         : 100%;
+  display       : flex;
+  flex-direction: column;
 
-    #routerWrapper {
-        flex-grow: 1;
-        min-height: 0;
-    }
+  nz-tabset {
+    flex-shrink: 0;
+  }
+  .tab-title {
+    display    : inline;
+    user-select: none;
+  }
 
-    .tab-title {
-        display: inline;
-        user-select: none;
-        -moz-user-select: none;
-    }
+  #routerWrapper {
+    flex-grow : 1;
+    min-height: 0;
+  }
 }

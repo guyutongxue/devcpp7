@@ -1,0 +1,59 @@
+<nz-layout id="outerLayout">
+  <nz-sider [nzWidth]="150">
+    <ul nz-menu nzMode="inline">
+      <li nz-menu-item nzIcon="file" nzSelected>单文件编译</li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-layout id="innerLayout">
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <h3>标准</h3>
+          <nz-select [(ngModel)]="currentOptionList.std">
+            <nz-option nzValue="" nzLabel="默认"></nz-option>
+            <nz-option *ngFor="let option of stdOptions" [nzValue]="option" [nzLabel]="'C++'+option"></nz-option>
+          </nz-select><br>
+          <label nz-checkbox [(nzChecked)]="currentOptionList.gnu">带 GNU 扩展</label>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <h3>优化</h3>
+          <nz-select [(ngModel)]="currentOptionList.O">
+            <nz-option nzValue="" nzLabel="默认"></nz-option>
+            <nz-option *ngFor="let option of optOptions" [nzValue]="option" [nzLabel]="'-O'+option"></nz-option>
+          </nz-select>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <h3>调试</h3>
+          <label nz-checkbox [(nzChecked)]="currentOptionList.g">带调试信息(<code>-g</code>)</label><br>
+          <small>调试前的编译会默认启用 <code>-g</code>。</small>
+        </div>
+      </div>
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <h3>警告</h3>
+          <label nz-checkbox [(nzChecked)]="currentOptionList.Wall">启用全部警告(<code>-Wall</code>)</label><br>
+          <label nz-checkbox [(nzChecked)]="currentOptionList.Wextra">启用更多警告(<code>-Wextra</code>)</label><br>
+          <label nz-checkbox [(nzChecked)]="currentOptionList.Werror">认警告为错误(<code>-Werror</code>)</label><br>
+        </div>
+      </div>
+      <h3>自定义...</h3>
+      <div class="ant-input" id="customArgs" [ngClass]="customArgsDivClass" (click)="innerInput.focus()">
+        <nz-tag *ngFor="let arg of buildedArgs">{{arg}}</nz-tag>
+        <nz-tag *ngFor="let arg of currentOptionList.other" nzColor="processing" nzMode="closeable" (nzOnClose)="customRemove(arg)">{{arg}}</nz-tag>
+        <input #innerInput nz-input id="innerInput"
+          [nzBorderless]="true"
+          (focus)="customArgsDivClass = ['ant-input-focused']"
+          (blur)="customArgsDivClass = []"
+          (keydown.enter)="customSubmit(innerInput.value); innerInput.value = ''"
+          (keydown.backspace)="innerInput.value === '' ? removeLast() : 0"
+          placeholder="键入..."
+         >
+      </div>
+    </nz-layout>
+    <nz-footer>
+      保存后设置才会生效。
+      <button nz-button nzType="secondary" (click)="initOption()">放弃更改</button>
+      <button nz-button nzType="primary" (click)="saveOption()">保存设置</button>
+    </nz-footer>
+  </nz-layout>
+</nz-layout>
