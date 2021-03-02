@@ -75,7 +75,10 @@ async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean
   return new Promise((resolve, _) => {
     execFile(path.join(extraResourcesPath, 'mingw64/bin/g++.exe'), args, {
       cwd: cwd,
-      encoding: 'buffer'
+      encoding: 'buffer',
+      env: {
+        Path: process.env.Path + (path.delimiter + path.join(extraResourcesPath, 'mingw64/bin'))
+      }
     }, (error, _, stderrBuf) => {
       const stderr = iconv.decode(stderrBuf, ioEncoding);
       if (error) {
