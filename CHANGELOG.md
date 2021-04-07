@@ -1,5 +1,9 @@
 # Changelog
 
+## 2104.1
+
+- Fix bug - `spawn` failed when path contains spaces
+
 ## 2104.0
 
 - Fix a packing problem.
