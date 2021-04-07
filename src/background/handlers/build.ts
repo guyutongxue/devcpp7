@@ -154,16 +154,22 @@ typedIpcMain.handle('build/build', async (_, arg) => {
 
 typedIpcMain.handle('build/runExe', async (_, arg) => {
   console.log(arg.path);
+  console.log(getExecutablePath(arg.path));
   if (arg.forceCompile || !isCompiled(arg.path)) {
     const result = await doCompile(arg.path);
     getWebContents().send('ng:build/buildComplete', result);
     if (!result.success) return;
   }
-  spawn(path.join(extraResourcesPath, 'bin/ConsolePauser.exe'), [
+  const cpPath = path.join(extraResourcesPath, 'bin/ConsolePauser.exe');
+  // https://github.com/nodejs/node/issues/7367#issuecomment-229721296
+  const result = spawn(JSON.stringify(cpPath), [
     getExecutablePath(arg.path)
   ], {
     detached: true,
     shell: true,
     cwd: path.dirname(arg.path)
   });
+  console.log(result.pid);
+  result.on('error', console.error);
+  result.on('exit', ()=>console.log('exit'))
 });
