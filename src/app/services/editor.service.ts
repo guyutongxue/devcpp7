@@ -138,6 +138,7 @@ export class EditorService {
         releaseDocumentSemanticTokens() { }
       })
       monaco.editor.defineTheme('devcpp-classic', classicTheme);
+      MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
       this.startLanguageClient();
     })
   }
@@ -218,8 +219,8 @@ export class EditorService {
   }
 
   async startLanguageClient() {
+    if (this.isLanguageClientStarted) return;
     const result = await this.electronService.ipcRenderer.invoke('langServer/start');
-    MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
     // create the web socket
     const socketUrl = `ws://localhost:${result.port}/langServer`;
     const socketOptions = {
