@@ -142,9 +142,11 @@ export class TabsService {
     this.tabList.push(newTab);
   }
 
-  remove(key: string) {
+  /** @return new active index */
+  remove(key: string): number {
     // Clone it, for we will remove it's src later
     const index = this.getByKey(key).index;
+    let newIndex = -1;
     const target: Tab = { ...this.tabList[index] };
     this.tabList.splice(index, 1);
     // closing current tab
@@ -155,14 +157,15 @@ export class TabsService {
         this.electronService.ipcRenderer.invoke('window/setTitle', '');
       } else if (index === this.tabList.length) {
         // The last tab, move to front
-        this.changeActive(index - 1);
+        newIndex = index - 1;
       } else {
         // Stay on current index (next tab)
-        this.changeActive(index);
+        newIndex = index;
       }
     }
     if (target.type === "file")
       this.editorService.destroy(target);
+    return newIndex;
   }
 
   saveCode(key: string, savePath: string) {
