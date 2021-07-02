@@ -35,10 +35,17 @@
           <label nz-checkbox [(nzChecked)]="currentOptionList.Wextra">启用更多警告(<code>-Wextra</code>)</label><br>
           <label nz-checkbox [(nzChecked)]="currentOptionList.Werror">认警告为错误(<code>-Werror</code>)</label><br>
         </div>
+        <div nz-col [nzSpan]="8">
+          <h3>编码</h3>
+          <label nz-checkbox [(nzChecked)]="currentOptionList.fexec_charset">调整可执行文件编码(<code>-fexec-charset</code>)</label><br>
+        </div>
       </div>
       <h3>自定义...</h3>
       <div class="ant-input" id="customArgs" [ngClass]="customArgsDivClass" (click)="innerInput.focus()">
-        <nz-tag *ngFor="let arg of buildedArgs">{{arg}}</nz-tag>
+        <ng-container *ngFor="let arg of buildedArgs">
+          <nz-tag *ngIf="arg.startsWith('DYN'); else staticArg" nzColor="warning">{{arg.substr(3) + '...'}}</nz-tag>
+          <ng-template #staticArg><nz-tag>{{arg}}</nz-tag></ng-template>
+        </ng-container>
         <nz-tag *ngFor="let arg of currentOptionList.other" nzColor="processing" nzMode="closeable" (nzOnClose)="customRemove(arg)">{{arg}}</nz-tag>
         <input #innerInput nz-input id="innerInput"
           [nzBorderless]="true"

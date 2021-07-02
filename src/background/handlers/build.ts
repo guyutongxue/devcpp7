@@ -19,7 +19,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
-import { extraResourcesPath, typedIpcMain, getWebContents, store } from '../basicUtil'
+import { extraResourcesPath, typedIpcMain, getWebContents, store } from '../basicUtil';
 import { GccDiagnostics, BuildResult } from '../ipcTyping';
 import { ioEncoding } from './constants';
 
@@ -48,6 +48,16 @@ interface ExecCompilerResult {
   stderr: string
 }
 
+function parseDynamic(arg: string): string {
+  if (arg.startsWith('DYN')) {
+    const argval = arg.substr(3);
+    if (argval === "-fexec-charset") {
+      // -fexec-charset=GBK
+      return argval + '=' + store.get('advanced.ioEncoding');
+    } else throw new Error("unknown dynamic option");
+  } else return arg;
+}
+
 async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean): Promise<ExecCompilerResult> {
   let outputFileName: string;
   const cwd = path.dirname(srcPath);
@@ -55,8 +65,8 @@ async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean
   if (noLink) {
     outputFileName = path.basename(changeExt(srcPath, '.o'));
     args = [
-      ...store.get('build.compileArgs'),
-      ...(debugInfo ? ['-g']: []),
+      ...store.get('build.compileArgs').map(parseDynamic),
+      ...(debugInfo ? ['-g'] : []),
       '-c',
       srcPath,
       '-o',
@@ -66,7 +76,7 @@ async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean
   } else {
     outputFileName = path.basename(getExecutablePath(srcPath));
     args = [
-      ...store.get('build.compileArgs'),
+      ...store.get('build.compileArgs').map(parseDynamic),
       srcPath,
       '-o',
       outputFileName,
@@ -171,5 +181,5 @@ typedIpcMain.handle('build/runExe', async (_, arg) => {
   });
   console.log(result.pid);
   result.on('error', console.error);
-  result.on('exit', ()=>console.log('exit'))
+  result.on('exit', () => console.log('exit'))
 });

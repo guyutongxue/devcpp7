@@ -30,6 +30,11 @@ class OptionList {
   Wextra: boolean = false;
   Werror: boolean = false;
 
+  // Dynamic options:
+  // Dynamic options will be evaluated until building.
+  // Storing dynamic options with a 'DYN' prefix.
+  fexec_charset: boolean = true;
+
   other: string[] = [];
 }
 
@@ -55,6 +60,8 @@ function parseOption(str: string[]): OptionList {
       result.Wextra = true;
     else if (opt === '-Werror')
       result.Werror = true;
+    else if (opt === 'DYN-fexec-charset')
+      result.fexec_charset = true;
     else {
       result.other.push(opt);
     }
@@ -76,6 +83,7 @@ function buildOption(option: OptionList): string[] {
   if (option.Wall) result.push('-Wall');
   if (option.Wextra) result.push('-Wextra');
   if (option.Werror) result.push('-Werror');
+  if (option.fexec_charset) result.push('DYN-fexec-charset');
   return result;
 }
 

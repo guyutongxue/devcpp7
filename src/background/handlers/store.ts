@@ -20,11 +20,16 @@ import * as fs from 'fs';
 
 import { store, typedIpcMain, extraResourcesPath } from "../basicUtil";
 
-
+function ignoreByClangdFilter(arg: string) {
+  if (arg.startsWith('DYN')) return false;
+  if (arg.startsWith('-fexec-charset')) return false;
+  if (arg.startsWith('-finput-charset')) return false;
+  return true;
+}
 
 function updateClangdCompileArgs(value: string[]) {
   const flags = [
-    '-xc++', '--target=x86_64-pc-windows-gnu', ...value
+    '-xc++', '--target=x86_64-pc-windows-gnu', ...value.filter(ignoreByClangdFilter)
   ];
   fs.writeFileSync(path.join(extraResourcesPath, '/anon_workspace/compile_flags.txt'), flags.join('\n'));
 }
