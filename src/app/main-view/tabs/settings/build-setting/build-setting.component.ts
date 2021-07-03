@@ -17,75 +17,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../../../../core/services';
-
-
-class OptionList {
-  std: string = '';
-  gnu: boolean = false;
-
-  O: string = '';
-  g: boolean = false;
-
-  Wall: boolean = false;
-  Wextra: boolean = false;
-  Werror: boolean = false;
-
-  // Dynamic options:
-  // Dynamic options will be evaluated until building.
-  // Storing dynamic options with a 'DYN' prefix.
-  fexec_charset: boolean = true;
-
-  other: string[] = [];
-}
-
-function parseOption(str: string[]): OptionList {
-  const result = new OptionList();
-  for (const opt of str) {
-    if (opt.startsWith('-std')) {
-      if (opt.startsWith('-std=c++')) {
-        result.std = opt.substr(8);
-        result.gnu = false;
-      } else if (opt.startsWith('-std=gnu++')) {
-        result.std = opt.substr(10);
-        result.gnu = true;
-      }
-    }
-    else if (opt.startsWith('-O'))
-      result.O = opt.substr(2);
-    else if (opt === '-g')
-      result.g = true;
-    else if (opt === '-Wall')
-      result.Wall = true;
-    else if (opt === '-Wextra')
-      result.Wextra = true;
-    else if (opt === '-Werror')
-      result.Werror = true;
-    else if (opt === 'DYN-fexec-charset')
-      result.fexec_charset = true;
-    else {
-      result.other.push(opt);
-    }
-  }
-  return result;
-}
-
-function buildOption(option: OptionList): string[] {
-  const result: string[] = [];
-  if (option.std !== '') {
-    if (option.gnu)
-      result.push(`-std=gnu++${option.std}`);
-    else
-      result.push(`-std=c++${option.std}`);
-  }
-  if (option.O !== '')
-    result.push(`-O${option.O}`);
-  if (option.g) result.push('-g');
-  if (option.Wall) result.push('-Wall');
-  if (option.Wextra) result.push('-Wextra');
-  if (option.Werror) result.push('-Werror');
-  if (option.fexec_charset) result.push('DYN-fexec-charset');
-  return result;
-}
+import { SettingsService } from '../../../../services/settings.service'
 
 @Component({
   selector: 'app-build-setting',
@@ -96,9 +28,7 @@ export class BuildSettingComponent implements OnInit {
 
   customArgsDivClass: string[] = []
 
-  constructor(private electronService: ElectronService) { }
-
-  currentOptionList: OptionList = new OptionList();
+  constructor(private settingsService: SettingsService, private electronService: ElectronService) { }
 
   stdOptions = [
     '98',
@@ -114,41 +44,39 @@ export class BuildSettingComponent implements OnInit {
   listOfTagOptions = [];
 
   ngOnInit() {
-    this.initOption();
+    console.log(this.currentOptions);
   }
 
-
-
-  async initOption() {
-    const args = await this.electronService.getConfig('build.compileArgs');
-    console.log(args);
-    this.currentOptionList = parseOption(args);
-    console.log(this.currentOptionList);
+  get currentOptions() {
+    return this.settingsService.currentBuildOptions;
   }
 
   saveOption() {
-    const result = [ ...this.buildedArgs, ...this.currentOptionList.other ];
-    this.electronService.setConfig('build.compileArgs', result);
+    this.settingsService.saveBuildOption();
+  }
+
+  resetOption() {
+    this.settingsService.resetBuildOption();
   }
 
   get buildedArgs() {
-    return buildOption(this.currentOptionList);
+    return this.currentOptions.toList();
   }
 
   customSubmit(value: string) {
-    const index = this.currentOptionList.other.indexOf(value);
+    const index = this.currentOptions.other.indexOf(value);
     if (index === -1)
-      this.currentOptionList.other.push(value);
+      this.currentOptions.other.push(value);
   }
   customRemove(value: string) {
-    const index = this.currentOptionList.other.indexOf(value);
+    const index = this.currentOptions.other.indexOf(value);
     if (index !== -1)
-      this.currentOptionList.other.splice(index, 1);
+      this.currentOptions.other.splice(index, 1);
   }
   removeLast() {
     console.log("pp");
-    if (this.currentOptionList.other.length > 0)
-      this.currentOptionList.other.pop();
+    if (this.currentOptions.other.length > 0)
+      this.currentOptions.other.pop();
   }
 
 }

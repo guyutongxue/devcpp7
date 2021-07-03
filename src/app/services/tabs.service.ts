@@ -136,7 +136,7 @@ export class TabsService {
       type: options.type,
       title: options.title,
       code: options.code ?? "",
-      saved: !(options.type === "file" && typeof options.path === "undefined"),
+      saved: true, // !(options.type === "file" && typeof options.path === "undefined") // use this if create unsaved new file
       path: options.path ?? null
     };
     this.tabList.push(newTab);
