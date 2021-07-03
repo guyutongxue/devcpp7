@@ -1,6 +1,6 @@
 <nz-button-group>
-    <button nz-button nzType="secondary" (click)="newVariable()"><i nz-icon nzType="plus" title="添加观察"></i></button>
-    <button nz-button nzType="secondary" (click)="clearAll()"><i nz-icon nzType="delete" title="删除全部"></i></button>
+    <button nz-button nzType="default" (click)="newVariable()"><i nz-icon nzType="plus" title="添加观察"></i></button>
+    <button nz-button nzType="default" (click)="clearAll()"><i nz-icon nzType="delete" title="删除全部"></i></button>
 </nz-button-group>
 <div id="watchVarTreeWrapper">
     <nz-tree-view [nzTreeControl]="treeControl" [nzDataSource]="dataSource">

@@ -7,31 +7,31 @@
             <div id="exprResult">{{exprVal}}</div>
         </div>
         <div id="debugControl">
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行"
+            <button nz-button nzType="default" nz-tooltip nzTooltipPlacement="topLeft" nzTooltipTitle="继续执行"
                 [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugContinue()">
                 <i class="codicon codicon-debug-continue"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步执行"
+            <button nz-button nzType="default" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步执行"
                 [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugStepover()">
                 <i class="codicon codicon-debug-step-over"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步进入"
+            <button nz-button nzType="default" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="单步进入"
                 [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugStepinto()">
                 <i class="codicon codicon-debug-step-into"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="跳出函数"
+            <button nz-button nzType="default" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="跳出函数"
                 [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugStepout()">
                 <i class="codicon codicon-debug-step-out"></i>
             </button>
-            <button nz-button nzType="secondary" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="重新运行"
+            <button nz-button nzType="default" nz-tooltip nzTooltipPlacement="top" nzTooltipTitle="重新运行"
                 [disabled]="!enabled || !(isDebugging$ | async)" (click)="debugRestart()">
                 <i class="codicon codicon-debug-restart"></i>
             </button>
-            <button *ngIf="!(isDebugging$ | async)" nz-button nzType="secondary" (click)="startDebug()" nz-tooltip
+            <button *ngIf="!(isDebugging$ | async)" nz-button nzType="default" (click)="startDebug()" nz-tooltip
                 nzTooltipPlacement="topRight" nzTooltipTitle="开始调试" [disabled]="!enabled">
                 <i class="codicon codicon-debug-start"></i>
             </button>
-            <button *ngIf="(isDebugging$ | async)" nz-button nzType="secondary" (click)="exitDebug()" nz-tooltip
+            <button *ngIf="(isDebugging$ | async)" nz-button nzType="default" (click)="exitDebug()" nz-tooltip
                 nzTooltipPlacement="topRight" nzTooltipTitle="退出调试" [disabled]="!enabled">
                 <i class="codicon codicon-debug-stop"></i>
             </button>
