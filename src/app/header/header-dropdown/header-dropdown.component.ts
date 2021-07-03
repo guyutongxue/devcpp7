@@ -1,17 +1,17 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,8 +31,8 @@ string | {
   name: 'typeof'
 })
 export class TypeofPipe implements PipeTransform {
-  transform(value: any): any {
-    return typeof value;
+  transform<T>(value: any, typeofChecker: T): T {
+    return typeof value === typeof typeofChecker ? value : undefined;
   }
 }
 
@@ -66,7 +66,7 @@ export class HeaderDropdownComponent implements OnInit {
 
   constructor(
     private statusService: StatusService
-  ) { 
+  ) {
     this.commandList = this.statusService.commandList
   }
 

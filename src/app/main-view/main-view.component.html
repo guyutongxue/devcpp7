@@ -1,6 +1,7 @@
 <div id="asContainer">
     <as-split unit="pixel" direction="vertical" (dragEnd)="toolsSizeOnChange($event)" id="outerSplit">
-        <as-split-area [order]="0" size="*">
+        <!-- https://github.com/angular-split/angular-split/issues/220 -->
+        <as-split-area [order]="0" [size]="$any('*')">
             <div id="upperPart">
                 <ul nz-menu nzMode="inline" [nzInlineCollapsed]="true" id="sidebarMenu">
                     <li nz-menu-item nz-tooltip nzTooltipPlacement="right" *ngFor="let i of sidebarItems"
@@ -10,10 +11,10 @@
                     </li>
                 </ul>
                 <as-split unit="pixel" direction="horizontal">
-                    <as-split-area *ngIf="currentOutletUrl('sidebar') !== null" [order]="0" [size]="200" minSize="150" id="sidebarArea">
+                    <as-split-area *ngIf="currentOutletUrl('sidebar') !== null" [order]="0" [size]="200" [minSize]="150" id="sidebarArea">
                         <router-outlet name="sidebar"></router-outlet>
                     </as-split-area>
-                    <as-split-area [order]="1" size="*" [ngStyle]="{ overflow: 'hidden' }">
+                    <as-split-area [order]="1" [size]="$any('*')" [ngStyle]="{ overflow: 'hidden' }">
                         <app-tabs></app-tabs>
                     </as-split-area>
                 </as-split>
