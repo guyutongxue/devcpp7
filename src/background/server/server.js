@@ -15,14 +15,17 @@ const lsp = require("vscode-languageserver");
  *
  * @param {rpc.IWebSocket} socket
  * @param {string} serverPath
- * @param {string[]} argv
+ * @param {NodeJS.ProcessEnv} env
+ * @param {string[]} args
  */
-function launch(socket, serverPath, argv) {
+function launch(socket, serverPath, env, args) {
   const reader = new rpc.WebSocketMessageReader(socket);
   const writer = new rpc.WebSocketMessageWriter(socket);
   const server = require("@codingame/monaco-jsonrpc/lib/server");
   const socketConnection = server.createConnection(reader, writer, () => socket.dispose());
-  const serverConnection = server.createServerProcess('C++', serverPath, argv);
+  const serverConnection = server.createServerProcess('C++', serverPath, args, {
+    env
+  });
   server.forward(socketConnection, serverConnection, message => {
     if (rpc.isRequestMessage(message)) {
       if (message.method === lsp.InitializeRequest.type.method) {
@@ -37,14 +40,14 @@ function launch(socket, serverPath, argv) {
 
 
 console.log(process.argv);
-// ["elecetron", "server.js", port, exec, argv... ]
-const argv = process.argv.slice(2);
-if (argv.length < 2) {
-  console.log(`Usage: server.ts <port> <langserver> [<argv>...]`);
+// ["electron", "server.js", port, execPath, PATH, argv... ]
+if (process.argv.length < 5) {
+  console.log(`Usage: server.js <port> <execPath> <PATH> [<argv>...]`);
   process.exit(1);
 }
-if (!/^\+?(0|[1-9]\d*)$/.test(argv[0])) { // not a port number
-  console.log(`Port "${argv[0]}" invalid.`);
+const [port, execPath, PATH, ...serverArgs] = process.argv.slice(2);
+if (!/^\+?(0|[1-9]\d*)$/.test(port)) { // not a port number
+  console.log(`Port "${port}" invalid.`);
   process.exit(1);
 }
 
@@ -60,7 +63,7 @@ const app = express();
 // server the static content, i.e. index.html
 app.use(express.static(__dirname));
 // start the server
-const server = app.listen(argv[0]);
+const server = app.listen(port);
 // create the web socket
 const wss = new ws.Server({
   noServer: true,
@@ -91,9 +94,11 @@ const handler = (request, socket, head) => {
       };
       // launch the server when the web socket is opened
       if (webSocket.readyState === webSocket.OPEN) {
-        launch(socket, argv[1], argv.slice(2));
+        launch(socket, execPath, { Path: PATH }, serverArgs);
       } else {
-        webSocket.on('open', () => launch(socket, argv[1], argv.slice(2)));
+        webSocket.on('open', () => {
+          launch(socket, execPath, { Path: PATH }, serverArgs);
+        });
       }
     });
   }

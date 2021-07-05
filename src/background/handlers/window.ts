@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
-import { getWebContents, getWindow, typedIpcMain } from "../basicUtil";
+import { extraResourcesPath, getWebContents, getWindow, typedIpcMain } from "../basicUtil";
 
 typedIpcMain.handle('window/toggleDevTools', (_) => {
   getWebContents().toggleDevTools();
@@ -26,6 +26,6 @@ typedIpcMain.handle('window/setTitle', (_, title) => {
   else getWindow().setTitle(title + ' - Dev-C++ 7');
 });
 
-typedIpcMain.handle('window/getArgv', (_) => {
-  return process.argv;
-});
+typedIpcMain.handle('window/getArgv', (_) => process.argv);
+
+typedIpcMain.handle('window/getExtraResourcePath', (_) => extraResourcesPath);

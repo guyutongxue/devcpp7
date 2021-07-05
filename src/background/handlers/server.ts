@@ -28,8 +28,9 @@ async function doStart() {
     path.join(__dirname, 'server/server.js'),
     [
       port.toString(),
-      path.join(extraResourcesPath, 'mingw64/bin/clangd.exe'),
-      `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`,
+      path.join(extraResourcesPath, 'clangd/bin/clangd.exe'),
+      path.join(extraResourcesPath, 'mingw64/bin'),
+      // `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`,
       // `--log=verbose`
     ],
     {
@@ -39,19 +40,27 @@ async function doStart() {
   return { port, process };
 }
 
+function getServerProc(): child_process.ChildProcess | null {
+  return global['langServerProcess'];
+}
+function setServerProc(proc: child_process.ChildProcess | null) {
+  global['langServerProcess'] = proc;
+}
+
 typedIpcMain.handle('langServer/start', async (_) => {
   console.log("Starting language server...")
   const result = await doStart();
-  global['langServerProcess'] = result.process;
   console.log("done");
+  setServerProc(result.process);
+  result.process.addListener('close', () => setServerProc(null));
   return {
     port: result.port
   };
 });
 
 typedIpcMain.handle('langServer/stop', (_) => {
-  if (global['langServerProcess'] !== null) {
-    const pid: child_process.ChildProcess = global['langServerProcess'];
-    pid.kill();
+  const proc = getServerProc();
+  if (proc !== null) {
+    proc.kill();
   }
 });

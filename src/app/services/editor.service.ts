@@ -91,6 +91,9 @@ export class EditorService {
   isLanguageClientStarted = false;
   editorMessage: Subject<{ type: string; arg?: any }> = new Subject();
 
+  // Root path of new files, `extraResources/anon_workspace`
+  private nullPath: string;
+
   private editor: monaco.editor.IStandaloneCodeEditor;
   private languageClient: MonacoLanguageClient;
   private editorText = new BehaviorSubject<string>("");
@@ -112,7 +115,7 @@ export class EditorService {
       if (model) {
         this.updateBkptInfo(model);
       }
-    })
+    });
     this.monacoEditorLoaderService.isMonacoLoaded$.pipe(
       filter(isLoaded => isLoaded),
       take(1)
@@ -133,19 +136,22 @@ export class EditorService {
         provideDocumentSemanticTokens: async (model: monaco.editor.ITextModel) => {
           return {
             data: new Uint32Array(await this.getSemanticTokens(model))
-          }
+          };
         },
         releaseDocumentSemanticTokens() { }
       })
       monaco.editor.defineTheme('devcpp-classic', classicTheme);
       MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
       this.startLanguageClient();
+    });
+    this.electronService.ipcRenderer.invoke('window/getExtraResourcePath').then(v => {
+      this.nullPath = v + '/anon_workspace/';
     })
   }
 
   private getUri(tab: Tab): monaco.Uri {
     let uri = tab.type + "://";
-    if (tab.path === null) uri += '/anon_workspace/' + tab.title;
+    if (tab.path === null) uri += this.nullPath + tab.title;
     else uri += '/' + tab.path.replace(/\\/g, '/');
     return monaco.Uri.parse(uri);
   }
@@ -172,7 +178,7 @@ export class EditorService {
         this.editor?.focus();
         (this.editor.getModel() as any).undo();
       },
-    })
+    });
     this.editor.addAction({
       id: 'redo',
       label: 'Redo',
@@ -180,8 +186,7 @@ export class EditorService {
         this.editor?.focus();
         (this.editor.getModel() as any).redo();
       },
-    })
-
+    });
     this.editor.addAction({
       id: 'editor.action.clipboardCutAction',
       label: 'Cut',
@@ -189,7 +194,7 @@ export class EditorService {
         this.editor?.focus();
         document.execCommand('cut');
       },
-    })
+    });
     this.editor.addAction({
       id: 'editor.action.clipboardCopyAction',
       label: 'Copy',
@@ -197,7 +202,7 @@ export class EditorService {
         this.editor?.focus();
         document.execCommand('copy');
       },
-    })
+    });
     this.editor.addAction({
       id: 'editor.action.clipboardPasteAction',
       label: 'Paste',
@@ -205,7 +210,7 @@ export class EditorService {
         this.editor?.focus();
         document.execCommand('paste');
       },
-    })
+    });
     // https://github.com/microsoft/monaco-editor/issues/2010
     this.editor.addAction({
       id: 'editor.action.selectAll',
@@ -215,7 +220,7 @@ export class EditorService {
         const range = this.editor.getModel().getFullModelRange();
         this.editor.setSelection(range);
       }
-    })
+    });
   }
 
   async startLanguageClient() {
