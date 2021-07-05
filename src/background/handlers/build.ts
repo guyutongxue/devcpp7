@@ -23,16 +23,16 @@ import { extraResourcesPath, typedIpcMain, getWebContents, store } from '../basi
 import { GccDiagnostics, BuildResult } from '../ipcTyping';
 import { ioEncoding } from './constants';
 
-function encode(src: string) {
-  return encodeURIComponent(src);
-}
+// function encode(src: string) {
+//   return encodeURIComponent(src);
+// }
 
 function changeExt(srcPath: string, ext: string) {
   return path.join(path.dirname(srcPath), path.parse(srcPath).name + ext);
 }
 
 function getExecutablePath(srcPath: string) {
-  return path.join(path.dirname(srcPath), encode(path.parse(srcPath).name) + ".exe");
+  return path.join(path.dirname(srcPath), path.parse(srcPath).name + ".exe");
 }
 
 function isCompiled(srcPath: string): boolean {
