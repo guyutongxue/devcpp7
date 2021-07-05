@@ -125,7 +125,7 @@ export async function doCompile(srcPath: string, debugInfo = false): Promise<Bui
         error: e,
         stderr: compileResult.stderr
       }
-    }
+    };
   }
   if (!compileResult.success) {
     return {
@@ -181,5 +181,5 @@ typedIpcMain.handle('build/runExe', async (_, arg) => {
   });
   console.log(result.pid);
   result.on('error', console.error);
-  result.on('exit', () => console.log('exit'))
+  result.on('exit', () => console.log('exit'));
 });

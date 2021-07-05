@@ -310,7 +310,7 @@ export class DebugService {
     const changeList = result.payload["changelist"] as GdbArray;
     for (const change of changeList) {
       if (change["in_scope"] !== "true") {
-        deleteList.push(change["name"])
+        deleteList.push(change["name"]);
         continue;
       }
       if (change["new_num_children"]) {
