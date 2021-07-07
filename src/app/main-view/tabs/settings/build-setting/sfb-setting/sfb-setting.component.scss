@@ -1,0 +1,24 @@
+nz-layout {
+  background: inherit;
+  padding: 20px;
+  overflow-y: auto;
+
+  div[nz-row] {
+    margin-bottom: 16px;
+  }
+
+  nz-select {
+    width: 100%;
+  }
+
+  #customArgs {
+    font-family: var(--monospace-font);
+    cursor: text;
+
+    #innerInput {
+      width: 150px;
+      display: inline-block;
+    }
+  }
+
+}

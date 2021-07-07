@@ -21,6 +21,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { EditorComponent } from './editor/editor.component';
 import { EmptyPageComponent } from '../empty-page/empty-page.component';
 import { BuildSettingComponent } from './settings/build-setting/build-setting.component';
+import { SfbSettingComponent } from './settings/build-setting/sfb-setting/sfb-setting.component';
+import { EnvSettingComponent } from './settings/build-setting/env-setting/env-setting.component';
 
 const routes: Routes = [
   {
@@ -33,7 +35,22 @@ const routes: Routes = [
   },
   {
     path: 'setting/~build',
-    component: BuildSettingComponent
+    component: BuildSettingComponent,
+    children: [
+      {
+        path: 'sfb',
+        component: SfbSettingComponent
+      },
+      {
+        path: '',
+        redirectTo: 'sfb',
+        pathMatch: 'full'
+      },
+      {
+        path: 'env',
+        component: EnvSettingComponent
+      }
+    ]
   },
   {
     path: '**',

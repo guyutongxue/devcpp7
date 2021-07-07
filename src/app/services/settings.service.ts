@@ -95,20 +95,21 @@ export class BuildOptions {
   providedIn: 'root'
 })
 export class SettingsService {
-  currentBuildOptions: BuildOptions = new BuildOptions();
+  /** Current Single-File-Build Options */
+  currentSfbOptions: BuildOptions = new BuildOptions();
 
   constructor(private electronService: ElectronService) {
     this.resetBuildOption();
   }
 
   async resetBuildOption() {
-    this.currentBuildOptions = new BuildOptions(await this.electronService.getConfig('build.compileArgs'));
+    this.currentSfbOptions = new BuildOptions(await this.electronService.getConfig('build.compileArgs'));
   }
 
   async saveBuildOption() {
     this.electronService.setConfig('build.compileArgs', [
-      ...this.currentBuildOptions.toList(),
-      ...this.currentBuildOptions.other
+      ...this.currentSfbOptions.toList(),
+      ...this.currentSfbOptions.other
     ]);
   }
 

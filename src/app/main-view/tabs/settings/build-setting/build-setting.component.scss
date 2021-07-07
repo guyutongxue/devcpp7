@@ -1,47 +1,26 @@
-#outerLayout {
-  height    : 100%;
+#wrapper {
+  height: 100%;
   background: inherit;
 
-  >nz-sider {
-    background: inherit;
-
-    ul {
-      height: 100%;
-    }
-  }
+  display: flex;
+  flex-direction: column;
 
   nz-layout {
     background: inherit;
+    flex-grow: 1;
 
-    #innerLayout {
+    >nz-sider {
       background: inherit;
-      padding: 20px;
-      overflow-y: auto;
 
-      div[nz-row] {
-        margin-bottom: 16px;
+      ul {
+        height: 100%;
       }
-
-      nz-select {
-        width: 100%;
-      }
-
-      #customArgs {
-        font-family: var(--monospace-font);
-        cursor: text;
-
-        #innerInput {
-          width: 150px;
-          display: inline-block;
-        }
-      }
-
     }
+  }
 
-    nz-footer {
-      button {
-        margin-right: 8px;
-      }
+  nz-footer {
+    button {
+      margin-right: 8px;
     }
   }
 }

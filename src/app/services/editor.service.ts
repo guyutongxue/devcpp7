@@ -92,7 +92,7 @@ export class EditorService {
   editorMessage: Subject<{ type: string; arg?: any }> = new Subject();
 
   // Root path of new files, `extraResources/anon_workspace`
-  private nullPath: string;
+  private nullPath: string = '/anon_workspace/';
 
   private editor: monaco.editor.IStandaloneCodeEditor;
   private languageClient: MonacoLanguageClient;
@@ -144,7 +144,7 @@ export class EditorService {
       MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
       this.startLanguageClient();
     });
-    this.electronService.ipcRenderer.invoke('window/getExtraResourcePath').then(v => {
+    this.electronService.ipcRenderer.invoke('window/getExtraResourcePath')?.then(v => {
       this.nullPath = v + '/anon_workspace/';
     })
   }

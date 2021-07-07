@@ -38,10 +38,12 @@ import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
 import { TabsComponent } from './tabs/tabs.component';
 import { EditorComponent } from './editor/editor.component';
 import { BuildSettingComponent } from './settings/build-setting/build-setting.component';
+import { SfbSettingComponent } from './settings/build-setting/sfb-setting/sfb-setting.component';
+import { EnvSettingComponent } from './settings/build-setting/env-setting/env-setting.component';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
 @NgModule({
-  declarations: [TabsComponent, EditorComponent, BuildSettingComponent],
+  declarations: [TabsComponent, EditorComponent, BuildSettingComponent, SfbSettingComponent, EnvSettingComponent],
   imports: [
     CommonModule,
     AppRoutingModule,
