@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import { ElectronService } from '../core/services';
 
 
-export class BuildOptions {
+export class SfbOptions {
   std: string = '';
   gnu: boolean = false;
 
@@ -90,27 +90,36 @@ export class BuildOptions {
 
 }
 
+interface EnvOptions {
+  ioEncoding?: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
   /** Current Single-File-Build Options */
-  currentSfbOptions: BuildOptions = new BuildOptions();
+  currentSfbOptions: SfbOptions;
+  currentEnvOptions: EnvOptions = {};
 
   constructor(private electronService: ElectronService) {
     this.resetBuildOption();
   }
 
   async resetBuildOption() {
-    this.currentSfbOptions = new BuildOptions(await this.electronService.getConfig('build.compileArgs'));
+    await Promise.all([
+      this.electronService.getConfig('build.compileArgs').then(v => this.currentSfbOptions = new SfbOptions(v)),
+      this.electronService.getConfig('advanced.ioEncoding').then(v => this.currentEnvOptions.ioEncoding = v)
+    ]);
   }
 
-  async saveBuildOption() {
+  saveBuildOption() {
     this.electronService.setConfig('build.compileArgs', [
       ...this.currentSfbOptions.toList(),
       ...this.currentSfbOptions.other
     ]);
+    this.electronService.setConfig('advanced.ioEncoding', this.currentEnvOptions.ioEncoding);
   }
 
 }

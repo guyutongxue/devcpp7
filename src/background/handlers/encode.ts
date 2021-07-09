@@ -15,10 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
-import './file';
-import './build';
-import './server';
-import './debug';
-import './window';
-import './encode';
-import './store';
+import { typedIpcMain } from "../basicUtil";
+import { getConsoleCodePage } from "chcp";
+
+typedIpcMain.handle('encode/getCp', (_) => {
+  const cp = getConsoleCodePage();
+  alert(cp);
+  return cp;
+});
+
+typedIpcMain.handle('encode/verify', (_, encode: string) => {
+  return false;
+});

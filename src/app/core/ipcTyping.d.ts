@@ -148,7 +148,7 @@ type DebugSendRequestResult = {
 
 export interface Configurations {
   'build.compileArgs': string[],
-  'advanced.ioEncoding': 'utf8' | 'win1252' | 'GBK';
+  'advanced.ioEncoding': string;
 }
 
 // Async IPC
@@ -172,6 +172,9 @@ export type IpcCommands = {
   'window/setTitle': (title: string) => void;
   'window/getArgv': () => string[];
   'window/getExtraResourcePath': () => string;
+
+  'encode/getCp': () => string;
+  'encode/verify': (encode: string) => boolean;
 
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
   'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];

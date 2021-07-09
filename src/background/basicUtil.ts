@@ -28,7 +28,7 @@ export const store = new Store<Configurations>({
     'build.compileArgs': [
       '-g', '-std=c++2a'
     ],
-    'advanced.ioEncoding': 'GBK'
+    'advanced.ioEncoding': '936'
   },
   accessPropertiesByDotNotation: false
 });
