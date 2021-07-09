@@ -20,7 +20,6 @@ import { getConsoleCodePage } from "chcp";
 
 typedIpcMain.handle('encode/getCp', (_) => {
   const cp = getConsoleCodePage();
-  alert(cp);
   return cp;
 });
 
