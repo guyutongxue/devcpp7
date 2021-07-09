@@ -33,11 +33,15 @@ module.exports = {
           path.resolve(__dirname, "src/background"),
           path.resolve(__dirname, "main.ts"),
         ]
+      },
+      {
+        test: /\.node$/,
+        loader: "node-loader",
       }
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js', '.node'],
     plugins: [
       new TsconfigPathsPlugin({
         configFile: path.resolve(__dirname, "tsconfig.serve.json")
