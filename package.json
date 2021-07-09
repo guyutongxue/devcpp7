@@ -35,7 +35,7 @@
     "ws": "7.4.6"
   },
   "devDependencies": {
-    "@angular-builders/custom-webpack": "11.1.0",
+    "@angular-builders/custom-webpack": "12",
     "@angular-devkit/build-angular": "12.1.1",
     "@angular-eslint/builder": "0.8.0-beta.3",
     "@angular-eslint/eslint-plugin": "0.8.0-beta.3",
@@ -121,5 +121,9 @@
   },
   "engines": {
     "node": ">=16.0.0"
-  }
+  },
+  "browserslist": [
+    "Electron 11.1",
+    "Node 16"
+  ]
 }
