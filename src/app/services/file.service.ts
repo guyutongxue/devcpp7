@@ -150,7 +150,7 @@ export class FileService {
     this.succUntitledNumber();
   }
 
-  newSettings(type: string, title: string) {
+  newSettings(type: string, title: string): Tab {
     const key = "~" + type;
     if (this.tabsService.getByKey(key).index === null) {
       this.tabsService.add({
@@ -160,6 +160,7 @@ export class FileService {
       })
     }
     this.tabsService.changeActive(key);
+    return this.tabsService.getActive().value;
   }
 
   /**

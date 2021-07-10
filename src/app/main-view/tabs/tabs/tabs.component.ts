@@ -23,6 +23,7 @@ import { FileService } from '../../../services/file.service';
 import { StatusService } from '../../../services/status.service';
 import { ElectronService } from '../../../core/services';
 import { AppConfig } from '../../../../environments/environment';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-tabs',
@@ -36,6 +37,7 @@ export class TabsComponent implements OnInit {
     private electronService: ElectronService,
     private tabsService: TabsService,
     private fileService: FileService,
+    private settingsService: SettingsService,
     // private statusService: StatusService
   ) { }
 
@@ -93,7 +95,9 @@ export class TabsComponent implements OnInit {
   notSaveModalVisible: boolean = false;
   notSaveModalYes() {
     this.notSaveModalVisible = false;
-    if (this.fileService.save(this.notSaveModalTab))
+    if (this.notSaveModalTab.type === "file" && this.fileService.save(this.notSaveModalTab))
+      this.doRemoveTab(this.notSaveModalTab);
+    if (this.notSaveModalTab.type === "setting" && this.settingsService.save(this.notSaveModalTab))
       this.doRemoveTab(this.notSaveModalTab);
   }
   notSaveModalNo() {

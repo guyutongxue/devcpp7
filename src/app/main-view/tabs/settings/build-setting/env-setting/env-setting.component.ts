@@ -18,6 +18,10 @@ export class EnvSettingComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  onChange() {
+    this.settingsService.buildOptionTab.saved.next(false);
+  }
+
   async getDefaultEncoding() {
     const cp = await this.electronService.ipcRenderer.invoke('encode/getCp');
     this.currentEnvOptions.ioEncoding = cp;

@@ -2,7 +2,7 @@
   <div nz-row [nzGutter]="16">
     <div nz-col>
       <h3>系统编码（代码页）</h3>
-      <input nz-input [(ngModel)]="currentEnvOptions.ioEncoding">
+      <input nz-input [(ngModel)]="currentEnvOptions.ioEncoding" (ngModelChange)="onChange()">
     </div>
     <div nz-col>
       <button nz-button (click)="getDefaultEncoding()" nzType="default">填入当前代码页</button>

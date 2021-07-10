@@ -24,6 +24,7 @@ import { FileService } from './file.service';
 import { EditorService } from './editor.service';
 import { HotkeysService } from './hotkeys.service';
 import { ElectronService } from '../core/services';
+import { SettingsService } from './settings.service';
 
 export interface Command {
   name: string;
@@ -174,7 +175,7 @@ export class StatusService {
         name: '编译设置...',
         shortcut: null,
         enabled: () => true,
-        run: () => this.fileService.newSettings('build', '编译设置')
+        run: () => this.settingsService.openBuildSettings()
       },
       'window.toggleDevtools': {
         name: '切换 DevTools',
@@ -191,7 +192,8 @@ export class StatusService {
     private editorService: EditorService,
     private fileService: FileService,
     private debugService: DebugService,
-    private buildService: BuildService
+    private buildService: BuildService,
+    private settingsService: SettingsService
   ) {
     this.debugService.isDebugging$.subscribe(v => this.isDebugging = v);
     this.buildService.isBuilding$.subscribe(v => this.isBuilding = v);

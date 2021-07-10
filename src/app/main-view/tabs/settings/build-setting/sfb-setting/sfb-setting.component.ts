@@ -11,7 +11,7 @@ export class SfbSettingComponent implements OnInit {
 
   customArgsDivClass: string[] = []
 
-  constructor(private settingsService: SettingsService, private electronService: ElectronService) { }
+  constructor(private settingsService: SettingsService) { }
 
   stdOptions = [
     '98',
@@ -30,6 +30,10 @@ export class SfbSettingComponent implements OnInit {
     console.log(this.currentOptions);
   }
 
+  onChange() {
+    this.settingsService.buildOptionTab.saved.next(false);
+  }
+
   get currentOptions() {
     return this.settingsService.currentSfbOptions;
   }
@@ -40,17 +44,23 @@ export class SfbSettingComponent implements OnInit {
 
   customSubmit(value: string) {
     const index = this.currentOptions.other.indexOf(value);
-    if (index === -1)
+    if (index === -1) {
       this.currentOptions.other.push(value);
+      this.onChange();
+    }
   }
   customRemove(value: string) {
+    this.onChange();
     const index = this.currentOptions.other.indexOf(value);
-    if (index !== -1)
+    if (index !== -1) {
       this.currentOptions.other.splice(index, 1);
+      this.onChange();
+    }
   }
   removeLast() {
-    console.log("pp");
-    if (this.currentOptions.other.length > 0)
+    if (this.currentOptions.other.length > 0) {
+      this.onChange();
       this.currentOptions.other.pop();
+    }
   }
 }

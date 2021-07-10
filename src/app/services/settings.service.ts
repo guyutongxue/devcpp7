@@ -16,7 +16,10 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { ElectronService } from '../core/services';
+import { FileService } from './file.service';
+import { Tab } from './tabs.service';
 
 
 export class SfbOptions {
@@ -94,17 +97,37 @@ interface EnvOptions {
   ioEncoding?: string;
 }
 
+class TabControl {
+  tab: Tab | null = null;
+  saved: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  constructor() {
+    this.saved.subscribe(v => {
+      if (this.tab !== null) {
+        this.tab.saved = v;
+      }
+    });
+  }
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
-  /** Current Single-File-Build Options */
+
+  buildOptionTab: TabControl = new TabControl();
+
+  // Current Single-File-Build Options
   currentSfbOptions: SfbOptions;
   currentEnvOptions: EnvOptions = {};
 
-  constructor(private electronService: ElectronService) {
-    this.resetBuildOption();
+  constructor(private fileService: FileService, private electronService: ElectronService) {
+    // this.resetBuildOption();
+  }
+
+  async openBuildSettings() {
+    await this.resetBuildOption();
+    this.buildOptionTab.tab = this.fileService.newSettings('build', '编译设置');
   }
 
   async resetBuildOption() {
@@ -112,6 +135,7 @@ export class SettingsService {
       this.electronService.getConfig('build.compileArgs').then(v => this.currentSfbOptions = new SfbOptions(v)),
       this.electronService.getConfig('advanced.ioEncoding').then(v => this.currentEnvOptions.ioEncoding = v)
     ]);
+    this.buildOptionTab.saved.next(true);
   }
 
   saveBuildOption() {
@@ -120,6 +144,15 @@ export class SettingsService {
       ...this.currentSfbOptions.other
     ]);
     this.electronService.setConfig('advanced.ioEncoding', this.currentEnvOptions.ioEncoding);
+    this.buildOptionTab.saved.next(true);
+  }
+
+  save(tab: Tab) {
+    if (tab.key === this.buildOptionTab.tab.key) {
+      this.saveBuildOption();
+      return true;
+    }
+    return false;
   }
 
 }
