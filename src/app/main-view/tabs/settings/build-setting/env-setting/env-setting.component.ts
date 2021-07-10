@@ -12,14 +12,14 @@ export class EnvSettingComponent implements OnInit {
   constructor(private settingsService: SettingsService, private electronService: ElectronService) { }
 
   get currentEnvOptions() {
-    return this.settingsService.currentEnvOptions;
+    return this.settingsService.getOptions('build').env;
   }
 
   ngOnInit(): void {
   }
 
   onChange() {
-    this.settingsService.buildOptionTab.saved.next(false);
+    this.settingsService.onChange('build');
   }
 
   async getDefaultEncoding() {

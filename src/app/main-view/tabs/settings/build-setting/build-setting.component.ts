@@ -30,11 +30,11 @@ export class BuildSettingComponent implements OnInit {
   ngOnInit() { }
 
   saveOption() {
-    this.settingsService.saveBuildOption();
+    this.settingsService.saveSetting('build');
   }
 
   resetOption() {
-    this.settingsService.resetBuildOption();
+    this.settingsService.resetSetting('build');
   }
 
 }

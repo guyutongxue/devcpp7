@@ -150,8 +150,8 @@ export class FileService {
     this.succUntitledNumber();
   }
 
-  newSettings(type: string, title: string): Tab {
-    const key = "~" + type;
+  newSettings(url: string, title: string): Tab {
+    const key = "~" + url;
     if (this.tabsService.getByKey(key).index === null) {
       this.tabsService.add({
         key,

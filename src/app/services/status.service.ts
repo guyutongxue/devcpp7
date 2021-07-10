@@ -175,7 +175,7 @@ export class StatusService {
         name: '编译设置...',
         shortcut: null,
         enabled: () => true,
-        run: () => this.settingsService.openBuildSettings()
+        run: () => this.settingsService.openSetting('build')
       },
       'window.toggleDevtools': {
         name: '切换 DevTools',

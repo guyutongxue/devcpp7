@@ -93,11 +93,11 @@ export class TabsComponent implements OnInit {
 
   notSaveModalTab: Tab;
   notSaveModalVisible: boolean = false;
-  notSaveModalYes() {
+  async notSaveModalYes() {
     this.notSaveModalVisible = false;
-    if (this.notSaveModalTab.type === "file" && this.fileService.save(this.notSaveModalTab))
+    if (this.notSaveModalTab.type === "file" && await this.fileService.save(this.notSaveModalTab))
       this.doRemoveTab(this.notSaveModalTab);
-    if (this.notSaveModalTab.type === "setting" && this.settingsService.save(this.notSaveModalTab))
+    if (this.notSaveModalTab.type === "setting" && this.settingsService.saveTab(this.notSaveModalTab))
       this.doRemoveTab(this.notSaveModalTab);
   }
   notSaveModalNo() {

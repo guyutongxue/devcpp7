@@ -31,11 +31,11 @@ export class SfbSettingComponent implements OnInit {
   }
 
   onChange() {
-    this.settingsService.buildOptionTab.saved.next(false);
+    this.settingsService.onChange('build');
   }
 
   get currentOptions() {
-    return this.settingsService.currentSfbOptions;
+    return this.settingsService.getOptions('build').sfb;
   }
 
   get buildedArgs() {

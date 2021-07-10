@@ -97,16 +97,64 @@ interface EnvOptions {
   ioEncoding?: string;
 }
 
-class TabControl {
-  tab: Tab | null = null;
-  saved: BehaviorSubject<boolean> = new BehaviorSubject(true);
+type OptionsType = {
+  'build': {
+    sfb: SfbOptions;
+    env: EnvOptions;
+  },
+  // 'editor': {}
+};
 
-  constructor() {
+abstract class SubSetting<Url extends keyof OptionsType> {
+  options: OptionsType[Url];
+
+  private tab: Tab | null = null;
+  private saved: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  constructor(private url: Url, private name: string) {
     this.saved.subscribe(v => {
       if (this.tab !== null) {
         this.tab.saved = v;
       }
     });
+  }
+
+  open(fileService: FileService) {
+    this.tab = fileService.newSettings(this.url, this.name);
+  }
+
+  updateSaved(value: boolean = true) {
+    this.saved.next(value);
+  }
+
+  abstract reset(electron: ElectronService): Promise<void> | void;
+  abstract save(electron: ElectronService): Promise<void> | void;
+}
+
+class BuildSubSetting extends SubSetting<'build'> {
+  constructor() {
+    super('build', '编译设置');
+    this.options = {
+      sfb: new SfbOptions(),
+      env: {}
+    };
+  }
+
+  async reset(electron: ElectronService) {
+    await Promise.all([
+      electron.getConfig('build.compileArgs').then(v => this.options.sfb = new SfbOptions(v)),
+      electron.getConfig('advanced.ioEncoding').then(v => this.options.env.ioEncoding = v)
+    ]);
+    super.updateSaved();
+  }
+
+  save(electron: ElectronService) {
+    electron.setConfig('build.compileArgs', [
+      ...this.options.sfb.toList(),
+      ...this.options.sfb.other
+    ]);
+    electron.setConfig('advanced.ioEncoding', this.options.env.ioEncoding);
+    super.updateSaved();
   }
 }
 
@@ -114,45 +162,38 @@ class TabControl {
   providedIn: 'root'
 })
 export class SettingsService {
-
-  buildOptionTab: TabControl = new TabControl();
-
-  // Current Single-File-Build Options
-  currentSfbOptions: SfbOptions;
-  currentEnvOptions: EnvOptions = {};
+  subSettings: { [K in keyof OptionsType]: SubSetting<K> } = {
+    build: new BuildSubSetting(),
+    // editor: null
+  };
 
   constructor(private fileService: FileService, private electronService: ElectronService) {
     // this.resetBuildOption();
   }
 
-  async openBuildSettings() {
-    await this.resetBuildOption();
-    this.buildOptionTab.tab = this.fileService.newSettings('build', '编译设置');
+  getOptions<K extends keyof OptionsType>(url: K): OptionsType[K] {
+    return (this.subSettings[url] as SubSetting<K>).options;
   }
 
-  async resetBuildOption() {
-    await Promise.all([
-      this.electronService.getConfig('build.compileArgs').then(v => this.currentSfbOptions = new SfbOptions(v)),
-      this.electronService.getConfig('advanced.ioEncoding').then(v => this.currentEnvOptions.ioEncoding = v)
-    ]);
-    this.buildOptionTab.saved.next(true);
+  onChange<K extends keyof OptionsType>(url: K) {
+    this.subSettings[url].updateSaved(false);
   }
 
-  saveBuildOption() {
-    this.electronService.setConfig('build.compileArgs', [
-      ...this.currentSfbOptions.toList(),
-      ...this.currentSfbOptions.other
-    ]);
-    this.electronService.setConfig('advanced.ioEncoding', this.currentEnvOptions.ioEncoding);
-    this.buildOptionTab.saved.next(true);
+  async openSetting<K extends keyof OptionsType>(url: K) {
+    await this.subSettings[url].reset(this.electronService);
+    this.subSettings[url].open(this.fileService);
   }
 
-  save(tab: Tab) {
-    if (tab.key === this.buildOptionTab.tab.key) {
-      this.saveBuildOption();
-      return true;
-    }
-    return false;
+  async resetSetting<K extends keyof OptionsType>(url: K) {
+    await this.subSettings[url].reset(this.electronService);
   }
 
+  async saveSetting<K extends keyof OptionsType>(url: K) {
+    await this.subSettings[url].save(this.electronService);
+  }
+
+  saveTab(tab: Tab): boolean {
+    this.subSettings[tab.key.substr(1)].save(this.electronService);
+    return true;
+  }
 }
