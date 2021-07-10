@@ -1,6 +1,7 @@
 # Dev-C++ 7
 
-<img src="https://github.com/Guyutongxue/devcpp7/actions/workflows/yarn.yml/badge.svg">
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Guyutongxue/devcpp7/Yarn%20CI)
+![LGTM Grade](https://img.shields.io/lgtm/grade/javascript/github/Guyutongxue/devcpp7?label=code%20quality)
 
 <p align="center">
 <img src="./src/assets/icons/favicon.png" height="70" alt="Dev C++ 7"> =
@@ -62,3 +63,5 @@ Follow [here](src/extraResources/README.md).
 | `yarn start`        | Hot reload in browser, for debugging UI stuff |
 | `yarn electron:dev` | Run developer env in Electron                 |
 | `yarn build`        | Build executable with electron-builder        |
+
+> `npx electron-rebuild -o chcp -v 11.1.0`
