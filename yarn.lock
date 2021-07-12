@@ -4730,12 +4730,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chcp@https://github.com/Guyutongxue/chcp/tarball/8fdd1eb2eecb3b9cd1194ead6beb3bdc0e0966d9":
+"chcp@https://github.com/Guyutongxue/chcp/tarball/691e1a9024e1287ce622893dc5a94a650d3b9b8b":
   version: 1.1.0
-  resolution: "chcp@https://github.com/Guyutongxue/chcp.git#commit=8fdd1eb2eecb3b9cd1194ead6beb3bdc0e0966d9"
+  resolution: "chcp@https://github.com/Guyutongxue/chcp.git#commit=691e1a9024e1287ce622893dc5a94a650d3b9b8b"
   peerDependencies:
     node-gyp: ^8.1.0
-  checksum: c412948aafc27401444aa0bc5cba90b3835b6f6971412fc77a9a4fee66cd7cca439a58c2c7dfb599df4afb661e0a050f75615313ad4aacae4e46f39f5de6bd2b
+  checksum: 30912fbb35b55968a5df6c1329f69b201254a6df3a5946204b303d099d813d98f11ccdf437df61343ef1dfbd92b79c0a47fd2cae1e40a445aea312ba039acdef
   languageName: node
   linkType: hard
 
@@ -6571,7 +6571,7 @@ __metadata:
     "@yarnpkg/pnpify": ^3.0.0-rc.10
     angular-split: ^5.0.0
     chai: 4.2.0
-    chcp: "https://github.com/Guyutongxue/chcp/tarball/8fdd1eb2eecb3b9cd1194ead6beb3bdc0e0966d9"
+    chcp: "https://github.com/Guyutongxue/chcp/tarball/691e1a9024e1287ce622893dc5a94a650d3b9b8b"
     conventional-changelog-cli: 2.1.1
     copy-webpack-plugin: 7.0.0
     core-js: 3.6.5

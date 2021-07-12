@@ -46,9 +46,12 @@ This repo is based on [angular-electron](https://github.com/maximegris/angular-e
 
 ### Install dependencies
 
-Install Node.js and Yarn on Windows, then type
+Install Node.js and Yarn on Windows. You should install node-gyp (including Python & MSVC) to build some modules.
+
+Then:
 ```
-yarn install
+yarn
+yarn electron:rebuild # rebuild node modules to match electron version
 ```
 in the root directory of this project to install all the dependencies.
 

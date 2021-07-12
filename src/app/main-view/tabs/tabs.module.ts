@@ -30,6 +30,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
@@ -59,6 +60,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
     NzTagModule,
     NzInputModule,
     NzModalModule,
+    NzAlertModule,
     NzIconModule,
     MonacoEditorModule
   ],

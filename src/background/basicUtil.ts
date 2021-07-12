@@ -19,6 +19,7 @@ import * as path from 'path';
 import { BrowserWindow, ipcMain } from 'electron';
 import * as isAsar from 'electron-is-running-in-asar';
 import * as Store from 'electron-store';
+import * as chcp from 'chcp';
 import { TypedIpcMain, TypedWebContents } from 'electron-typed-ipc';
 
 import { IpcEvents, IpcCommands, Configurations } from './ipcTyping'
@@ -47,3 +48,7 @@ export function getWebContents(): TypedWebContents<IpcEvents> {
 }
 
 export const typedIpcMain = ipcMain as TypedIpcMain<IpcEvents, IpcCommands>
+
+export function getACP(): number {
+  return chcp.getAnsiCodePage();
+}

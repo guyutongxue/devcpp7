@@ -2,7 +2,8 @@
   <div nz-row [nzGutter]="16">
     <div nz-col>
       <h3>系统编码（代码页）</h3>
-      <input nz-input [(ngModel)]="currentEnvOptions.ioEncoding" (ngModelChange)="onChange()">
+      <input nz-input [(ngModel)]="currentEnvOptions.ioEncoding" (ngModelChange)="onChange();verify()">
+      <nz-alert *ngIf="!currentEncodingValid" nzType="warning" nzMessage="不受支持的编码。"></nz-alert>
     </div>
     <div nz-col>
       <button nz-button (click)="getDefaultEncoding()" nzType="default">填入当前代码页</button>

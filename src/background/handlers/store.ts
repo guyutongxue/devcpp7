@@ -17,6 +17,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
+import * as iconv from 'iconv-lite';
 
 import { store, typedIpcMain, extraResourcesPath } from "../basicUtil";
 
@@ -39,7 +40,17 @@ typedIpcMain.handle('store/get', (_, key) => {
   return store.get(key);
 });
 typedIpcMain.handle('store/set', (_, key, value) => {
+  // pre set
+  switch (key) {
+    case 'advanced.ioEncoding':
+      if (!iconv.encodingExists(value as string)) {
+        console.error(`[${key}] ${value} is not a valid encoding`);
+        return;
+      }
+  }
+  // set
   store.set(key, value);
+  // post set
   switch (key) {
     case 'build.compileArgs':
       updateClangdCompileArgs(value as string[]);
