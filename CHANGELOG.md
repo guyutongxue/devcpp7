@@ -1,5 +1,17 @@
 # Changelog
 
+## \[2107.0\]
+
+- Features:
+  - Ability to adjust code pages (GBK or UTF-8 or sth else)
+  - Modal for unsaved settings
+
+## 2105.0
+
+- Fix bugs:
+  - `ConsolePauser.exe` not launched when path contains space.
+  - [#1](https://github.com/Guyutongxue/devcpp7/issues/1)
+
 ## 2104.1
 
 - Fix bug - `spawn` failed when path contains spaces
