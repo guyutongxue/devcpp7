@@ -38,10 +38,10 @@ export const store = new Store<Configurations>({
 export const extraResourcesPath =
   !isAsar()
     ? path.join(__dirname, '../src/extraResources')
-    : path.join((process as any).resourcesPath, 'extraResources');
+    : path.join(process['resourcesPath'], 'extraResources');
 
 export function getWindow(): BrowserWindow {
-  return global["win"] as BrowserWindow;
+  return global["win"];
 }
 export function getWebContents(): TypedWebContents<IpcEvents> {
   return getWindow().webContents;
