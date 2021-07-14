@@ -19,10 +19,9 @@ import { GdbController } from "tsgdbmi";
 import * as path from 'path';
 
 import { doCompile } from './build';
-import { extraResourcesPath, getWebContents, getWindow, typedIpcMain } from '../basicUtil';
-import { ioEncoding } from "./constants";
+import { extraResourcesPath, getWebContents, getWindow, typedIpcMain, store } from '../basicUtil';
 
-const gdb = new GdbController(ioEncoding);
+const gdb = new GdbController(store.get('advanced.ioEncoding'));
 gdb.onResponse(response => {
   switch (response.type) {
     case "console":

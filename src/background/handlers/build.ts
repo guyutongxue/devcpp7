@@ -21,7 +21,6 @@ import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
 import { extraResourcesPath, typedIpcMain, getWebContents, store } from '../basicUtil';
 import { GccDiagnostics, BuildResult } from '../ipcTyping';
-import { ioEncoding } from './constants';
 
 // function encode(src: string) {
 //   return encodeURIComponent(src);
@@ -90,7 +89,7 @@ async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean
         Path: process.env.Path + (path.delimiter + path.join(extraResourcesPath, 'mingw64/bin'))
       }
     }, (error, _, stderrBuf) => {
-      const stderr = iconv.decode(stderrBuf, ioEncoding);
+      const stderr = iconv.decode(stderrBuf, store.get('advanced.ioEncoding'));
       if (error) {
         resolve({
           success: false,

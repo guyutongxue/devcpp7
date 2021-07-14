@@ -1,12 +1,15 @@
 <nz-layout>
   <div nz-row [nzGutter]="16">
     <div nz-col>
-      <h3>系统编码（代码页）</h3>
-      <input nz-input [(ngModel)]="currentEnvOptions.ioEncoding" (ngModelChange)="onChange();verify()">
+      <h3>输入输出编码</h3>
+      <nz-input-group nzSearch [nzAddOnAfter]="getAcpBtn">
+        <input nz-input type="text" [(ngModel)]="currentEnvOptions.ioEncoding" (ngModelChange)="onChange();verify()">
+      </nz-input-group>
       <nz-alert *ngIf="!currentEncodingValid" nzType="warning" nzMessage="不受支持的编码。"></nz-alert>
-    </div>
-    <div nz-col>
-      <button nz-button (click)="getDefaultEncoding()" nzType="default">填入当前代码页</button>
+      <small>设置与编译器和 GDB 交互时将采用的编码。若在单文件编译中启用了“调整可执行文件编码”选项，则可执行文件的输出编码也将设置为此。</small>
+      <ng-template #getAcpBtn>
+        <button nz-button (click)="getDefaultEncoding()" nzType="default">填入当前系统 ANSI 代码页</button>
+      </ng-template>
     </div>
   </div>
 </nz-layout>

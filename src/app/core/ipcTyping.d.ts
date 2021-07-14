@@ -173,7 +173,7 @@ export type IpcCommands = {
   'window/getArgv': () => string[];
   'window/getExtraResourcePath': () => string;
 
-  'encode/getCp': () => string;
+  'encode/getAcp': () => string;
   'encode/verify': (encode: string) => boolean;
 
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;

@@ -38,7 +38,7 @@ export class EnvSettingComponent implements OnInit {
   }
 
   async getDefaultEncoding() {
-    const cp = await this.electronService.ipcRenderer.invoke('encode/getCp');
+    const cp = await this.electronService.ipcRenderer.invoke('encode/getAcp');
     this.currentEnvOptions.ioEncoding = cp;
     this.onChange();
     this.verify();
