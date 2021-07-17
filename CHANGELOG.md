@@ -1,6 +1,6 @@
 # Changelog
 
-## \[2107.0\]
+## 2107.0
 
 - Features:
   - Ability to adjust code pages (GBK or UTF-8 or sth else)
