@@ -30,7 +30,7 @@ async function doStart() {
       port.toString(),
       path.join(extraResourcesPath, 'clangd/bin/clangd.exe'),
       path.join(extraResourcesPath, 'mingw64/bin'),
-      // `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`,
+      `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`,
       // `--log=verbose`
     ],
     {
