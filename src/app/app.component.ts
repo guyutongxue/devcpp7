@@ -67,8 +67,29 @@ export class AppComponent implements OnInit {
     return this.windowHeight - this.headerHeight - this.footerHeight;
   }
 
-  ngOnInit() : void {
+  async ngOnInit() {
+    // this.electronService.ipcRenderer.invoke('window/toggleDevTools');
+    const [mingwPath, clangdPath] = await Promise.all([
+      this.electronService.getConfig('env.mingwPath'),
+      this.electronService.getConfig('env.clangdPath')
+    ]);
+    // if (mingwPath === null || clangdPath === null) {
+    //   this.setEnvModal = true;
+    // }
+    // if (mingwPath !== null)
+    //   this.tempMingwPath = mingwPath;
+    // if (clangdPath !== null)
+    //   this.tempClangdPath = clangdPath;
+  }
 
+  setEnvModal: boolean = false;
+  tempMingwPath: string = "";
+  tempClangdPath: string = "";
+
+  confirmPaths(): void {
+    this.electronService.setConfig('env.mingwPath', this.tempMingwPath);
+    this.electronService.setConfig('env.clangdPath', this.tempClangdPath);
+    this.setEnvModal = false;
   }
 
   get currentStatus() {

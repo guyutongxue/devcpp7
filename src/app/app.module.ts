@@ -28,6 +28,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { IconDefinition } from '@ant-design/icons-angular'
 import * as AllIcons from '@ant-design/icons-angular/icons';
@@ -57,6 +59,8 @@ const icons: IconDefinition[] = Object.keys(antDesignIcons).map(key => antDesign
     CoreModule,
     MainViewModule,
     HeaderModule,
+    NzModalModule,
+    NzButtonModule,
     NzIconModule.forRoot(icons),
     AppRoutingModule,
     TranslateModule.forRoot({

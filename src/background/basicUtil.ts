@@ -27,9 +27,11 @@ import { IpcEvents, IpcCommands, Configurations } from './ipcTyping'
 export const store = new Store<Configurations>({
   defaults: {
     'build.compileArgs': [
-      '-g', '-std=c++2a'
+      '-g', '-std=c++2a', 'DYN-fexec-charset'
     ],
-    'advanced.ioEncoding': '936'
+    'env.clangdPath': null,
+    'env.mingwPath': null,
+    'advanced.ioEncoding': 'cp936'
   },
   accessPropertiesByDotNotation: false
 });

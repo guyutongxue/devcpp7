@@ -147,7 +147,9 @@ type DebugSendRequestResult = {
 }
 
 export interface Configurations {
-  'build.compileArgs': string[],
+  'build.compileArgs': string[];
+  'env.mingwPath': string;
+  'env.clangdPath': string;
   'advanced.ioEncoding': string;
 }
 

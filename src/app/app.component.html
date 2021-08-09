@@ -3,5 +3,27 @@
 </div>
 <div id="mainView" [ngStyle]="{ 'height.px': mainViewHeight }">
     <app-main-view></app-main-view>
+    <nz-modal
+      [nzVisible]="setEnvModal"
+      [nzTitle]="modalTitle"
+      [nzContent]="modalContent"
+      [nzFooter]="modalFooter"
+      [nzClosable]="false"
+    >
+      <ng-template #modalTitle>必要设置</ng-template>
+
+      <ng-template #modalContent>
+        <p>有一些 Dev-C++ 设置需要完成。</p>
+        <p>MinGW 路径</p>
+        <input [(ngModel)]="tempMingwPath">
+        <p>Clangd 路径</p>
+        <input [(ngModel)]="tempClangdPath">
+      </ng-template>
+
+      <ng-template #modalFooter>
+        <span>Modal Footer:</span>
+        <button nz-button nzType="default" (click)="confirmPaths()">完成</button>
+      </ng-template>
+    </nz-modal>
 </div>
 <div id="footer">{{ currentStatus }}</div>

@@ -225,6 +225,7 @@ export class EditorService {
 
   async startLanguageClient() {
     if (this.isLanguageClientStarted) return;
+    if (await this.electronService.getConfig('env.clangdPath') === null) return;
     const result = await this.electronService.ipcRenderer.invoke('langServer/start');
     // create the web socket
     const socketUrl = `ws://localhost:${result.port}/langServer`;
