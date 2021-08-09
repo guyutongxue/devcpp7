@@ -1,5 +1,12 @@
 # Changelog
 
+## 2108.0
+
+- Fix bugs:
+  - Clangd should recognize compiler options.
+
+> I do not have time on developing this. 😞
+
 ## 2107.0
 
 - Features:
