@@ -22,7 +22,7 @@ A project simulating legacy Dev-C++, a tiny C++ IDE, powered by Angular, Electro
 
 ## Current Status
 
-**Under construction, but may be in abeyance later**
+**NOT UNDER MAINTENANCE**
 
 Current features:
 - Basic New/Open/Save
@@ -37,7 +37,7 @@ Current features:
 - **WON'T** test on any system lower than Windows 10.
 - **WON'T** provide the options of changing compiler set.
 - **MAY NOT** support C project or file.
-- **MAY NOT** support l11n. (Only Simplified Chinese now.)
+- **MAY NOT** support i18n. (Only Simplified Chinese now.)
 - **PRETTY LARGER** than legacy Dev-C++ (because of Electron, Clangd and so on).
 
 ## Build instructions
