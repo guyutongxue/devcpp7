@@ -31,7 +31,7 @@ type FileSaveResult = {
 } | {
   success: false;
   error: any
-}
+};
 
 interface FileSaveAsOptions {
   content: string;
@@ -47,7 +47,7 @@ type FileSaveAsResult = {
   success: false;
   cancelled: false;
   error: any;
-}
+};
 
 interface FileOpenOptions {
   /** Whether show a dialog to let user choose which file should open */
@@ -65,7 +65,7 @@ type FileOpenResult = {
 } | {
   success: false;
   error: any;
-}
+};
 
 interface BuildOptions {
   path: string;
@@ -121,11 +121,6 @@ export interface BuildResult {
   }
 }
 
-
-interface LanguageServerStartResult {
-  port: number;
-}
-
 interface DebugStartOptions {
   srcPath: string;
 }
@@ -134,7 +129,7 @@ type DebugStartResult = {
 } | {
   success: false;
   error: string;
-}
+};
 
 interface DebugSendRequestOptions {
   command: string;
@@ -144,12 +139,14 @@ type DebugSendRequestResult = {
 } | {
   success: false;
   error: any;
-}
+};
 
 export interface Configurations {
   'build.compileArgs': string[];
   'env.mingwPath': string;
+  'env.useBundledMingw': boolean;
   'env.clangdPath': string;
+  'env.useBundledClangd': boolean;
   'advanced.ioEncoding': string;
 }
 
@@ -163,7 +160,7 @@ export type IpcCommands = {
   'build/build': (options: BuildOptions) => void;
   'build/runExe': (options: RunExeOptions) => void;
 
-  'langServer/start': () => LanguageServerStartResult;
+  'langServer/start': () => void;
   'langServer/stop': () => void;
 
   'debug/start': (options: DebugStartOptions) => DebugStartResult;
@@ -181,7 +178,7 @@ export type IpcCommands = {
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
   'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];
   'store/reset': (key?: keyof Configurations) => void;
-}
+};
 
 // Sync IPC
 // Event emitted from ipcMain, received by ipcRenderer
@@ -195,4 +192,6 @@ export type IpcEvents = {
   'ng:debug/notify': (response: GdbResponse) => void;
   'ng:debug/result': (response: GdbResponse) => void;
 
-}
+  'ng:langServer/started': (port: number) => void;
+  'ng:langServer/stopped': () => void;
+};

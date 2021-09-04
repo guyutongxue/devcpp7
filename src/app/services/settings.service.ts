@@ -16,6 +16,7 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, UrlSegment } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { ElectronService } from '../core/services';
 import { FileService } from './file.service';
@@ -23,20 +24,20 @@ import { Tab } from './tabs.service';
 
 
 export class SfbOptions {
-  std: string = '';
-  gnu: boolean = false;
+  std = '';
+  gnu = false;
 
-  O: string = '';
-  g: boolean = false;
+  O = '';
+  g = false;
 
-  Wall: boolean = false;
-  Wextra: boolean = false;
-  Werror: boolean = false;
+  Wall = false;
+  Wextra = false;
+  Werror = false;
 
   // Dynamic options:
   // Dynamic options will be evaluated until building.
   // Storing dynamic options with a 'DYN' prefix.
-  fexec_charset: boolean = true;
+  fexec_charset = true;
 
   other: string[] = [];
 
@@ -93,8 +94,12 @@ export class SfbOptions {
 
 }
 
-interface EnvOptions {
-  ioEncoding?: string;
+export interface EnvOptions {
+  ioEncoding: string;
+  mingwPath: string;
+  useBundledMingw: boolean;
+  clangdPath: string;
+  useBundledClangd: boolean;
 }
 
 type OptionsType = {
@@ -123,7 +128,7 @@ abstract class SubSetting<Url extends keyof OptionsType> {
     this.tab = fileService.newSettings(this.url, this.name);
   }
 
-  updateSaved(value: boolean = true) {
+  updateSaved(value = true) {
     this.saved.next(value);
   }
 
@@ -136,14 +141,24 @@ class BuildSubSetting extends SubSetting<'build'> {
     super('build', '编译设置');
     this.options = {
       sfb: new SfbOptions(),
-      env: {}
+      env: {
+        ioEncoding: 'cp936',
+        mingwPath: null,
+        useBundledMingw: true,
+        clangdPath: null,
+        useBundledClangd: true,
+      }
     };
   }
 
   async reset(electron: ElectronService) {
     await Promise.all([
       electron.getConfig('build.compileArgs').then(v => this.options.sfb = new SfbOptions(v)),
-      electron.getConfig('advanced.ioEncoding').then(v => this.options.env.ioEncoding = v)
+      electron.getConfig('advanced.ioEncoding').then(v => this.options.env.ioEncoding = v),
+      electron.getConfig('env.mingwPath').then(v => this.options.env.mingwPath = v),
+      electron.getConfig('env.useBundledMingw').then(v => this.options.env.useBundledMingw = v),
+      electron.getConfig('env.clangdPath').then(v => this.options.env.clangdPath = v),
+      electron.getConfig('env.useBundledClangd').then(v => this.options.env.useBundledClangd = v),
     ]);
     super.updateSaved();
   }
@@ -154,6 +169,10 @@ class BuildSubSetting extends SubSetting<'build'> {
       ...this.options.sfb.other
     ]);
     electron.setConfig('advanced.ioEncoding', this.options.env.ioEncoding);
+    electron.setConfig('env.mingwPath', this.options.env.mingwPath);
+    electron.setConfig('env.useBundledMingw', this.options.env.useBundledMingw);
+    electron.setConfig('env.clangdPath', this.options.env.clangdPath);
+    electron.setConfig('env.useBundledClangd', this.options.env.useBundledClangd);
     super.updateSaved();
   }
 }
@@ -167,7 +186,7 @@ export class SettingsService {
     // editor: null
   };
 
-  constructor(private fileService: FileService, private electronService: ElectronService) {
+  constructor(private router: Router, private fileService: FileService, private electronService: ElectronService) {
     // this.resetBuildOption();
   }
 
@@ -175,25 +194,56 @@ export class SettingsService {
     return (this.subSettings[url] as SubSetting<K>).options;
   }
 
-  onChange<K extends keyof OptionsType>(url: K) {
+  onChange<K extends keyof OptionsType>(url: K): void {
     this.subSettings[url].updateSaved(false);
   }
 
-  async openSetting<K extends keyof OptionsType>(url: K) {
+  async openSetting<K extends keyof OptionsType>(url: K): Promise<void> {
     await this.subSettings[url].reset(this.electronService);
     this.subSettings[url].open(this.fileService);
   }
 
-  async resetSetting<K extends keyof OptionsType>(url: K) {
+  async resetSetting<K extends keyof OptionsType>(url: K): Promise<void> {
     await this.subSettings[url].reset(this.electronService);
   }
 
-  async saveSetting<K extends keyof OptionsType>(url: K) {
+  async saveSetting<K extends keyof OptionsType>(url: K): Promise<void> {
     await this.subSettings[url].save(this.electronService);
   }
 
   saveTab(tab: Tab): boolean {
     this.subSettings[tab.key.substr(1)].save(this.electronService);
     return true;
+  }
+}
+
+
+// This guard redirect setting page to the correct subsetting tab which has last been visited
+@Injectable({
+  providedIn: 'root'
+})
+export class SettingsGuard implements CanActivate {
+
+  private readonly homeUrl: {
+    [key: string]: string;
+  } = {
+      "~build": "sfb"
+    };
+
+  lastVisitedUrl: string | null = null;
+
+  constructor(private router: Router) { }
+
+  canActivate(activatedRoute: ActivatedRouteSnapshot): boolean {
+    const parentUrl = activatedRoute.parent.url[1].path;
+    if (this.lastVisitedUrl === null) {
+      this.lastVisitedUrl = this.homeUrl[parentUrl] ?? "";
+    }
+    this.router.navigate([
+      "setting",
+      parentUrl,
+      this.lastVisitedUrl
+    ]);
+    return false;
   }
 }

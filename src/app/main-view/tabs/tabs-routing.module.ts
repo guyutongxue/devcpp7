@@ -23,6 +23,7 @@ import { EmptyPageComponent } from '../empty-page/empty-page.component';
 import { BuildSettingComponent } from './settings/build-setting/build-setting.component';
 import { SfbSettingComponent } from './settings/build-setting/sfb-setting/sfb-setting.component';
 import { EnvSettingComponent } from './settings/build-setting/env-setting/env-setting.component';
+import { SettingsGuard } from '../../services/settings.service';
 
 const routes: Routes = [
   {
@@ -43,8 +44,8 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'sfb',
-        pathMatch: 'full'
+        canActivate: [SettingsGuard],
+        component: EmptyPageComponent
       },
       {
         path: 'env',

@@ -65,7 +65,7 @@ const clangdSemanticTokensLegend: monaco.languages.SemanticTokensLegend = {
     "macro",     // Macro
     "comment"    // Inactive Code
   ]
-}
+};
 
 interface EditorBreakpointDecInfo {
   id: string;
@@ -92,7 +92,7 @@ export class EditorService {
   editorMessage: Subject<{ type: string; arg?: any }> = new Subject();
 
   // Root path of new files, `extraResources/anon_workspace`
-  private nullPath: string = '/anon_workspace/';
+  private nullPath = '/anon_workspace/';
 
   private editor: monaco.editor.IStandaloneCodeEditor;
   private languageClient: MonacoLanguageClient;
@@ -110,12 +110,13 @@ export class EditorService {
     this.editorText.pipe(
       debounceTime(300),
       distinctUntilChanged()
-    ).subscribe(_ => {
+    ).subscribe((_) => {
       const model = this.editor?.getModel();
       if (model) {
         this.updateBkptInfo(model);
       }
     });
+
     this.monacoEditorLoaderService.isMonacoLoaded$.pipe(
       filter(isLoaded => isLoaded),
       take(1)
@@ -139,14 +140,65 @@ export class EditorService {
           };
         },
         releaseDocumentSemanticTokens() { }
-      })
+      });
       monaco.editor.defineTheme('devcpp-classic', classicTheme);
       MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
       this.startLanguageClient();
     });
+
     this.electronService.ipcRenderer.invoke('window/getExtraResourcePath')?.then(v => {
       this.nullPath = v + '/anon_workspace/';
-    })
+    });
+
+    // Language Server Handlers
+    this.electronService.ipcRenderer.on('ng:langServer/started', (_, port) => {
+      // create the web socket
+      const socketUrl = `ws://localhost:${port}/langServer`;
+      const socketOptions = {
+        maxReconnectionDelay: 10000,
+        minReconnectionDelay: 1000,
+        reconnectionDelayGrowFactor: 1.3,
+        connectionTimeout: 10000,
+        maxRetries: 8,
+        debug: false
+      };
+      const webSocket = new ReconnectingWebSocket(socketUrl, [], socketOptions) as any;
+      // listen when the web socket is opened
+      listen({
+        webSocket,
+        onConnection: (connection: MessageConnection) => {
+          // create and start the language client
+          this.languageClient = new MonacoLanguageClient({
+            name: `C++ Client`,
+            clientOptions: {
+              // use a language id as a document selector
+              documentSelector: ['cpp'],
+              // disable the default error handler
+              errorHandler: {
+                error: () => ErrorAction.Continue,
+                closed: () => CloseAction.DoNotRestart
+              }
+            },
+            // create a language client connection from the JSON RPC connection on demand
+            connectionProvider: {
+              get: (errorHandler, closeHandler) => {
+                return Promise.resolve(createConnection(<any>connection, errorHandler, closeHandler));
+              }
+            }
+          });
+          const disposable = this.languageClient.start();
+          this.isLanguageClientStarted = true;
+          connection.onClose(() => {
+            this.isLanguageClientStarted = false;
+            disposable.dispose();
+          });
+        }
+      });
+    });
+    this.electronService.ipcRenderer.on('ng:langServer/stopped', (_) => {
+      this.isLanguageClientStarted = false;
+      this.languageClient.stop();
+    });
   }
 
   private getUri(tab: Tab): monaco.Uri {
@@ -226,49 +278,7 @@ export class EditorService {
   async startLanguageClient() {
     if (this.isLanguageClientStarted) return;
     if (await this.electronService.getConfig('env.clangdPath') === null) return;
-    const result = await this.electronService.ipcRenderer.invoke('langServer/start');
-    // create the web socket
-    const socketUrl = `ws://localhost:${result.port}/langServer`;
-    const socketOptions = {
-      maxReconnectionDelay: 10000,
-      minReconnectionDelay: 1000,
-      reconnectionDelayGrowFactor: 1.3,
-      connectionTimeout: 10000,
-      maxRetries: 8,
-      debug: false
-    };
-    const webSocket = new ReconnectingWebSocket(socketUrl, [], socketOptions) as any;
-    // listen when the web socket is opened
-    listen({
-      webSocket,
-      onConnection: (connection: MessageConnection) => {
-        // create and start the language client
-        this.languageClient = new MonacoLanguageClient({
-          name: `C++ Client`,
-          clientOptions: {
-            // use a language id as a document selector
-            documentSelector: ['cpp'],
-            // disable the default error handler
-            errorHandler: {
-              error: () => ErrorAction.Continue,
-              closed: () => CloseAction.DoNotRestart
-            }
-          },
-          // create a language client connection from the JSON RPC connection on demand
-          connectionProvider: {
-            get: (errorHandler, closeHandler) => {
-              return Promise.resolve(createConnection(<any>connection, errorHandler, closeHandler));
-            }
-          }
-        });
-        const disposable = this.languageClient.start();
-        this.isLanguageClientStarted = true;
-        connection.onClose(() => {
-          this.isLanguageClientStarted = false;
-          disposable.dispose();
-        });
-      }
-    });
+    await this.electronService.ipcRenderer.invoke('langServer/start');
   }
 
   // https://github.com/microsoft/monaco-editor/issues/2000
@@ -312,9 +322,9 @@ export class EditorService {
       }
       this.updateBkptInfo(currentModel);
     }
-  }
+  };
 
-  editorInit(editor: monaco.editor.IStandaloneCodeEditor) {
+  editorInit(editor: monaco.editor.IStandaloneCodeEditor): void {
     monaco.editor.setTheme('devcpp-classic');
     this.editor = editor;
     this.interceptOpenEditor();
@@ -327,14 +337,14 @@ export class EditorService {
     this.editorMessage.next({ type: "initCompleted" });
   }
 
-  editorDestroy() {
+  editorDestroy(): void {
     this.editorText.next("");
     this.editor = null;
     this.isInit = false;
   }
 
 
-  switchToModel(tab: Tab, replace: boolean = false) {
+  switchToModel(tab: Tab, replace = false): void {
     const uri = this.getUri(tab);
     const newUri = uri.toString();
     let newModel = monaco.editor.getModel(uri);

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ElectronService } from '../../../../../core/services';
-import { SettingsService } from '../../../../../services/settings.service';
+import { ActivatedRoute } from '@angular/router';
+import { SettingsGuard, SettingsService, SfbOptions } from '../../../../../services/settings.service';
 
 @Component({
   selector: 'app-sfb-setting',
@@ -9,47 +9,51 @@ import { SettingsService } from '../../../../../services/settings.service';
 })
 export class SfbSettingComponent implements OnInit {
 
-  customArgsDivClass: string[] = []
+  customArgsDivClass: string[] = [];
 
-  constructor(private settingsService: SettingsService) { }
+  constructor(private route: ActivatedRoute,
+    private settingsService: SettingsService,
+    private settingsGuard: SettingsGuard) {
+    this.route.url.subscribe((url) => {
+      this.settingsGuard.lastVisitedUrl = url[0].path;
+    });
+  }
 
   stdOptions = [
     '98',
     '11',
     '14',
     '17',
-    '2a',
+    '20',
   ];
   optOptions = [
     '1', '2', '3', 's', 'fast', 'g'
-  ]
+  ];
 
-  listOfTagOptions = [];
-
-  ngOnInit() {
+  ngOnInit(): void {
     console.log(this.currentOptions);
   }
 
-  onChange() {
+  onChange(): void {
     this.settingsService.onChange('build');
   }
 
-  get currentOptions() {
+  get currentOptions(): SfbOptions {
     return this.settingsService.getOptions('build').sfb;
   }
 
-  get buildedArgs() {
+  get buildedArgs(): string[] {
     return this.currentOptions.toList();
   }
 
-  customSubmit(value: string) {
+  customSubmit(value: string): void {
     const index = this.currentOptions.other.indexOf(value);
     if (index === -1) {
       this.currentOptions.other.push(value);
       this.onChange();
     }
   }
-  customRemove(value: string) {
+  customRemove(value: string): void {
     this.onChange();
     const index = this.currentOptions.other.indexOf(value);
     if (index !== -1) {
@@ -57,7 +61,7 @@ export class SfbSettingComponent implements OnInit {
       this.onChange();
     }
   }
-  removeLast() {
+  removeLast(): void {
     if (this.currentOptions.other.length > 0) {
       this.onChange();
       this.currentOptions.other.pop();
