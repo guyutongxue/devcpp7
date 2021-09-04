@@ -1,8 +1,9 @@
+import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { ElectronService } from '../../../../../core/services';
-import { SettingsService } from '../../../../../services/settings.service';
+import { EnvOptions, SettingsGuard, SettingsService } from '../../../../../services/settings.service';
 
 @Component({
   selector: 'app-env-setting',
@@ -11,12 +12,19 @@ import { SettingsService } from '../../../../../services/settings.service';
 })
 export class EnvSettingComponent implements OnInit {
 
-  constructor(private settingsService: SettingsService, private electronService: ElectronService) { }
+  constructor(private route: ActivatedRoute,
+    private settingsService: SettingsService,
+    private electronService: ElectronService,
+    private settingsGuard: SettingsGuard) {
+    this.route.url.subscribe((url) => {
+      this.settingsGuard.lastVisitedUrl = url[0].path;
+    });
+  }
 
-  currentEncoding: Subject<string> = new Subject<string>();
-  currentEncodingValid: boolean = true;
+  currentEncoding = new Subject<string>();
+  currentEncodingValid = true;
 
-  get currentEnvOptions() {
+  get currentEnvOptions(): EnvOptions {
     return this.settingsService.getOptions('build').env;
   }
 
@@ -29,15 +37,15 @@ export class EnvSettingComponent implements OnInit {
     });
   }
 
-  onChange() {
+  onChange(): void {
     this.settingsService.onChange('build');
   }
 
-  verify() {
+  verify(): void {
     this.currentEncoding.next(this.currentEnvOptions.ioEncoding);
   }
 
-  async getDefaultEncoding() {
+  async getDefaultEncoding(): Promise<void> {
     const cp = await this.electronService.ipcRenderer.invoke('encode/getAcp');
     this.currentEnvOptions.ioEncoding = cp;
     this.onChange();

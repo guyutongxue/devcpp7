@@ -19,7 +19,7 @@ import { GdbController } from "tsgdbmi";
 import * as path from 'path';
 
 import { doCompile } from './build';
-import { extraResourcesPath, getWebContents, getWindow, typedIpcMain, store } from '../basicUtil';
+import { extraResourcesPath, getWebContents, getWindow, typedIpcMain, store, getMingwPath } from '../basicUtil';
 
 const gdb = new GdbController(store.get('advanced.ioEncoding'));
 gdb.onResponse(response => {
@@ -41,7 +41,7 @@ gdb.onResponse(response => {
 gdb.onClose(() => {
   getWebContents().send('ng:debug/debuggerStopped');
 });
-const gdbPath = path.join(extraResourcesPath, 'mingw64/bin/gdb.exe');
+const gdbPath = path.join(getMingwPath(), 'bin/gdb.exe');
 const startupCommand = [
   '-gdb-set new-console on',
   '-enable-pretty-printing'
@@ -54,13 +54,13 @@ typedIpcMain.handle('debug/start', async (_, arg) => {
     return {
       success: false,
       error: "Compilation failed."
-    }
+    };
   }
   if (gdb.isRunning) {
     gdb.exit();
     // wait for a while
     await new Promise(r => setTimeout(r, 500));
-  };
+  }
   const cwd = path.dirname(result.output);
   const filename = path.basename(result.output);
   gdb.launch(gdbPath, [filename], {
@@ -80,12 +80,12 @@ typedIpcMain.handle('debug/start', async (_, arg) => {
     return {
       success: false,
       error: e
-    }
+    };
   }
   getWebContents().send('ng:debug/debuggerStarted');
   return {
     success: true
-  }
+  };
 });
 
 typedIpcMain.handle('debug/exit', (_) => {

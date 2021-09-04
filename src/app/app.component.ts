@@ -67,32 +67,28 @@ export class AppComponent implements OnInit {
     return this.windowHeight - this.headerHeight - this.footerHeight;
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     // this.electronService.ipcRenderer.invoke('window/toggleDevTools');
-    const [mingwPath, clangdPath] = await Promise.all([
+    const [mingwPath, useBundled] = await Promise.all([
       this.electronService.getConfig('env.mingwPath'),
-      this.electronService.getConfig('env.clangdPath')
+      this.electronService.getConfig('env.useBundledMingw')
     ]);
-    // if (mingwPath === null || clangdPath === null) {
-    //   this.setEnvModal = true;
-    // }
-    // if (mingwPath !== null)
-    //   this.tempMingwPath = mingwPath;
-    // if (clangdPath !== null)
-    //   this.tempClangdPath = clangdPath;
+    if (!useBundled && mingwPath === '') {
+      this.setEnvModal = true;
+    }
   }
 
-  setEnvModal: boolean = false;
-  tempMingwPath: string = "";
-  tempClangdPath: string = "";
+  setEnvModal = false;
+  tempMingwPath = "";
+  tempUseBundledMingw = false;
 
   confirmPaths(): void {
     this.electronService.setConfig('env.mingwPath', this.tempMingwPath);
-    this.electronService.setConfig('env.clangdPath', this.tempClangdPath);
+    this.electronService.setConfig('env.useBundledMingw', this.tempUseBundledMingw);
     this.setEnvModal = false;
   }
 
-  get currentStatus() {
+  get currentStatus(): string {
     if (this.statusService.isBuilding) return "正在编译中";
     if (this.statusService.isDebugging) return "正在调试中";
     return "就绪";

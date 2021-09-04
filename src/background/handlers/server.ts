@@ -19,7 +19,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import * as getPort from 'get-port';
 
-import { extraResourcesPath, typedIpcMain } from '../basicUtil';
+import { extraResourcesPath, getClangdPath, getMingwPath, getWebContents, typedIpcMain } from '../basicUtil';
 
 
 async function doStart() {
@@ -28,8 +28,8 @@ async function doStart() {
     path.join(__dirname, 'server/server.js'),
     [
       port.toString(),
-      path.join(extraResourcesPath, 'clangd/bin/clangd.exe'),
-      path.join(extraResourcesPath, 'mingw64/bin'),
+      path.join(getClangdPath(), 'bin/clangd.exe'),
+      path.join(getMingwPath(), 'bin'),
       `--compile-commands-dir=${path.join(extraResourcesPath, 'anon_workspace')}`,
       // `--log=verbose`
     ],
@@ -47,20 +47,30 @@ function setServerProc(proc: child_process.ChildProcess | null) {
   global['langServerProcess'] = proc;
 }
 
-typedIpcMain.handle('langServer/start', async (_) => {
-  console.log("Starting language server...")
+async function startServer() {
+  console.log("Starting language server...");
   const result = await doStart();
   console.log("done");
+  getWebContents().send('ng:langServer/started', result.port);
   setServerProc(result.process);
-  result.process.addListener('close', () => setServerProc(null));
-  return {
-    port: result.port
-  };
-});
+  result.process.addListener('close', () => {
+    setServerProc(null);
+    getWebContents().send('ng:langServer/stopped');
+  });
+}
 
-typedIpcMain.handle('langServer/stop', (_) => {
+function stopServer() {
   const proc = getServerProc();
   if (proc !== null) {
     proc.kill();
   }
-});
+}
+
+export function restartServer(): Promise<void> {
+  stopServer();
+  return startServer();
+}
+
+typedIpcMain.handle('langServer/start', startServer);
+
+typedIpcMain.handle('langServer/stop', stopServer);

@@ -1,6 +1,6 @@
 <nz-layout>
   <div nz-row [nzGutter]="16">
-    <div nz-col>
+    <div nz-col [nzSpan]="24">
       <h3>输入输出编码</h3>
       <nz-input-group nzSearch [nzAddOnAfter]="getAcpBtn">
         <input nz-input type="text" [(ngModel)]="currentEnvOptions.ioEncoding" (ngModelChange)="onChange();verify()">
@@ -10,6 +10,19 @@
       <ng-template #getAcpBtn>
         <button nz-button (click)="getDefaultEncoding()" nzType="default">填入当前系统 ANSI 代码页</button>
       </ng-template>
+    </div>
+  </div>
+
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="12">
+      <h3>MinGW 路径</h3>
+      <input nz-input type="text" [disabled]="currentEnvOptions.useBundledMingw" [(ngModel)]="currentEnvOptions.mingwPath">
+      <label nz-checkbox [(ngModel)]="currentEnvOptions.useBundledMingw">使用自带的</label>
+    </div>
+    <div nz-col [nzSpan]="12">
+      <h3>Clangd 路径</h3>
+      <input nz-input type="text" [disabled]="currentEnvOptions.useBundledClangd" [(ngModel)]="currentEnvOptions.clangdPath">
+      <label nz-checkbox [(ngModel)]="currentEnvOptions.useBundledClangd">使用自带的</label>
     </div>
   </div>
 </nz-layout>

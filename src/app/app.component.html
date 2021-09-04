@@ -13,16 +13,13 @@
       <ng-template #modalTitle>必要设置</ng-template>
 
       <ng-template #modalContent>
-        <p>有一些 Dev-C++ 设置需要完成。</p>
-        <p>MinGW 路径</p>
-        <input [(ngModel)]="tempMingwPath">
-        <p>Clangd 路径</p>
-        <input [(ngModel)]="tempClangdPath">
+        <p>MinGW 路径（如 <code>C:\mingw64</code>）</p>
+        <input nz-input [disabled]="tempUseBundledMingw" [(ngModel)]="tempMingwPath">
+        <label nz-checkbox [(ngModel)]="tempUseBundledMingw">使用自带的 MinGW</label>
       </ng-template>
 
       <ng-template #modalFooter>
-        <span>Modal Footer:</span>
-        <button nz-button nzType="default" (click)="confirmPaths()">完成</button>
+        <button nz-button nzType="default" [disabled]="!tempUseBundledMingw && tempMingwPath === ''" (click)="confirmPaths()">完成</button>
       </ng-template>
     </nz-modal>
 </div>

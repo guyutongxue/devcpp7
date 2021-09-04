@@ -19,7 +19,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
 import { execFile, spawn } from 'child_process';
-import { extraResourcesPath, typedIpcMain, getWebContents, store } from '../basicUtil';
+import { extraResourcesPath, typedIpcMain, getWebContents, store, getMingwPath } from '../basicUtil';
 import { GccDiagnostics, BuildResult } from '../ipcTyping';
 
 // function encode(src: string) {
@@ -71,7 +71,7 @@ async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean
       '-o',
       outputFileName,
       '-fdiagnostics-format=json',
-    ]
+    ];
   } else {
     outputFileName = path.basename(getExecutablePath(srcPath));
     args = [
@@ -79,14 +79,19 @@ async function execCompiler(srcPath: string, noLink: boolean, debugInfo: boolean
       srcPath,
       '-o',
       outputFileName,
-    ]
+    ];
   }
-  return new Promise((resolve, _) => {
-    execFile(path.join(extraResourcesPath, 'mingw64/bin/g++.exe'), args, {
+  return new Promise((resolve) => {
+    const mingwPath = getMingwPath();
+    const gxxPath = path.join(mingwPath, 'bin/g++.exe');
+    if (!fs.existsSync(gxxPath)) {
+      resolve({ success: false, stderr: '编译器 g++.exe 在当前 Mingw 路径下未找到。' });
+    }
+    execFile(path.join(mingwPath, 'bin/g++.exe'), args, {
       cwd: cwd,
       encoding: 'buffer',
       env: {
-        Path: process.env.Path + (path.delimiter + path.join(extraResourcesPath, 'mingw64/bin'))
+        Path: process.env.Path + path.delimiter + path.join(mingwPath, 'bin')
       }
     }, (error, _, stderrBuf) => {
       const stderr = iconv.decode(stderrBuf, store.get('advanced.ioEncoding'));

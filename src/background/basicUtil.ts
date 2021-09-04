@@ -22,15 +22,17 @@ import * as Store from 'electron-store';
 import * as chcp from 'chcp';
 import { TypedIpcMain, TypedWebContents } from 'electron-typed-ipc';
 
-import { IpcEvents, IpcCommands, Configurations } from './ipcTyping'
+import { IpcEvents, IpcCommands, Configurations } from './ipcTyping';
 
 export const store = new Store<Configurations>({
   defaults: {
     'build.compileArgs': [
       '-g', '-std=c++2a', 'DYN-fexec-charset'
     ],
-    'env.clangdPath': null,
-    'env.mingwPath': null,
+    'env.mingwPath': '',
+    'env.useBundledMingw': true,
+    'env.clangdPath': '',
+    'env.useBundledClangd': true,
     'advanced.ioEncoding': 'cp936'
   },
   accessPropertiesByDotNotation: false
@@ -49,8 +51,22 @@ export function getWebContents(): TypedWebContents<IpcEvents> {
   return getWindow().webContents;
 }
 
-export const typedIpcMain = ipcMain as TypedIpcMain<IpcEvents, IpcCommands>
+export const typedIpcMain = ipcMain as TypedIpcMain<IpcEvents, IpcCommands>;
 
 export function getACP(): number {
   return chcp.getAnsiCodePage();
+}
+
+export function getMingwPath(): string {
+  if (store.get('env.useBundledMingw')) {
+    return path.join(extraResourcesPath, 'mingw64');
+  }
+  return store.get('env.mingwPath');
+}
+
+export function getClangdPath(): string {
+  if (store.get('env.useBundledClangd')) {
+    return path.join(extraResourcesPath, 'clangd');
+  }
+  return store.get('env.clangdPath');
 }
