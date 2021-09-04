@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ElectronService } from '../core/services'
+import { ElectronService } from '../core/services';
 import { EditorService } from './editor.service';
 import { Tab, TabsService } from './tabs.service';
 
@@ -27,7 +27,7 @@ import { Tab, TabsService } from './tabs.service';
   providedIn: 'root'
 })
 export class FileService {
-  private nextUntitledNumber: number = 1;
+  private nextUntitledNumber = 1;
   constructor(
     private editorService: EditorService,
     private tabsService: TabsService,
@@ -157,7 +157,7 @@ export class FileService {
         key,
         type: "setting",
         title
-      })
+      });
     }
     this.tabsService.changeActive(key);
     return this.tabsService.getActive().value;

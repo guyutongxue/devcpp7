@@ -16,7 +16,7 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router'
+import { Router } from '@angular/router';
 import { BehaviorSubject, EMPTY, firstValueFrom, Observable, Subject, throwError, TimeoutError } from 'rxjs';
 import { GdbArray, GdbResponse, GdbVal } from 'tsgdbmi';
 import { ElectronService } from '../core/services';
@@ -28,13 +28,13 @@ function escape(src: string) {
   return src.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\t/g, '\\t');
 }
 
-interface TraceLine { file: string; line: number };
+interface TraceLine { file: string; line: number }
 export interface FrameInfo {
   file: string;
   line: number;
   func: string;
   level: number;
-};
+}
 
 export interface BreakpointInfo {
   file: string;
@@ -56,7 +56,7 @@ export class DebugService {
 
   isDebugging$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  private allOutput: string = "";
+  private allOutput = "";
   private consoleOutput: BehaviorSubject<string> = new BehaviorSubject("");
   consoleOutput$: Observable<string> = this.consoleOutput.asObservable();
 
@@ -88,17 +88,19 @@ export class DebugService {
     private fileService: FileService,
     private editorService: EditorService) {
 
-    this.electronService.ipcRenderer.on('ng:debug/debuggerStarted', async () => {
-      this.consoleOutput.next("");
-      for (const breakInfo of this.initBreakpoints) {
-        await this.sendMiRequest(`-break-insert ${this.bkptConditionCmd(breakInfo)} "${escape(this.sourcePath)}:${breakInfo.line}"`);
-      }
-      this.router.navigate([{
-        outlets: {
-          tools: 'debug'
+    this.electronService.ipcRenderer.on('ng:debug/debuggerStarted', () => {
+      (async () => {
+        this.consoleOutput.next("");
+        for (const breakInfo of this.initBreakpoints) {
+          await this.sendMiRequest(`-break-insert ${this.bkptConditionCmd(breakInfo)} "${escape(this.sourcePath)}:${breakInfo.line}"`);
         }
-      }]);
-      await this.sendMiRequest("-exec-run");
+        this.router.navigate([{
+          outlets: {
+            tools: 'debug'
+          }
+        }]);
+        await this.sendMiRequest("-exec-run");
+      })();
     });
 
     this.electronService.ipcRenderer.on('ng:debug/debuggerStopped', () => {
@@ -138,7 +140,7 @@ export class DebugService {
 
     this.electronService.ipcRenderer.on("ng:debug/result", (_, response: GdbResponse) => {
       this.requestResults.next(response);
-    })
+    });
 
     this.traceLine.pipe(
       debounceTime(100)
@@ -149,7 +151,7 @@ export class DebugService {
 
     this.editorService.breakpointInfos$.subscribe(value => {
       this.editorBkptList = value;
-    })
+    });
   }
 
   private exitCleaning(): void {
@@ -270,7 +272,7 @@ export class DebugService {
   }
 
   private isVariableExpandable(x: GdbVal) {
-    return !!(x["dynamic"] ?? x["numchild"] !== "0")
+    return !!(x["dynamic"] ?? x["numchild"] !== "0");
   }
 
   async createVariables(origin: GdbVarInfo[]): Promise<GdbVarInfo[]> {
@@ -284,7 +286,7 @@ export class DebugService {
         value: result.payload["value"] ?? "",
         expandable: this.isVariableExpandable(result.payload)
       } as GdbVarInfo;
-    }))
+    }));
   }
 
   async getVariableChildren(variableId: string): Promise<GdbVarInfo[]> {
@@ -306,7 +308,7 @@ export class DebugService {
     const collapseList: string[] = [];
     if (!this.isDebugging$.value) return { deleteList: origin.map(v => v.id), collapseList };
     const result = await this.sendMiRequest('-var-update --all-values *');
-    if (result.message === "error") return{ deleteList, collapseList };
+    if (result.message === "error") return { deleteList, collapseList };
     const changeList = result.payload["changelist"] as GdbArray;
     for (const change of changeList) {
       if (change["in_scope"] !== "true") {
@@ -322,7 +324,7 @@ export class DebugService {
     return { deleteList, collapseList };
   }
 
-  async deleteVariable(variableId: string, childrenOnly = false) {
+  deleteVariable(variableId: string, childrenOnly = false) {
     if (this.isDebugging$.value) this.sendMiRequest(`-var-delete ${childrenOnly ? '-c' : ''} ${variableId}`);
   }
 }

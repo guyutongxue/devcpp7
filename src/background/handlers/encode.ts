@@ -28,7 +28,7 @@ const missingCP: { [key: string]: string } = {
   "20127": "ascii",
   "65000": "utf-7",
   "65001": "utf-8",
-}
+};
 
 typedIpcMain.handle('encode/getAcp', (_) => {
   const cp: string = getACP().toString();

@@ -20,6 +20,8 @@ import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
 
 import { store, typedIpcMain, extraResourcesPath } from "../basicUtil";
+import { Configurations } from '../ipcTyping';
+import { restartServer } from './server';
 
 function ignoreByClangdFilter(arg: string) {
   if (arg.startsWith('DYN')) return false;
@@ -39,24 +41,39 @@ function updateClangdCompileArgs(value: string[]) {
 typedIpcMain.handle('store/get', (_, key) => {
   return store.get(key);
 });
+
+
+type SetStoreHandlerMap = {
+  [K in keyof Configurations]?: (value: Configurations[K]) => boolean;
+};
+
+const setStoreHandlers: SetStoreHandlerMap = {
+  'advanced.ioEncoding': (value) => {
+    if (!iconv.encodingExists(value)) {
+      console.error(`[Set IO Encoding] ${value} is not a valid encoding`);
+      return false;
+    }
+    return true;
+  },
+  'build.compileArgs': (value) => {
+    updateClangdCompileArgs(value);
+    return true;
+  },
+  // Restart language server when mingw or clangd path changed
+  'env.mingwPath': () => (restartServer(), true),
+  'env.useBundledMingw': () => (restartServer(), true),
+  'env.clangdPath': () => (restartServer(), true),
+  'env.useBundledClangd': () => (restartServer(), true)
+};
+
 typedIpcMain.handle('store/set', (_, key, value) => {
-  // pre set
-  switch (key) {
-    case 'advanced.ioEncoding':
-      if (!iconv.encodingExists(value as string)) {
-        console.error(`[${key}] ${value} is not a valid encoding`);
-        return;
-      }
+  if (key in setStoreHandlers) {
+    const handler = setStoreHandlers[key] as (value: any) => boolean;
+    if (!handler(value)) return;
   }
-  // set
   store.set(key, value);
-  // post set
-  switch (key) {
-    case 'build.compileArgs':
-      updateClangdCompileArgs(value as string[]);
-      break;
-  }
 });
+
 typedIpcMain.handle('store/reset', (_, key) => {
   if (typeof key === "undefined") {
     store.clear();

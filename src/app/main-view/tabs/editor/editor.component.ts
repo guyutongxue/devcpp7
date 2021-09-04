@@ -16,10 +16,10 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute } from '@angular/router';
 
-import { EditorService } from '../../../services/editor.service'
-import { TabsService } from '../../../services/tabs.service'
+import { EditorService } from '../../../services/editor.service';
+import { TabsService } from '../../../services/tabs.service';
 
 @Component({
   selector: 'app-editor',
@@ -35,7 +35,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     'semanticHighlighting.enabled': true
   };
   key: string;
-  get code(){
+  get code() {
     return this.editorService.getCode();
   }
 
@@ -64,7 +64,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     if (!this.editorService.isLanguageClientStarted) this.editorService.startLanguageClient();
     this.editorService.editorInit(editor);
     if (this.key) {
-      let activeTab = this.tabsService.getByKey(this.key).value;
+      const activeTab = this.tabsService.getByKey(this.key).value;
       this.editorService.switchToModel(activeTab);
     }
   }

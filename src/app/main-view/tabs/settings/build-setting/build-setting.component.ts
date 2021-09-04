@@ -16,6 +16,7 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { SettingsService } from '../../../../services/settings.service';
 
 @Component({
@@ -25,7 +26,8 @@ import { SettingsService } from '../../../../services/settings.service';
 })
 export class BuildSettingComponent implements OnInit {
 
-  constructor(private settingsService: SettingsService) { }
+  constructor(private route: ActivatedRoute,
+    private settingsService: SettingsService,) { }
 
   ngOnInit() { }
 

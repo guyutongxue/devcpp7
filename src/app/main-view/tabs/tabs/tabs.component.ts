@@ -17,7 +17,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Tab, TabsService } from '../../../services/tabs.service'
+import { Tab, TabsService } from '../../../services/tabs.service';
 import { Router } from '@angular/router';
 import { FileService } from '../../../services/file.service';
 import { StatusService } from '../../../services/status.service';
@@ -46,10 +46,12 @@ export class TabsComponent implements OnInit {
       this.electronService.ipcRenderer.invoke('window/getArgv').then(argv => {
         argv.shift();
         this.fileService.open(false, argv);
-      })
+      });
     }
-    if (this.tabsService.getActive().index !== null)
+    if (this.tabsService.getActive().index !== null) {
+      // eslint-disable-next-line
       this.activeIndex = this.activeIndex;
+    }
   }
 
   get tabList() {
@@ -92,7 +94,7 @@ export class TabsComponent implements OnInit {
   }
 
   notSaveModalTab: Tab;
-  notSaveModalVisible: boolean = false;
+  notSaveModalVisible = false;
   async notSaveModalYes() {
     this.notSaveModalVisible = false;
     if (this.notSaveModalTab.type === "file" && await this.fileService.save(this.notSaveModalTab))

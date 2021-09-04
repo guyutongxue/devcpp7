@@ -16,7 +16,7 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router'
+import { Router } from '@angular/router';
 import { NzNotificationDataOptions, NzNotificationService } from 'ng-zorro-antd/notification';
 import { ElectronService } from '../core/services';
 import { BuildResult, GccDiagnostics } from '../core/ipcTyping';
@@ -32,7 +32,7 @@ export class BuildService {
   isBuilding$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private notifyOption: NzNotificationDataOptions = {
     nzDuration: 3000
-  }
+  };
 
   constructor(
     private router: Router,
@@ -44,7 +44,7 @@ export class BuildService {
     console.log(this.electronService);
     this.electronService.ipcRenderer.on("ng:build/buildStarted", (_) => {
       this.isBuilding$.next(true);
-    })
+    });
     this.electronService.ipcRenderer.on("ng:build/buildComplete", (_, result) => {
       this.isBuilding$.next(false);
       console.log("Compile result: ", result);
@@ -92,7 +92,7 @@ export class BuildService {
       }
     }]);
     if (result.stage === "unknown") {
-      this.problemsService.unknownerr.next(`Error: ${result.what.error}\n\nstderr: ${result.what.stderr}`);
+      this.problemsService.unknownerr.next(`Error: ${result.what.error as string}\n\nstderr: ${result.what.stderr}`);
     } else if (result.stage === "link") {
       this.problemsService.linkerr.next(result.linkerr);
     }
@@ -112,13 +112,13 @@ export class BuildService {
     });
   }
 
-  async compile() {
+  async compile(): Promise<void> {
     const srcPath = await this.fileService.saveOnNeed();
     if (srcPath !== null)
       this.sendBuildRequest(srcPath);
   }
 
-  async runExe(forceCompile = false) {
+  async runExe(forceCompile = false): Promise<void> {
     const srcPath = await this.fileService.saveOnNeed();
     if (srcPath !== null)
       this.sendRunExeRequest(srcPath, forceCompile);

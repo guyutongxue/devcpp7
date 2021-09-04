@@ -76,11 +76,11 @@ export class TabsService {
     // that use EditorService.
     // When initialization finished, it will send a event. TabsService will
     // do necessary initialization by calling `getActive` then.
-    this.editorService.editorMessage.subscribe(({type, arg}) => {
+    this.editorService.editorMessage.subscribe(({ type, arg }) => {
       if (type === "initCompleted") {
         this.getActive();
       }
-    })
+    });
   }
 
   syncActiveCode() {
@@ -91,7 +91,7 @@ export class TabsService {
 
   getActive(): Enumerate<Tab> {
     if (this.activeTabKey === null) return nullEnum;
-    return this.getByKey(this.activeTabKey)
+    return this.getByKey(this.activeTabKey);
   }
 
   getByKey(key: string): Enumerate<Tab> {
@@ -100,12 +100,12 @@ export class TabsService {
     return {
       index,
       value: this.tabList[index]
-    }
+    };
   }
 
   changeActive(key?: string): void;
   changeActive(index: number): void;
-  changeActive(arg: any) {
+  changeActive(arg?: string | number): void {
     if (typeof arg === "undefined") {
       if (this.editorService.isInit) this.editorService.switchToModel(this.getActive().value);
       return;
@@ -168,7 +168,7 @@ export class TabsService {
     return newIndex;
   }
 
-  saveCode(key: string, savePath: string) {
+  saveCode(key: string, savePath: string): void {
     if (!this.editorService.isInit) return;
     const target = this.getByKey(key).value;
     const oldPath = target.path;

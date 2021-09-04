@@ -1,27 +1,29 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GccDiagnostic, GccDiagnosticPosition } from '../../../core/ipcTyping';
 import { ProblemsService } from '../../../services/problems.service';
-import * as path from 'path'
+import * as path from 'path';
 import { FileService } from '../../../services/file.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+import { replaceGccDiagnostics } from 'gcc-translation';
 
 export interface ITreeNode extends GccDiagnostic {
   level: number;
@@ -50,9 +52,9 @@ export class ProblemsComponent implements OnInit {
       type: 'info-circle',
       color: 'blue'
     }
-  }
+  };
 
-  printPosition(position: GccDiagnosticPosition) {
+  printPosition(position: GccDiagnosticPosition): string {
     return `${path.basename(position.file.replace(/\n/g, '\\'))}:${position.line}:${position.column}`;
   }
 
@@ -87,18 +89,19 @@ export class ProblemsComponent implements OnInit {
     const array: ITreeNode[] = [];
     stack.push({ ...root, level: 0, expand: false });
     while (stack.length !== 0) {
-      const node = stack.pop()!;
+      const node = stack.pop();
+      node.message = replaceGccDiagnostics(node.message);
       array.push(node);
       if (node.children) {
         for (let i = node.children.length - 1; i >= 0; i--) {
-          stack.push({ ...node.children[i], level: node.level! + 1, expand: false, parent: node });
+          stack.push({ ...node.children[i], level: node.level + 1, expand: false, parent: node });
         }
       }
     }
     return array;
   }
 
-  showProblem(item: ITreeNode) {
+  showProblem(item: ITreeNode): void {
     const mainLocation = item.locations[0].caret;
     this.fileService.locate(mainLocation.file.replace(/\n|\//g, '\\'), mainLocation.line, mainLocation.column);
   }
