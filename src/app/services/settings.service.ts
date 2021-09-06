@@ -16,11 +16,12 @@
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, UrlSegment } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { ElectronService } from '../core/services';
 import { FileService } from './file.service';
 import { Tab } from './tabs.service';
+import { ThemeService } from './theme.service';
 
 
 export class SfbOptions {
@@ -107,7 +108,11 @@ type OptionsType = {
     sfb: SfbOptions;
     env: EnvOptions;
   },
-  // 'editor': {}
+  'editor': {
+    theme: {
+      activeName: string;
+    };
+  }
 };
 
 abstract class SubSetting<Url extends keyof OptionsType> {
@@ -132,12 +137,12 @@ abstract class SubSetting<Url extends keyof OptionsType> {
     this.saved.next(value);
   }
 
-  abstract reset(electron: ElectronService): Promise<void> | void;
-  abstract save(electron: ElectronService): Promise<void> | void;
+  abstract reset(): Promise<void> | void;
+  abstract save(): Promise<void> | void;
 }
 
 class BuildSubSetting extends SubSetting<'build'> {
-  constructor() {
+  constructor(private electronService: ElectronService) {
     super('build', '编译设置');
     this.options = {
       sfb: new SfbOptions(),
@@ -151,28 +156,68 @@ class BuildSubSetting extends SubSetting<'build'> {
     };
   }
 
-  async reset(electron: ElectronService) {
+  async reset() {
     await Promise.all([
-      electron.getConfig('build.compileArgs').then(v => this.options.sfb = new SfbOptions(v)),
-      electron.getConfig('advanced.ioEncoding').then(v => this.options.env.ioEncoding = v),
-      electron.getConfig('env.mingwPath').then(v => this.options.env.mingwPath = v),
-      electron.getConfig('env.useBundledMingw').then(v => this.options.env.useBundledMingw = v),
-      electron.getConfig('env.clangdPath').then(v => this.options.env.clangdPath = v),
-      electron.getConfig('env.useBundledClangd').then(v => this.options.env.useBundledClangd = v),
+      this.electronService.getConfig('build.compileArgs').then(v => this.options.sfb = new SfbOptions(v)),
+      this.electronService.getConfig('advanced.ioEncoding').then(v => this.options.env.ioEncoding = v),
+      this.electronService.getConfig('env.mingwPath').then(v => this.options.env.mingwPath = v),
+      this.electronService.getConfig('env.useBundledMingw').then(v => this.options.env.useBundledMingw = v),
+      this.electronService.getConfig('env.clangdPath').then(v => this.options.env.clangdPath = v),
+      this.electronService.getConfig('env.useBundledClangd').then(v => this.options.env.useBundledClangd = v),
     ]);
     super.updateSaved();
   }
 
-  save(electron: ElectronService) {
-    electron.setConfig('build.compileArgs', [
+  save() {
+    this.electronService.setConfig('build.compileArgs', [
       ...this.options.sfb.toList(),
       ...this.options.sfb.other
     ]);
-    electron.setConfig('advanced.ioEncoding', this.options.env.ioEncoding);
-    electron.setConfig('env.mingwPath', this.options.env.mingwPath);
-    electron.setConfig('env.useBundledMingw', this.options.env.useBundledMingw);
-    electron.setConfig('env.clangdPath', this.options.env.clangdPath);
-    electron.setConfig('env.useBundledClangd', this.options.env.useBundledClangd);
+    this.electronService.setConfig('advanced.ioEncoding', this.options.env.ioEncoding);
+    this.electronService.setConfig('env.mingwPath', this.options.env.mingwPath);
+    this.electronService.setConfig('env.useBundledMingw', this.options.env.useBundledMingw);
+    this.electronService.setConfig('env.clangdPath', this.options.env.clangdPath);
+    this.electronService.setConfig('env.useBundledClangd', this.options.env.useBundledClangd);
+    super.updateSaved();
+  }
+}
+
+class EditorSubSetting extends SubSetting<'editor'> {
+  constructor(private electronService: ElectronService, private themeService: ThemeService) {
+    super('editor', '编辑器设置');
+    this.options = {
+      theme: {
+        activeName: '',
+      }
+    };
+  }
+
+  async reset() {
+    await Promise.all([
+      this.electronService.getConfig('theme.active').then(v => this.options.theme.activeName = v)
+      // this.electronService.getConfig('editor.fontFamily').then(v => this.options.fontFamily = v),
+      // this.electronService.getConfig('editor.fontSize').then(v => this.options.fontSize = v),
+      // this.electronService.getConfig('editor.fontLigatures').then(v => this.options.fontLigatures = v),
+      // this.electronService.getConfig('editor.fontWeight').then(v => this.options.fontWeight = v),
+      // this.electronService.getConfig('editor.fontStyle').then(v => this.options.fontStyle = v),
+      // this.electronService.getConfig('editor.lineHeight').then(v => this.options.lineHeight = v),
+      // this.electronService.getConfig('editor.letterSpacing').then(v => this.options.letterSpacing = v),
+      // this.electronService.getConfig('editor.tabSize').then(v => this.options.tabSize = v),
+    ]);
+    super.updateSaved();
+  }
+
+  save() {
+    this.electronService.setConfig('theme.active', this.options.theme.activeName);
+    // this.electronService.setConfig('editor.fontFamily', this.options.fontFamily);
+    // this.electronService.setConfig('editor.fontSize', this.options.fontSize);
+    // this.electronService.setConfig('editor.fontLigatures', this.options.fontLigatures);
+    // this.electronService.setConfig('editor.fontWeight', this.options.fontWeight);
+    // this.electronService.setConfig('editor.fontStyle', this.options.fontStyle);
+    // this.electronService.setConfig('editor.lineHeight', this.options.lineHeight);
+    // this.electronService.setConfig('editor.letterSpacing', this.options.letterSpacing);
+    // this.electronService.setConfig('editor.tabSize', this.options.tabSize);
+    this.themeService.setTheme(this.options.theme.activeName);
     super.updateSaved();
   }
 }
@@ -181,12 +226,15 @@ class BuildSubSetting extends SubSetting<'build'> {
   providedIn: 'root'
 })
 export class SettingsService {
-  subSettings: { [K in keyof OptionsType]: SubSetting<K> } = {
-    build: new BuildSubSetting(),
-    // editor: null
+  private subSettings: { [K in keyof OptionsType]: SubSetting<K> } = {
+    build: new BuildSubSetting(this.electronService),
+    editor: new EditorSubSetting(this.electronService, this.themeService)
   };
 
-  constructor(private router: Router, private fileService: FileService, private electronService: ElectronService) {
+  constructor(
+    private fileService: FileService,
+    private themeService: ThemeService,
+    private electronService: ElectronService) {
     // this.resetBuildOption();
   }
 
@@ -199,20 +247,20 @@ export class SettingsService {
   }
 
   async openSetting<K extends keyof OptionsType>(url: K): Promise<void> {
-    await this.subSettings[url].reset(this.electronService);
+    await this.subSettings[url].reset();
     this.subSettings[url].open(this.fileService);
   }
 
   async resetSetting<K extends keyof OptionsType>(url: K): Promise<void> {
-    await this.subSettings[url].reset(this.electronService);
+    await this.subSettings[url].reset();
   }
 
   async saveSetting<K extends keyof OptionsType>(url: K): Promise<void> {
-    await this.subSettings[url].save(this.electronService);
+    await this.subSettings[url].save();
   }
 
   saveTab(tab: Tab): boolean {
-    this.subSettings[tab.key.substr(1)].save(this.electronService);
+    this.subSettings[tab.key.substr(1)].save();
     return true;
   }
 }
@@ -227,22 +275,25 @@ export class SettingsGuard implements CanActivate {
   private readonly homeUrl: {
     [key: string]: string;
   } = {
-      "~build": "sfb"
+      "~build": "sfb",
+      "~editor": "theme"
     };
 
-  lastVisitedUrl: string | null = null;
+  lastVisitedUrl: {
+    [key: string]: string;
+  } = {};
 
   constructor(private router: Router) { }
 
   canActivate(activatedRoute: ActivatedRouteSnapshot): boolean {
     const parentUrl = activatedRoute.parent.url[1].path;
-    if (this.lastVisitedUrl === null) {
-      this.lastVisitedUrl = this.homeUrl[parentUrl] ?? "";
+    if (!(parentUrl in this.lastVisitedUrl)) {
+      this.lastVisitedUrl[parentUrl] = this.homeUrl[parentUrl];
     }
     this.router.navigate([
       "setting",
       parentUrl,
-      this.lastVisitedUrl
+      this.lastVisitedUrl[parentUrl]
     ]);
     return false;
   }

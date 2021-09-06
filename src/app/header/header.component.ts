@@ -31,7 +31,7 @@ export class HeaderComponent implements OnInit {
 
   readonly commandList: {
     [key: string]: Command
-  }
+  };
 
   fileMenuId: DropdownList = [
     "file.new",
@@ -63,12 +63,13 @@ export class HeaderComponent implements OnInit {
   ];
 
   toolMenuId: DropdownList = [
-    "tool.openBuildSetting"
-  ]
+    "tool.openBuildSetting",
+    "tool.openEditorSetting"
+  ];
 
   helpMenuId: DropdownList = [
     "window.toggleDevtools"
-  ]
+  ];
 
   constructor() {
   }

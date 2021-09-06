@@ -15,7 +15,7 @@ export class SfbSettingComponent implements OnInit {
     private settingsService: SettingsService,
     private settingsGuard: SettingsGuard) {
     this.route.url.subscribe((url) => {
-      this.settingsGuard.lastVisitedUrl = url[0].path;
+      this.settingsGuard.lastVisitedUrl['build'] = url[0].path;
     });
   }
 

@@ -1,0 +1,14 @@
+@import "../../common_subsetting_styles.scss";
+
+nz-radio-group {
+
+  display: block;
+
+  [nz-radio] {
+    display: block;
+    height: 32px;
+    line-height: 32px;
+  }
+
+  margin-bottom: 8px;
+}

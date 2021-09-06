@@ -1,3 +1,5 @@
+// 此文件存放 Dev-C++ 7 的主题配置 Schema
+// 勿动
 {
   "$schema": "http://json-schema.org/draft/2020-12/schema",
   "type": "object",
@@ -109,19 +111,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": [
-          "preprocessor",
-          "string",
-          "string.char",
-          "keyword",
-          "punctuation",
-          "number",
-          "comment",
-          "macro",
-          "type",
-          "variable",
-          "function"
-        ]
+        "pattern": "^(preprocessor|string|keyword|punctuation|number|comment|macro|type|variable|function)(\\.\\w+)?"
       }
     }
   }

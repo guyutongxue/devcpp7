@@ -24,6 +24,8 @@ import { BuildSettingComponent } from './settings/build-setting/build-setting.co
 import { SfbSettingComponent } from './settings/build-setting/sfb-setting/sfb-setting.component';
 import { EnvSettingComponent } from './settings/build-setting/env-setting/env-setting.component';
 import { SettingsGuard } from '../../services/settings.service';
+import { EditorSettingComponent } from './settings/editor-setting/editor-setting.component';
+import { ThemeSettingComponent } from './settings/editor-setting/theme-setting/theme-setting.component';
 
 const routes: Routes = [
   {
@@ -39,17 +41,32 @@ const routes: Routes = [
     component: BuildSettingComponent,
     children: [
       {
+        path: '',
+        canActivate: [SettingsGuard],
+        component: EmptyPageComponent
+      },
+      {
         path: 'sfb',
         component: SfbSettingComponent
       },
+      {
+        path: 'env',
+        component: EnvSettingComponent
+      }
+    ]
+  },
+  {
+    path: 'setting/~editor',
+    component: EditorSettingComponent,
+    children: [
       {
         path: '',
         canActivate: [SettingsGuard],
         component: EmptyPageComponent
       },
       {
-        path: 'env',
-        component: EnvSettingComponent
+        path: 'theme',
+        component: ThemeSettingComponent
       }
     ]
   },

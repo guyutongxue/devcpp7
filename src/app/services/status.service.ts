@@ -41,8 +41,8 @@ export interface Command {
 export class StatusService {
 
   statusMessage: BehaviorSubject<string> = new BehaviorSubject("");
-  isDebugging: boolean = false;
-  isBuilding: boolean = false;
+  isDebugging= false;
+  isBuilding = false;
 
   readonly commandList: {
     [key: string]: Command
@@ -136,6 +136,18 @@ export class StatusService {
         enabled: () => this.hasFile,
         run: () => this.editorService.runAction('editor.action.commentLine')
       },
+      'edit.zoomIn': {
+        name: '放大',
+        shortcut: 'control.=',
+        enabled: () => this.hasFile,
+        run: () => this.editorService.runAction('editor.action.fontZoomIn')
+      },
+      'edit.zoomOut': {
+        name: '缩小',
+        shortcut: 'control.-',
+        enabled: () => this.hasFile,
+        run: () => this.editorService.runAction('editor.action.fontZoomOut')
+      },
       'build.build': {
         name: '编译',
         icon: 'build',
@@ -177,6 +189,12 @@ export class StatusService {
         enabled: () => true,
         run: () => this.settingsService.openSetting('build')
       },
+      'tool.openEditorSetting': {
+        name: '编辑器设置...',
+        shortcut: null,
+        enabled: () => true,
+        run: () => this.settingsService.openSetting('editor')
+      },
       'window.toggleDevtools': {
         name: '切换 DevTools',
         icon: 'codicon-debug-console',
@@ -184,7 +202,7 @@ export class StatusService {
         enabled: () => true,
         run: () => this.electronService.ipcRenderer.invoke('window/toggleDevTools')
       }
-    }
+    };
 
   constructor(
     private electronService: ElectronService,

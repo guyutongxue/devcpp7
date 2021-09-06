@@ -21,11 +21,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Command, StatusService } from '../../services/status.service';
 
 export type DropdownList = Array<
-string | {
-  title: string,
-  children: string[]
-}
->
+  string | {
+    title: string,
+    children: string[]
+  }
+>;
 
 @Pipe({
   name: 'typeof'
@@ -62,12 +62,12 @@ export class HeaderDropdownComponent implements OnInit {
 
   readonly commandList: {
     [key: string]: Command
-  }
+  };
 
   constructor(
     private statusService: StatusService
   ) {
-    this.commandList = this.statusService.commandList
+    this.commandList = this.statusService.commandList;
   }
 
   @Input('data') list: DropdownList;

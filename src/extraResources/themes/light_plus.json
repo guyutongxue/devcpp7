@@ -1,0 +1,26 @@
+{
+  "$schema": "./theme.schema.jsonc",
+  "type": "light",
+  "name": "VS Code Light+",
+  "colors": {
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "activeLine": "#ffffff",
+    "debugStep": "#add8e6",
+    "breakpoint": "#f08080",
+    "preprocessor": "#af00db",
+    "string": "#a31515",
+    "string.char": "#a31515",
+    "keyword": "#0000ff",
+    "punctuation": "#000000",
+    "number": "#098658",
+    "comment": "#008000",
+    "macro": "#af00db",
+    "type": "#267f99",
+    "variable": "#001080",
+    "function": "#795e26"
+  },
+  "boldTokens": [],
+  "italicTokens": [],
+  "underlineTokens": []
+}

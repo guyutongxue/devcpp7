@@ -92,8 +92,7 @@ export class ThemeService {
   }
 
   async setTheme(name?: string): Promise<void> {
-    this.changeMainTheme(ThemeType.Light);
-    const result = await this.electronService.ipcRenderer.invoke('theme/get', name);
+    const result = await this.electronService.ipcRenderer.invoke('theme/getData', name);
     if (typeof result === 'undefined') {
       // yarn start, result is undefined
       this.changeMainTheme(ThemeType.Light);

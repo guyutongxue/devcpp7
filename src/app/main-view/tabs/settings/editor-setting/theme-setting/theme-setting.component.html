@@ -1,0 +1,13 @@
+<nz-layout>
+
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="24">
+      <h3>选择当前主题</h3>
+      <nz-radio-group [(ngModel)]="currentThemeOptions.activeName" (ngModelChange)="onChange()">
+        <label nz-radio *ngFor="let theme of themeList" [nzValue]="theme">{{theme}}</label>
+      </nz-radio-group>
+      <button nz-button nzType="default" (click)="refreshList()">刷新</button><br>
+      <small>你可以在 安装路径\resources\extraResources\themes 中添加更多主题。</small>
+    </div>
+  </div>
+</nz-layout>

@@ -18,15 +18,21 @@
 import * as fallbackTheme from '../../extraResources/themes/classic.json';
 import * as fs from 'fs';
 import * as path from 'path';
-import { extraResourcesPath, typedIpcMain } from '../basicUtil';
+import { extraResourcesPath, store, typedIpcMain } from '../basicUtil';
 import { Theme } from '../ipcTyping';
 
-typedIpcMain.handle('theme/get', (_, name?) => {
+typedIpcMain.handle('theme/getList', (_) => {
+  const themePath = path.join(extraResourcesPath, 'themes');
+  if (!fs.existsSync(themePath)) return [];
+  const themeList = fs.readdirSync(themePath)
+    .filter((file) => file.endsWith('.json'))
+    .map((file) => file.slice(0, -5));
+  return themeList;
+});
+
+typedIpcMain.handle('theme/getData', (_, name?) => {
   if (typeof name === 'undefined') {
-    return {
-      success: true,
-      theme: <Theme>fallbackTheme
-    };
+    name = store.get('theme.active');
   }
   const jsonPath = path.join(extraResourcesPath, 'themes', `${name}.json`);
   if (!fs.existsSync(jsonPath)) {
@@ -65,7 +71,8 @@ typedIpcMain.handle('theme/get', (_, name?) => {
       type: theme.type,
       name: theme.name,
       colors: {
-        ...fallbackTheme.colors,
+        debugStep: fallbackTheme.colors.debugStep,
+        breakpoint: fallbackTheme.colors.breakpoint,
         ...theme.colors
       },
       boldTokens: theme.boldTokens ?? [],

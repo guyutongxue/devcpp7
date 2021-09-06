@@ -1,0 +1,27 @@
+#wrapper {
+  height: 100%;
+  background: inherit;
+
+  display: flex;
+  flex-direction: column;
+
+  nz-layout {
+    background: inherit;
+    flex-grow: 1;
+    overflow-y: auto;
+
+    >nz-sider {
+      background: inherit;
+
+      ul {
+        height: 100%;
+      }
+    }
+  }
+
+  nz-footer {
+    button {
+      margin-right: 8px;
+    }
+  }
+}

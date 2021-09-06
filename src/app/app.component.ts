@@ -48,7 +48,6 @@ export class AppComponent implements OnInit {
       console.log('Run in browser');
     }
     this.windowHeight = window.innerHeight;
-    this.themeService.setTheme();
   }
 
   private windowHeight: number;
@@ -72,6 +71,7 @@ export class AppComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     // this.electronService.ipcRenderer.invoke('window/toggleDevTools');
+    this.themeService.setTheme();
     const [mingwPath, useBundled] = await Promise.all([
       this.electronService.getConfig('env.mingwPath'),
       this.electronService.getConfig('env.useBundledMingw')

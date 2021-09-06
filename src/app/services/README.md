@@ -15,19 +15,19 @@ Below chart shows all services' dependency relation. `A --> B` means that A is d
                                           |
                                           |
                                           v
-BuildService                       DebugService
-    +---------------+                  |
-    |               v                  |
-    v            ProblemService        |
-FileService <--------------------------+ (Set trace line)
-    |                                  |
-    +--------+                         |
-    v        |                         |
-TabsService  |                         | (Get breakpoint info)
-    |        |                         |
-    |   +----+                         |
-    v   v                              |
-EditorService <------------------------+
+BuildService                       DebugService     SettingsService
+    +---------------+                  |                    |
+    |               v             +----|--------------------+
+    v            ProblemService   |    |                    |
+FileService <---------------------+----+ (Set trace line)   |
+    |                                  |                    |
+    +--------+                         |               ThemeService
+    v        |                         |                    |
+TabsService  |                         | (Get breakpoint)   |
+    |        |                         |                    |
+    |   +----+                         |                    |
+    v   v                              |                    |
+EditorService <------------------------+--------------------+
 
 ===================||=====================
                    vv

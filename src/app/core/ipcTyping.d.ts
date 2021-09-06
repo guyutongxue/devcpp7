@@ -180,6 +180,7 @@ export interface Configurations {
   'env.clangdPath': string;
   'env.useBundledClangd': boolean;
   'advanced.ioEncoding': string;
+  'theme.active': string;
 }
 
 // Async IPC
@@ -207,7 +208,8 @@ export type IpcCommands = {
   'encode/getAcp': () => string;
   'encode/verify': (encode: string) => boolean;
 
-  'theme/get': (name?: string) => ThemeGetResult;
+  'theme/getData': (name?: string) => ThemeGetResult;
+  'theme/getList': () => string[];
 
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
   'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];

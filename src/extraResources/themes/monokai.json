@@ -1,0 +1,27 @@
+{
+  "$schema": "./theme.schema.jsonc",
+  "name": "Monokai",
+  "type": "dark",
+  "colors": {
+    "background": "#282828",
+    "foreground": "#f8f8f2",
+    "activeLine": "#282828",
+    "debugStep": "#4b4b18",
+    "breakpoint": "#282828",
+    "preprocessor": "#529b2f",
+    "string": "#e6db74",
+    "string.char": "#e6db74",
+    "keyword": "#f92672",
+    "punctuation": "#ffd569",
+    "number": "#ae81ff",
+    "comment": "#75715e",
+    "macro": "#529b2f",
+    "type": "#66d9ef",
+    "variable": "#f8f8f2",
+    "variable.param": "#fd971f",
+    "function": "#a6e22e"
+  },
+  "boldTokens": [],
+  "italicTokens": [ "type", "variable.param" ],
+  "underlineTokens": []
+}

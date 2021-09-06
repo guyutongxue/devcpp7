@@ -1,5 +1,5 @@
 {
-  "$schema": "./theme.schema.json",
+  "$schema": "./theme.schema.jsonc",
   "type": "dark",
   "name": "VS Code Dark+",
   "colors": {
@@ -10,7 +10,7 @@
     "breakpoint": "#1e1e1e",
     "preprocessor": "#c586c0",
     "string": "#ce8178",
-    "string.char": "#000000",
+    "string.char": "#ce8178",
     "keyword": "#569cd6",
     "punctuation": "#d4d4d4",
     "number": "#b5cea8",
