@@ -41,7 +41,6 @@ export class BuildService {
     private fileService: FileService,
     private problemsService: ProblemsService
   ) {
-    console.log(this.electronService);
     this.electronService.ipcRenderer.on("ng:build/buildStarted", (_) => {
       this.isBuilding$.next(true);
     });

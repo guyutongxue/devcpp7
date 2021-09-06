@@ -7,7 +7,7 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import { TypedIpcRenderer } from 'electron-typed-ipc';
 
-import { IpcEvents, IpcCommands, Configurations } from '../ipcTyping'
+import { IpcEvents, IpcCommands, Configurations } from '../ipcTyping';
 
 
 @Injectable({
@@ -27,6 +27,7 @@ export class ElectronService {
   constructor() {
     // Conditional imports
     if (this.isElectron) {
+      // eslint-disable-next-line
       this.ipcRenderer = window.require('electron').ipcRenderer as any;
       this.webFrame = window.require('electron').webFrame;
       this.childProcess = window.require('child_process');

@@ -70,7 +70,7 @@ export class MainViewComponent implements OnInit {
       url: 'debug',
       disabled: false
     }
-  ]
+  ];
 
   constructor(private router: Router, private problemsService: ProblemsService) { }
 

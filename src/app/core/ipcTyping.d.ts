@@ -141,6 +141,38 @@ type DebugSendRequestResult = {
   error: any;
 };
 
+export type Theme = {
+  type: string;
+  name: string;
+  colors: {
+    background: string;
+    foreground: string;
+    activeLine: string;
+    debugStep: string;
+    breakpoint: string;
+    preprocessor: string;
+    string: string;
+    "string.char": string;
+    keyword: string;
+    punctuation: string;
+    number: string;
+    comment: string;
+    macro: string;
+    type: string;
+    variable: string;
+    function: string;
+  };
+  boldTokens: string[];
+  italicTokens: string[];
+  underlineTokens: string[];
+};
+
+type ThemeGetResult = {
+  success: boolean;
+  theme: Theme;
+  error?: any;
+};
+
 export interface Configurations {
   'build.compileArgs': string[];
   'env.mingwPath': string;
@@ -174,6 +206,8 @@ export type IpcCommands = {
 
   'encode/getAcp': () => string;
   'encode/verify': (encode: string) => boolean;
+
+  'theme/get': (name?: string) => ThemeGetResult;
 
   'store/set': <K extends keyof Configurations>(key: K, value: Configurations[K]) => void;
   'store/get': <K extends keyof Configurations>(key: K) => Configurations[K];

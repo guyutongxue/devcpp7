@@ -112,7 +112,7 @@ enum KeyCode {
     ABNT_C1 = 110,
     ABNT_C2 = 111,
     MAX_VALUE = 112
-};
+}
 enum KeyMod {
     CtrlCmd = (1 << 11) >>> 0,
     Shift = (1 << 10) >>> 0,

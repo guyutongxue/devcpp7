@@ -1,17 +1,17 @@
 // Copyright (C) 2021 Guyutongxue
-// 
+//
 // This file is part of Dev-C++ 7.
-// 
+//
 // Dev-C++ 7 is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Dev-C++ 7 is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -96,16 +96,16 @@ export class WatchService {
   dataSource = new DynamicDatasource(
     this.treeControl,
     this.flattenedData,
-    (a) => { this.loadChildren(a) },
-    (a) => { this.deleteNode(a, 'collapse') }
+    (a) => { this.loadChildren(a); },
+    (a) => { this.deleteNode(a, 'collapse'); }
   );
-  private nextId: number = 0;
+  private nextId = 0;
 
-  constructor(private debugService: DebugService) { 
-    this.debugService.programStop.subscribe(async _ => {
-      await this.tryCreateVar(this.flattenedData.value);
-      this.updateVar(this.flattenedData.value);
-    })
+  constructor(private debugService: DebugService) {
+    this.debugService.programStop.subscribe(() => {
+      this.tryCreateVar(this.flattenedData.value)
+        .then(() => this.updateVar(this.flattenedData.value));
+    });
   }
 
   private async tryCreateVar(data: GdbVarInfoNode[]) {
@@ -156,8 +156,8 @@ export class WatchService {
   }
 
   /**
-   * 
-   * @param node 
+   *
+   * @param node
    * @param reason 'user' User delete this node
    * @param reason 'gdb' This variable is no longer valid
    * @param reason 'collapse' Delete child nodes because of collapsion

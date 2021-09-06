@@ -41,6 +41,7 @@
         "@typescript-eslint/no-unsafe-return": 0,
         "@typescript-eslint/no-floating-promises": 0,
         "@typescript-eslint/semi": "error",
+        "no-useless-escape": "warn",
         "@angular-eslint/use-injectable-provided-in": "error",
         "@angular-eslint/no-attribute-decorator": "error"
       }
