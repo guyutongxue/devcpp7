@@ -26,7 +26,6 @@ import { debounceTime, distinctUntilChanged, filter, take } from 'rxjs/operators
 
 import { Tab } from './tabs.service';
 import { ElectronService } from '../core/services';
-import { classicTheme } from '../configs/editorTheme';
 import { cppLang, cppLangConf } from '../configs/cppLanguageConfig';
 
 // All standard C++ headers filename
@@ -44,26 +43,26 @@ const clangdSemanticTokensLegend: monaco.languages.SemanticTokensLegend = {
   tokenModifiers: [], // No token modifier supported now (12.0.0-rc1)
   // See https://github.com/llvm/llvm-project/blob/4dc8365/clang-tools-extra/clangd/SemanticHighlighting.h#L30
   tokenTypes: [
-    "variable",  // Global var
-    "variable",  // Local var
-    "variable",  // Param
-    "function",  // Function (global)
-    "function",  // Member function
-    "function",  // Static member function
-    "variable",  // Member data
-    "variable",  // Static member data
-    "type",      // Class type
-    "type",      // Enum type
-    "number",    // Enum member
-    "type",      // Type-alias (rely on template)
-    "type",      // Other type
-    "",          // Unknown
-    "type",      // Namespace
-    "type",      // Template param
-    "type",      // Concept
-    "type",      // Primitive type (type-alias)
-    "macro",     // Macro
-    "comment"    // Inactive Code
+    "variable.global",         // Global var
+    "variable.local",          // Local var
+    "variable.param",          // Param
+    "function",                // Function (global)
+    "function.member",         // Member function
+    "function.member.static",  // Static member function
+    "variable.member",         // Member data
+    "variable.member.static",  // Static member data
+    "type.class",              // Class type
+    "type.enum",               // Enum type
+    "number.enum",             // Enum member
+    "type",                    // Type-alias (rely on template)
+    "type",                    // Other type
+    "",                        // Unknown
+    "type.namespace",          // Namespace
+    "type.param",              // Template param
+    "type.concept",            // Concept
+    "type",                    // Primitive type (type-alias)
+    "macro",                   // Macro
+    "comment"                  // Inactive Code
   ]
 };
 
@@ -141,7 +140,6 @@ export class EditorService {
         },
         releaseDocumentSemanticTokens() { }
       });
-      monaco.editor.defineTheme('devcpp-classic', classicTheme);
       MonacoServices.install(require('monaco-editor-core/esm/vs/platform/commands/common/commands').CommandsRegistry);
       this.startLanguageClient();
     });
@@ -325,7 +323,7 @@ export class EditorService {
   };
 
   editorInit(editor: monaco.editor.IStandaloneCodeEditor): void {
-    monaco.editor.setTheme('devcpp-classic');
+    monaco.editor.setTheme('mytheme');
     this.editor = editor;
     this.interceptOpenEditor();
     this.addMissingActions();
@@ -343,6 +341,14 @@ export class EditorService {
     this.isInit = false;
   }
 
+  setEditorTheme(theme: monaco.editor.IStandaloneThemeData): void {
+    this.monacoEditorLoaderService.isMonacoLoaded$.pipe(
+      filter(isLoaded => isLoaded),
+      take(1)
+    ).subscribe(() => {
+      monaco.editor.defineTheme('mytheme', theme);
+    });
+  }
 
   switchToModel(tab: Tab, replace = false): void {
     const uri = this.getUri(tab);

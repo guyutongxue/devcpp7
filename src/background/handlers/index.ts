@@ -15,10 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
+import './store';
 import './file';
 import './build';
 import './server';
 import './debug';
 import './window';
 import './encode';
-import './store';
+import './theme';

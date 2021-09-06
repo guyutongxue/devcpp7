@@ -22,8 +22,17 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              {
+                "input": "node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+                "bundleName": "light",
+                "inject": false
+              },
+              {
+                "input": "node_modules/ng-zorro-antd/ng-zorro-antd.dark.min.css",
+                "bundleName": "dark",
+                "inject": false
+              }
             ],
             "scripts": [],
             "customWebpackConfig": {

@@ -22,6 +22,7 @@ import { AppConfig } from '../environments/environment';
 
 import { HotkeysService } from './services/hotkeys.service';
 import { StatusService } from './services/status.service';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -32,7 +33,8 @@ export class AppComponent implements OnInit {
   constructor(
     private electronService: ElectronService,
     private translate: TranslateService,
-    private statusService: StatusService
+    private statusService: StatusService,
+    private themeService: ThemeService
   ) {
     this.translate.setDefaultLang('en');
     console.log('AppConfig', AppConfig);
@@ -46,6 +48,7 @@ export class AppComponent implements OnInit {
       console.log('Run in browser');
     }
     this.windowHeight = window.innerHeight;
+    this.themeService.setTheme();
   }
 
   private windowHeight: number;

@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "主题名称"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["light", "dark"],
+      "description": "light 或 dark，指明整体为浅色或深色"
+    },
+    "colors": {
+      "type": "object",
+      "description": "配置主题颜色",
+      "properties": {
+        "background": {
+          "$ref": "#/$defs/color",
+          "description": "基本背景色"
+        },
+        "foreground": {
+          "$ref": "#/$defs/color",
+          "description": "基本前景色"
+        },
+        "activeLine": {
+          "$ref": "#/$defs/color",
+          "description": "当前行背景色"
+        },
+        "breakpoint": {
+          "$ref": "#/$defs/color",
+          "description": "断点行背景色"
+        },
+        "debugStep": {
+          "$ref": "#/$defs/color",
+          "description": "调试步进背景色"
+        },
+        "preprocessor": {
+          "$ref": "#/$defs/color",
+          "description": "预处理指令前景色"
+        },
+        "string": {
+          "$ref": "#/$defs/color",
+          "description": "字符串字面量前景色"
+        },
+        "string.char": {
+          "$ref": "#/$defs/color",
+          "description": "字符字面量前景色"
+        },
+        "keyword": {
+          "$ref": "#/$defs/color",
+          "description": "关键字前景色"
+        },
+        "punctuation": {
+          "$ref": "#/$defs/color",
+          "description": "标点符号前景色"
+        },
+        "number": {
+          "$ref": "#/$defs/color",
+          "description": "数值前景色"
+        },
+        "comment": {
+          "$ref": "#/$defs/color",
+          "description": "注释前景色"
+        },
+        "macro": {
+          "$ref": "#/$defs/color",
+          "description": "宏名前景色"
+        },
+        "type": {
+          "$ref": "#/$defs/color",
+          "description": "类型名前景色"
+        },
+        "variable": {
+          "$ref": "#/$defs/color",
+          "description": "变量名前景色"
+        },
+        "function": {
+          "$ref": "#/$defs/color",
+          "description": "函数名前景色"
+        }
+      }
+    },
+    "boldTokens": {
+      "$ref": "#/$defs/tokens",
+      "description": "指明哪些标记为粗体"
+    },
+    "italicTokens": {
+      "$ref": "#/$defs/tokens",
+      "description": "指明哪些标记为斜体"
+    },
+    "underlineTokens": {
+      "$ref": "#/$defs/tokens",
+      "description": "指明哪些标记为下划线"
+    }
+  },
+  "required": [
+    "name", "type"
+  ],
+  "$defs": {
+    "color": {
+      "type": "string",
+      "format": "color-hex",
+      "pattern": "^#[0-9a-f]{6}$"
+    },
+    "tokens": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "preprocessor",
+          "string",
+          "string.char",
+          "keyword",
+          "punctuation",
+          "number",
+          "comment",
+          "macro",
+          "type",
+          "variable",
+          "function"
+        ]
+      }
+    }
+  }
+}

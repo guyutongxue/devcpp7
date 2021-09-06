@@ -1,31 +1,37 @@
 ngx-monaco-editor {
-    height: 100%;
-    .editor-container {
-        overflow: overlay !important;
+  height: 100%;
 
-        .bkpt-line-decoration {
-            background: lightcoral;
-        }
+  .editor-container {
+    overflow: overlay !important;
 
-        .bkpt-glyph-margin {
-            color: red
-            // $font-size: 14px;
-            // $icon-size: $font-size * 0.8;
-            // $padding: $font-size * 0.3;
-        
-            // background: red;
-            // width: $icon-size !important;
-            // height: $icon-size !important;
-            // margin: $padding;
-            // border-radius: $icon-size / 2;
-        }
-
-        .trace-line-decoration {
-            background: lightblue;
-        }
-
-        .trace-glyph-margin {
-            color: blue;
-        }
+    .bkpt-line-decoration {
+      background: var(--breakpoint-background-color);
     }
+
+    .bkpt-glyph-margin {
+      color : red // $font-size: 14px;
+      // $icon-size: $font-size * 0.8;
+      // $padding: $font-size * 0.3;
+
+      // background: red;
+      // width: $icon-size !important;
+      // height: $icon-size !important;
+      // margin: $padding;
+      // border-radius: $icon-size / 2;
+    }
+
+    .trace-line-decoration {
+      background: var(--debug-step-background-color);
+    }
+
+    .trace-glyph-margin {
+      color: blue;
+    }
+
+    .bkpt-glyph-margin.codicon,
+    .trace-glyph-margin.codicon {
+      // Disable global translateY(15%)
+      transform: none;
+    }
+  }
 }

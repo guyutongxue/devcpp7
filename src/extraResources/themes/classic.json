@@ -1,0 +1,32 @@
+{
+  "$schema": "./theme.schema.json",
+  "type": "light",
+  "name": "Dev-C++ Classic+",
+  "colors": {
+    "background": "#ffffff",
+    "foreground": "#000000",
+    "activeLine": "#ccffff",
+    "debugStep": "#add8e6",
+    "breakpoint": "#f08080",
+    "preprocessor": "#008000",
+    "string": "#0000ff",
+    "string.char": "#000000",
+    "keyword": "#000000",
+    "punctuation": "#ff0000",
+    "number": "#800080",
+    "comment": "#0078d7",
+    "macro": "#008000",
+    "type": "#267f99",
+    "variable": "#001080",
+    "function": "#795e26"
+  },
+  "boldTokens": [
+    "keyword",
+    "string",
+    "punctuation"
+  ],
+  "italicTokens": [
+    "comment"
+  ],
+  "underlineTokens": []
+}

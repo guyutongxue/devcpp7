@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Dev-C++ 7.  If not, see <http://www.gnu.org/licenses/>.
 
+import * as fs from "fs";
 import * as path from 'path';
 import { BrowserWindow, ipcMain } from 'electron';
 import * as isAsar from 'electron-is-running-in-asar';
@@ -23,20 +24,6 @@ import * as chcp from 'chcp';
 import { TypedIpcMain, TypedWebContents } from 'electron-typed-ipc';
 
 import { IpcEvents, IpcCommands, Configurations } from './ipcTyping';
-
-export const store = new Store<Configurations>({
-  defaults: {
-    'build.compileArgs': [
-      '-g', '-std=c++2a', 'DYN-fexec-charset'
-    ],
-    'env.mingwPath': '',
-    'env.useBundledMingw': true,
-    'env.clangdPath': '',
-    'env.useBundledClangd': true,
-    'advanced.ioEncoding': 'cp936'
-  },
-  accessPropertiesByDotNotation: false
-});
 
 // very stupid to import a package, but useful.
 export const extraResourcesPath =
@@ -56,6 +43,20 @@ export const typedIpcMain = ipcMain as TypedIpcMain<IpcEvents, IpcCommands>;
 export function getACP(): number {
   return chcp.getAnsiCodePage();
 }
+
+export const store = new Store<Configurations>({
+  defaults: {
+    'build.compileArgs': [
+      '-g', '-std=c++2a', 'DYN-fexec-charset'
+    ],
+    'env.mingwPath': '',
+    'env.useBundledMingw': fs.existsSync(path.join(extraResourcesPath, "mingw64")),
+    'env.clangdPath': '',
+    'env.useBundledClangd': fs.existsSync(path.join(extraResourcesPath, "clangd")),
+    'advanced.ioEncoding': 'cp936'
+  },
+  accessPropertiesByDotNotation: false
+});
 
 export function getMingwPath(): string {
   if (store.get('env.useBundledMingw')) {

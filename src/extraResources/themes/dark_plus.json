@@ -1,0 +1,26 @@
+{
+  "$schema": "./theme.schema.json",
+  "type": "dark",
+  "name": "VS Code Dark+",
+  "colors": {
+    "background": "#1e1e1e",
+    "foreground": "#d4d4d4",
+    "activeLine": "#323232",
+    "debugStep": "#4b4b18",
+    "breakpoint": "#1e1e1e",
+    "preprocessor": "#c586c0",
+    "string": "#ce8178",
+    "string.char": "#000000",
+    "keyword": "#569cd6",
+    "punctuation": "#d4d4d4",
+    "number": "#b5cea8",
+    "comment": "#6a9955",
+    "macro": "#c586c0",
+    "type": "#4ec9b0",
+    "variable": "#9cdcfe",
+    "function": "#dcdcaa"
+  },
+  "boldTokens": [],
+  "italicTokens": [],
+  "underlineTokens": []
+}
