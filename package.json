@@ -1,6 +1,6 @@
 {
   "name": "devcpp7",
-  "version": "7.2108.0",
+  "version": "7.2109.0",
   "description": "A project which use modern framework to simulate legacy Dev-C++",
   "author": "Guyutongxue <guyutongxue@163.com>",
   "main": "dist/background-bundle.js",
@@ -9,7 +9,7 @@
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "ng serve -o",
-    "build": "npm run electron:build",
+
     "ng:build:dev": "ng build --base-href=./ -c=dev",
     "ng:build:prod": "ng build --base-href=./ -c=production",
     "electron:pack": "npx webpack --config main.webpack.js",
@@ -17,8 +17,11 @@
     "ngwithpack:prod": "npm-run-all -p ng:build:prod electron:pack",
     "electron:dev": "npm run ngwithpack:dev && npx electron .",
     "electron:prod": "npm run ngwithpack:prod && npx electron .",
-    "electron:build": "npm run ngwithpack:prod && electron-builder build --publish=never",
     "electron:rebuild": "npx electron-rebuild -o chcp -v 11.1.0",
+
+    "build": "npm run ngwithpack:prod && electron-builder build --config=builder/default.json --publish=never",
+    "build:no-mingw": "npm run ngwithpack:prod && electron-builder build --config=builder/no-mingw.json --publish=never",
+
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",

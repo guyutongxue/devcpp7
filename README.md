@@ -35,7 +35,6 @@ Current features:
 **This project is not aimed to replace legacy Dev-C++.** If you want a newer version of that, please check [royqh1979/Dev-CPP](https://github.com/royqh1979/Dev-CPP). This project is just a practice of using Angular and Electron to built a desktop application. So it:
 - **WON'T** support 32-bit system.
 - **WON'T** test on any system lower than Windows 10.
-- **WON'T** provide the options of changing compiler set.
 - **MAY NOT** support C project or file.
 - **MAY NOT** support i18n. (Only Simplified Chinese now.)
 - **PRETTY LARGER** than legacy Dev-C++ (because of Electron, Clangd and so on).

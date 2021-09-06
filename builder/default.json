@@ -30,7 +30,7 @@
       "icon": "dist/assets/icons/cpp.ico"
     },
     "target": [
-      "7z", "nsis"
+      "nsis"
     ]
   }
 }

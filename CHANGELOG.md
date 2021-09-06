@@ -1,5 +1,13 @@
 # Changelog
 
+## [2109.0]
+
+- Features
+  - GCC diagnostics translation powered by [gcc-translation](https://github.com/Guyutongxue/gcc-translation)
+  - Use your own MinGW instead of the bundle one. Change portable release to "no-mingw"
+- Fix bugs:
+  - Reopen settings tab should locate to correct page
+
 ## 2108.0
 
 - Fix bugs:
