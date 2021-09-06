@@ -5,6 +5,12 @@
 - Features
   - GCC diagnostics translation powered by [gcc-translation](https://github.com/Guyutongxue/gcc-translation)
   - Use your own MinGW instead of the bundle one. Change portable release to "no-mingw"
+  - Change editor theme. Now it have 4 initial themes:
+    - VS Code Light+
+    - Vs Code Dark+
+    - Dev-C++ Classic+
+    - Monokai
+    - (You can define your own theme if you want.)
 - Fix bugs:
   - Reopen settings tab should locate to correct page
 
