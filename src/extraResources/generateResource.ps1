@@ -20,7 +20,8 @@ $WITH_CLANGD = $true;
 
 $GENERATE_ANON_WS = $true;
 
-$MINGW_VERSION = "11.1.0";
+$MINGW_VERSION = "11.2.0";
+$MINGW_REV = "1"
 $CLANGD_VERSION = "12.0.0";
 
 $DEFAULT_COMPILE_FLAGS = @(
@@ -54,11 +55,26 @@ foreach ($arg in $args) {
 
 Import-Module BitsTransfer;
 
+if ($WITH_MINGW || $WITH_CLANGD) {
+  $env:Path += ";C:\\Program Files\\7-zip";
+  Get-Command "7z" -ErrorAction SilentlyContinue;
+  if (!$?) {
+    Write-Error "7z is not installed. Install 7-zip from 7-zip.org. You may need to add it to Path environment variable.";
+  }
+}
+
 if ($WITH_MINGW) {
-  Start-BitsTransfer -Source "https://github.com/Guyutongxue/mingw-release/releases/download/v$MINGW_VERSION/gytx_x86_64-$MINGW_VERSION-posix-seh.7z" -Destination "mingw.7z";
+  if ($MINGW_REV -ne "0") { $DASH_REV = "-r$MINGW_REV"; $US_REV = "_r$MINGW_REV" }
+  Start-BitsTransfer -Source "https://github.com/Guyutongxue/mingw-release/releases/download/v$MINGW_VERSION$DASH_REV/gytx_x86_64-$MINGW_VERSION-posix-seh$US_REV.7z" -Destination "mingw.7z";
+  7z x -y mingw.7z
+  Remove-Item -Path "mingw.7z";
+  Remove-Variable -Name DASH_REV, US_REV;
 }
 if ($WITH_CLANGD) {
   Start-BitsTransfer -Source "https://github.com/clangd/clangd/releases/download/$CLANGD_VERSION/clangd-windows-$CLANGD_VERSION.zip" -Destination "clangd.zip";
+  7z x -y clangd.zip
+  Rename-Item -Path "clangd_$CLANGD_VERSION" -NewName "clangd";
+  Remove-Item -Path "clangd.zip";
 }
 if ($GENERATE_ANON_WS) {
   Remove-Item -Path "anon_workspace" -Recurse;
