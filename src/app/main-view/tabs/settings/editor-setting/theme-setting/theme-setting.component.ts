@@ -29,13 +29,9 @@ export class ThemeSettingComponent implements OnInit {
 
   themeList: string[] = ['1', '2'];
 
-  constructor(private route: ActivatedRoute,
-    private settingsService: SettingsService,
+  constructor(private settingsService: SettingsService,
     private electronService: ElectronService,
     private settingsGuard: SettingsGuard) {
-    this.route.url.subscribe((url) => {
-      this.settingsGuard.lastVisitedUrl['editor'] = url[0].path;
-    });
   }
 
   get currentThemeOptions(): { activeName: string } {
@@ -43,6 +39,7 @@ export class ThemeSettingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.settingsGuard.lastVisitedUrl['~editor'] = 'theme';
     this.refreshList();
   }
 

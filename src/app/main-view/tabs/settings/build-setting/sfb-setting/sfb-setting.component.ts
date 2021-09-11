@@ -11,12 +11,8 @@ export class SfbSettingComponent implements OnInit {
 
   customArgsDivClass: string[] = [];
 
-  constructor(private route: ActivatedRoute,
-    private settingsService: SettingsService,
+  constructor(private settingsService: SettingsService,
     private settingsGuard: SettingsGuard) {
-    this.route.url.subscribe((url) => {
-      this.settingsGuard.lastVisitedUrl['build'] = url[0].path;
-    });
   }
 
   stdOptions = [
@@ -32,6 +28,7 @@ export class SfbSettingComponent implements OnInit {
 
   ngOnInit(): void {
     console.log(this.currentOptions);
+    this.settingsGuard.lastVisitedUrl['~build'] = 'sfb';
   }
 
   onChange(): void {

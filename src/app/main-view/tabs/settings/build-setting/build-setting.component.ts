@@ -27,7 +27,7 @@ import { SettingsService } from '../../../../services/settings.service';
 export class BuildSettingComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
-    private settingsService: SettingsService,) { }
+    private settingsService: SettingsService) { }
 
   ngOnInit() { }
 
