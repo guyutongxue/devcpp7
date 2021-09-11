@@ -1,6 +1,11 @@
 # Changelog
 
-## [2109.0]
+## 2109.1
+
+- Fix bugs:
+  - Reopen settings tab should locate to correct page (last release doesn't fix it properly)
+
+## 2109.0
 
 - Features
   - GCC diagnostics translation powered by [gcc-translation](https://github.com/Guyutongxue/gcc-translation)
