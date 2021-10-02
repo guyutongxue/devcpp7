@@ -47,7 +47,7 @@ export function getACP(): number {
 export const store = new Store<Configurations>({
   defaults: {
     'build.compileArgs': [
-      '-g', '-std=c++2a', 'DYN-fexec-charset'
+      '-g', '-std=c++20', 'DYN-fexec-charset'
     ],
     'env.mingwPath': '',
     'env.useBundledMingw': fs.existsSync(path.join(extraResourcesPath, "mingw64")),

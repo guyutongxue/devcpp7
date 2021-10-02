@@ -19,7 +19,7 @@ import { GdbController } from "tsgdbmi";
 import * as path from 'path';
 
 import { doCompile } from './build';
-import { extraResourcesPath, getWebContents, getWindow, typedIpcMain, store, getMingwPath } from '../basicUtil';
+import { getWebContents, getWindow, typedIpcMain, store, getMingwPath } from '../basicUtil';
 
 const gdb = new GdbController(store.get('advanced.ioEncoding'));
 gdb.onResponse(response => {

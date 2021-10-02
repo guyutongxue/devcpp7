@@ -27,7 +27,7 @@ $CLANGD_VERSION = "12.0.0";
 $DEFAULT_COMPILE_FLAGS = @(
   "-xc++",
   "--target=x86_64-pc-windows-gnu",
-  "-std=c++2a",
+  "-std=c++20",
   "-g"
 );
 
